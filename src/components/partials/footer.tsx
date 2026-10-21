@@ -2,7 +2,12 @@ import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import logoWithText from '@/assets/logo/logo-with-text.png';
 
-export default function Footer() {
+interface FooterProps {
+  isHidden?: boolean;
+}
+
+export default function Footer({ isHidden = false }: FooterProps) {
+  if (isHidden) return null;
   return (
     <footer className="w-full bg-[#FAF4E6] text-stone-800 pt-8 pb-6 px-4 sm:px-8 lg:px-14 font-sans select-none border-t border-stone-200">
       {/* Top Rounded Border Frame */}
