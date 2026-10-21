@@ -1,19 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Volume2, 
-  VolumeX, 
   Sparkles, 
   ChevronRight, 
   Play, 
   Pause, 
-  Heart,
-  Compass, 
-  Users, 
-  BookOpen, 
   Home as HomeIcon,
-  HelpCircle,
-  Layers
+  HelpCircle
 } from 'lucide-react';
 import SpotlightCanvas from './SpotlightCanvas';
 import { soundscape } from '@/lib/soundtrack';
