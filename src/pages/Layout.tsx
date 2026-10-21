@@ -10,7 +10,7 @@ export default function RootLayout() {
       <Preloader />
 
       <Navbar />
-      <main className="flex-grow w-full pt-[76px]">
+      <main className="flex-grow w-full pt-[74px]">
         <Outlet />
       </main>
       <Footer />

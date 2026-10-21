@@ -3,6 +3,7 @@
 ## 1. Global Typography
 * **Titles & Headings (`h1`, `h2`, `h3`, `h4`, `h5`, `h6`)**: `Playfair Display`, serif.
 * **Buttons (`button`, `[role="button"]`, `.btn`)**: `Playfair Display`, serif.
+* **Navigation Menu**: `Helvetica`, Regular (400), `16px`, `line-height: 24px`, `letter-spacing: 0%`, color: `#746343` (Active: `#ea580c`).
 * **Paragraphs, Body, Lists, Links, Form Inputs, Badges, & All Others**: `Helvetica`, `Arial`, sans-serif.
 
 ## 2. Core Palette
