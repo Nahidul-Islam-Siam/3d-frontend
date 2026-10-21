@@ -4,9 +4,9 @@ import logoWithText from '@/assets/logo/logo-with-text.png';
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#fbf8f2] text-stone-800 pt-8 pb-6 px-4 sm:px-8 lg:px-14 font-sans select-none border-t border-stone-200">
+    <footer className="w-full bg-[#FAF4E6] text-stone-800 pt-8 pb-6 px-4 sm:px-8 lg:px-14 font-sans select-none border-t border-stone-200">
       {/* Top Rounded Border Frame */}
-      <div className="max-w-7xl mx-auto rounded-t-[32px] border-t border-x border-orange-200/90 bg-[#faf6ee] px-6 sm:px-10 py-12 shadow-sm">
+      <div className="max-w-7xl mx-auto rounded-t-[32px] border-t border-x border-orange-200/90 bg-[#FAF4E6] px-6 sm:px-10 py-12 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
           {/* Col 1: Brand Info */}

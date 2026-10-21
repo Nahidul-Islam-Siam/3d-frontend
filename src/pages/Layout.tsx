@@ -5,7 +5,7 @@ import Preloader from "../components/common/Preloader";
 
 export default function RootLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#050505] text-[#f7f5f0] overflow-x-hidden selection:bg-[#F97316] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#FAF4E6] text-stone-900 overflow-x-hidden selection:bg-[#F97316] selection:text-white">
       {/* Edolus-style Left-to-Right Theatrical Preloader */}
       <Preloader />
 

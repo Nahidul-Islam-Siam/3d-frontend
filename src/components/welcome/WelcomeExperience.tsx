@@ -87,25 +87,22 @@ const dialogueSegments = [
 ];
 
 export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceProps) {
-  // Experience stages: 
-  // 0 = complete darkness
-  // 1 = warm spotlight & welcome
-  // 2 = cinematic montage
-  // 3 = curtain opening & COO on-camera
-  // 4 = hallway gateway
-  const [stage, setStage] = useState<number>(0);
+  // Starts directly at Stage 1: Spotlight on WELCOME (no placeholder darkness prompt)
+  const [stage, setStage] = useState<number>(1);
   const [montageIndex, setMontageIndex] = useState<number>(0);
   const [dialogueIndex, setDialogueIndex] = useState<number>(0);
   const [isPlayingDialogue, setIsPlayingDialogue] = useState<boolean>(true);
   const [showColorKey, setShowColorKey] = useState<boolean>(false);
 
-  // Step inside from complete darkness
-  const handleAwaken = () => {
-    if (stage === 0) {
-      setStage(1);
-      soundscape.start();
-    }
-  };
+  // Trigger soundscape and slowly reveal navbar as the spotlight grows
+  useEffect(() => {
+    // Reveal navbar gracefully after the WELCOME text is illuminated
+    const navTimer = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('reveal-navbar'));
+    }, 1400);
+
+    return () => clearTimeout(navTimer);
+  }, []);
 
   // Automatic cycle for montage when in stage 2
   useEffect(() => {
@@ -141,7 +138,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
   }, [stage, isPlayingDialogue]);
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-84px)] bg-[#050505] text-[#f7f5f0] overflow-hidden font-sans select-none flex flex-col justify-between">
+    <div className="relative w-full min-h-[calc(100vh-76px)] bg-[#050505] text-[#f7f5f0] overflow-hidden font-sans select-none flex flex-col justify-between">
       {/* 3D Dust and Ambient Lighting Canvas */}
       <SpotlightCanvas />
 
@@ -186,35 +183,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
         )}
       </AnimatePresence>
 
-      {/* STAGE 0: COMPLETE DARKNESS */}
-      <AnimatePresence>
-        {stage === 0 && (
-          <motion.div
-            key="stage-0"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.8 }}
-            onClick={handleAwaken}
-            className="fixed inset-0 z-40 bg-[#050505] flex flex-col items-center justify-center cursor-pointer px-6"
-          >
-            <motion.div 
-              animate={{ opacity: [0.3, 0.85, 0.3] }}
-              transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-              className="text-center space-y-4"
-            >
-              <div className="w-3 h-3 mx-auto rounded-full bg-amber-400/90 shadow-[0_0_25px_#f59e0b]" />
-              <p className="text-stone-300 text-sm md:text-base tracking-[0.3em] uppercase font-light">
-                Complete Darkness. Silence.
-              </p>
-              <p className="text-amber-400/80 text-xs font-mono tracking-widest pt-2">
-                Click anywhere to illuminate & awaken
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* STAGE 1: WARM SPOTLIGHT & "WELCOME" */}
+      {/* STAGE 1: WARM SPOTLIGHT & "WELCOME" (Directly illuminated on arrival) */}
       <AnimatePresence>
         {stage === 1 && (
           <motion.div
@@ -222,18 +191,21 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 1.4 }}
             className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-16 text-center"
           >
-            {/* Ambient Radial Spotlight */}
-            <div 
-              className="absolute pointer-events-none w-[600px] h-[600px] rounded-full blur-3xl opacity-40 bg-[radial-gradient(circle,rgba(251,191,36,0.35)_0%,rgba(180,83,9,0.15)_45%,transparent_75%)]"
+            {/* Ambient Radial Spotlight growing slowly */}
+            <motion.div 
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1.2, opacity: 0.45 }}
+              transition={{ duration: 2.5, ease: "easeOut" }}
+              className="absolute pointer-events-none w-[700px] h-[700px] rounded-full blur-3xl bg-[radial-gradient(circle,rgba(251,191,36,0.38)_0%,rgba(180,83,9,0.18)_45%,transparent_75%)]"
             />
 
             <motion.div
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.8, ease: "easeOut" }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 1.6, ease: "easeOut" }}
               className="relative space-y-6 max-w-3xl"
             >
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono uppercase tracking-[0.25em]">
@@ -241,14 +213,14 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
                 <span>Emotional Identity: Belonging</span>
               </div>
               
-              <h1 className="text-6xl sm:text-8xl md:text-9xl font-serif tracking-tight text-[#faf7f2] drop-shadow-[0_4px_40px_rgba(251,191,36,0.25)]">
+              <h1 className="text-6xl sm:text-8xl md:text-9xl font-serif font-bold tracking-tight text-[#faf7f2] drop-shadow-[0_4px_50px_rgba(251,191,36,0.3)]">
                 WELCOME
               </h1>
 
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 1 }}
+                transition={{ delay: 0.6, duration: 1.2 }}
                 className="space-y-2 font-serif text-2xl md:text-3xl text-stone-300 font-light"
               >
                 <p>We've been expecting you.</p>
@@ -260,12 +232,12 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.5, duration: 0.8 }}
+                transition={{ delay: 1.2, duration: 0.8 }}
                 className="pt-6"
               >
                 <button
                   onClick={() => setStage(2)}
-                  className="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 text-xs font-semibold tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(251,191,36,0.4)] font-mono"
+                  className="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-[#F97316] to-[#ea580c] hover:from-[#ea580c] hover:to-[#c2410c] text-white text-xs font-serif font-bold tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(249,115,22,0.4)]"
                 >
                   <span>Begin Cinematic Sequence</span>
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -314,7 +286,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
               </span>
               <button 
                 onClick={() => setStage(3)}
-                className="hover:text-amber-300 underline underline-offset-4 transition-colors"
+                className="hover:text-amber-300 underline underline-offset-4 transition-colors font-serif"
               >
                 Skip to Curtain & COO Welcome &rarr;
               </button>
@@ -336,7 +308,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
                   <span>{cinematicMoments[montageIndex].title}</span>
                 </div>
 
-                <h2 className="text-3xl md:text-5xl font-serif text-[#faf7f2] leading-tight">
+                <h2 className="text-3xl md:text-5xl font-serif font-bold text-[#faf7f2] leading-tight">
                   "{cinematicMoments[montageIndex].quote}"
                 </h2>
 
@@ -364,8 +336,8 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
                   <div 
                     className={`h-full transition-all duration-300 ${
                       idx === montageIndex 
-                        ? 'bg-amber-400 shadow-[0_0_10px_#f59e0b]' 
-                        : idx < montageIndex ? 'bg-amber-400/40' : 'bg-transparent'
+                        ? 'bg-[#F97316] shadow-[0_0_10px_#F97316]' 
+                        : idx < montageIndex ? 'bg-[#F97316]/40' : 'bg-transparent'
                     }`} 
                   />
                 </button>
@@ -418,7 +390,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
             {/* Top Bar with Director Note */}
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#F97316]">
                   Act II: The Encounter
                 </span>
                 <p className="text-xs text-stone-400 italic">
@@ -509,7 +481,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
 
               <button
                 onClick={() => onEnterHallway ? onEnterHallway() : setStage(4)}
-                className="group px-7 py-3 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-semibold text-xs tracking-widest uppercase transition-all shadow-[0_0_25px_rgba(251,191,36,0.4)] flex items-center gap-2"
+                className="group px-7 py-3 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white font-serif font-bold text-xs tracking-widest uppercase transition-all shadow-[0_0_25px_rgba(249,115,22,0.4)] flex items-center gap-2"
               >
                 <span>Step Into The Hallway</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -534,11 +506,11 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
             <div className="absolute inset-0 bg-gradient-to-b from-[#2b1810]/40 via-[#050505] to-[#120a06]" />
 
             <div className="relative z-10 max-w-2xl space-y-6">
-              <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-300">
+              <div className="w-16 h-16 mx-auto rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-[#F97316]">
                 <HomeIcon className="w-7 h-7" />
               </div>
 
-              <h2 className="text-4xl md:text-6xl font-serif text-[#faf7f2]">
+              <h2 className="text-4xl md:text-6xl font-serif font-bold text-[#faf7f2]">
                 Welcome Home.
               </h2>
 
@@ -548,19 +520,19 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6 text-left">
                 <div className="p-3.5 rounded-lg bg-stone-900/60 border border-stone-800 text-xs">
-                  <span className="text-amber-400 font-mono block mb-1">01</span>
+                  <span className="text-[#F97316] font-mono block mb-1">01</span>
                   <span className="text-stone-200 font-medium">Experience the Story</span>
                 </div>
                 <div className="p-3.5 rounded-lg bg-stone-900/60 border border-stone-800 text-xs">
-                  <span className="text-amber-400 font-mono block mb-1">02</span>
+                  <span className="text-[#F97316] font-mono block mb-1">02</span>
                   <span className="text-stone-200 font-medium">How We Serve</span>
                 </div>
                 <div className="p-3.5 rounded-lg bg-stone-900/60 border border-stone-800 text-xs">
-                  <span className="text-amber-400 font-mono block mb-1">03</span>
+                  <span className="text-[#F97316] font-mono block mb-1">03</span>
                   <span className="text-stone-200 font-medium">Join the Movement</span>
                 </div>
                 <div className="p-3.5 rounded-lg bg-stone-900/60 border border-stone-800 text-xs">
-                  <span className="text-amber-400 font-mono block mb-1">04</span>
+                  <span className="text-[#F97316] font-mono block mb-1">04</span>
                   <span className="text-stone-200 font-medium">Meet Us</span>
                 </div>
               </div>
