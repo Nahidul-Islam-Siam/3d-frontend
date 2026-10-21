@@ -70,13 +70,14 @@ export default function Navbar() {
     }
 
     const handleReveal = () => setIsRevealed(true);
-    window.addEventListener('reveal-navbar', handleReveal);
+    const handleHide = () => setIsRevealed(false);
 
-    const timer = setTimeout(() => setIsRevealed(true), 2000);
+    window.addEventListener('reveal-navbar', handleReveal);
+    window.addEventListener('hide-navbar', handleHide);
 
     return () => {
       window.removeEventListener('reveal-navbar', handleReveal);
-      clearTimeout(timer);
+      window.removeEventListener('hide-navbar', handleHide);
     };
   }, [isHomePage]);
 
