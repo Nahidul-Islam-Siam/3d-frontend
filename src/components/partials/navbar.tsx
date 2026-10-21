@@ -62,7 +62,28 @@ export default function Navbar() {
   const [audioActive, setAudioActive] = useState(false);
   const location = useLocation();
 
+  const isHomePage = location.pathname === '/';
+  const [isRevealed, setIsRevealed] = useState(!isHomePage);
+
   const toggleOpen = () => setIsOpen(!isOpen);
+
+  useEffect(() => {
+    if (!isHomePage) {
+      setIsRevealed(true);
+      return;
+    }
+
+    const handleReveal = () => setIsRevealed(true);
+    window.addEventListener('reveal-navbar', handleReveal);
+
+    // Fallback timer to ensure navbar always reveals smoothly
+    const timer = setTimeout(() => setIsRevealed(true), 2200);
+
+    return () => {
+      window.removeEventListener('reveal-navbar', handleReveal);
+      clearTimeout(timer);
+    };
+  }, [isHomePage]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,11 +113,14 @@ export default function Navbar() {
       
       <motion.nav 
         initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 h-[76px] z-50 transition-all duration-300 bg-[#faf6ee] border-b border-orange-100/80 ${
+        animate={{ 
+          y: isRevealed ? 0 : -60, 
+          opacity: isRevealed ? 1 : 0 
+        }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 h-[76px] z-50 transition-all duration-300 bg-[#FAF4E6] border-b border-orange-200/60 ${
           scrollY > 20 ? 'shadow-[0_4px_20px_rgba(0,0,0,0.04)]' : ''
-        }`}
+        } ${isRevealed ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-10 flex items-center justify-between">
           
@@ -141,7 +165,7 @@ export default function Navbar() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 6, scale: 0.98 }}
                           transition={{ duration: 0.18 }}
-                          className="absolute top-full -left-12 w-[380px] p-2.5 rounded-2xl bg-[#faf6ee] border border-orange-200/90 shadow-xl grid gap-1 text-left"
+                          className="absolute top-full -left-12 w-[380px] p-2.5 rounded-2xl bg-[#FAF4E6] border border-orange-200/90 shadow-xl grid gap-1 text-left"
                         >
                           <div className="px-3 py-1.5 border-b border-orange-100 text-[10px] font-mono tracking-wider text-[#ea580c] font-bold uppercase">
                             How We Serve Ministries

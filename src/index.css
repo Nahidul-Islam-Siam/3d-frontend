@@ -53,6 +53,11 @@
   * {
     @apply border-border;
   }
+
+  body {
+    background-color: #FAF4E6;
+    color: #1c1917;
+  }
   
   body, p, span, li, a, label, input, textarea, select {
     font-family: Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
