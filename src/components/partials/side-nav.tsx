@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { HiOutlineXMark } from "react-icons/hi2";
 import { Link } from 'react-router-dom';
+import logoWithText from '@/assets/logo/logo-with-text.png';
 import { 
   Sparkles, 
   Heart, 
@@ -12,8 +13,7 @@ import {
   Users, 
   HandHeart, 
   PhoneCall, 
-  Church, 
-  HelpCircle 
+  Church 
 } from 'lucide-react';
 
 interface SideNavProps {
@@ -78,19 +78,13 @@ export default function SideNav({ isOpen, handleClose }: SideNavProps) {
             <div>
               {/* Header */}
               <div className="flex items-center justify-between h-[80px] px-6 border-b border-stone-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-serif tracking-[0.2em] font-semibold text-[#fcfaf7] uppercase">
-                      Live Achieve Believe
-                    </span>
-                    <span className="text-[9px] font-mono tracking-widest text-amber-400 uppercase">
-                      People Matter
-                    </span>
-                  </div>
-                </div>
+                <Link to="/" onClick={handleClose}>
+                  <img 
+                    src={logoWithText} 
+                    alt="Live Achieve Believe" 
+                    className="h-7 w-auto object-contain"
+                  />
+                </Link>
 
                 <button
                   onClick={handleClose}
@@ -102,7 +96,7 @@ export default function SideNav({ isOpen, handleClose }: SideNavProps) {
 
               {/* Navigation Sections */}
               <div className="p-5 space-y-6">
-                {navSections.map((section, idx) => (
+                {navSections.map((section) => (
                   <div key={section.title} className="space-y-2">
                     <h3 className="text-[10px] font-mono uppercase tracking-widest text-amber-400/80 px-2">
                       {section.title}
@@ -133,9 +127,8 @@ export default function SideNav({ isOpen, handleClose }: SideNavProps) {
               <Link 
                 to="/contact" 
                 onClick={handleClose}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-semibold tracking-wider uppercase font-mono shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white text-xs font-serif font-bold tracking-wider shadow-sm transition-all"
               >
-                <Heart className="w-3.5 h-3.5 fill-current" />
                 <span>Give Hope / Donate</span>
               </Link>
               <p className="text-[10px] text-center text-stone-500 font-serif italic">

@@ -2,11 +2,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { CiMenuFries } from "react-icons/ci";
 import { 
-  Sparkles, 
-  Heart, 
+  ChevronDown, 
   Volume2, 
   VolumeX, 
-  ChevronDown, 
   Utensils, 
   GraduationCap, 
   BookHeart, 
@@ -16,6 +14,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import SideNav from "./side-nav";
 import { soundscape } from "@/lib/soundtrack";
+import logoWithText from "@/assets/logo/logo-with-text.png";
+import btnArrow from "@/assets/icons/btn-arrow.png";
 
 const ministries = [
   {
@@ -77,172 +77,175 @@ export default function Navbar() {
     setAudioActive(active);
   };
 
+  const navItems = [
+    { label: "Welcome", to: "/" },
+    { label: "Experience the Story", to: "/about" },
+    { label: "Who We Are", to: "/about#who-we-are" },
+    { label: "How We Serve", to: "/how-we-serve", hasDropdown: true },
+    { label: "Join the Movement", to: "/movement" },
+    { label: "Meet Us", to: "/about#team" },
+  ];
+
   return (
     <>
       <SideNav handleClose={toggleOpen} isOpen={isOpen} />
       
       <motion.nav 
-        initial={{ y: -80, opacity: 0 }}
+        initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 h-[84px] z-50 transition-all duration-300 ${
-          scrollY > 30 
-            ? 'bg-[#09090b]/90 border-b border-amber-500/20 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)]' 
-            : 'bg-gradient-to-b from-[#09090b]/95 via-[#09090b]/70 to-transparent'
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 h-[76px] z-50 transition-all duration-300 bg-[#faf6ee] border-b border-orange-100/80 ${
+          scrollY > 20 ? 'shadow-[0_4px_20px_rgba(0,0,0,0.04)]' : ''
         }`}
       >
-        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-10 flex items-center justify-between">
           
-          {/* Brand Logo & Tagline */}
-          <Link to="/" className="group flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/20 via-amber-600/10 to-transparent border border-amber-400/40 flex items-center justify-center text-amber-300 group-hover:scale-105 group-hover:border-amber-300 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm md:text-base font-serif tracking-[0.2em] font-semibold text-[#fcfaf7] group-hover:text-amber-200 transition-colors uppercase">
-                Live Achieve Believe
-              </span>
-              <span className="text-[10px] tracking-[0.25em] text-stone-400 uppercase font-mono">
-                People Matter
-              </span>
-            </div>
+          {/* 1. Official Brand Logo */}
+          <Link to="/" className="flex items-center flex-shrink-0">
+            <img 
+              src={logoWithText} 
+              alt="Live Achieve Believe" 
+              className="h-7 sm:h-8 w-auto object-contain" 
+            />
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-8 text-xs font-mono tracking-[0.16em] uppercase text-stone-300">
-            <Link 
-              to="/" 
-              className={`hover:text-amber-300 transition-colors py-2 relative ${
-                location.pathname === '/' ? 'text-amber-300' : ''
-              }`}
-            >
-              Welcome
-              {location.pathname === '/' && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 shadow-[0_0_8px_#fbbf24]" />
-              )}
-            </Link>
+          {/* 2. Desktop Navigation Links (Title-case, active orange dot) */}
+          <div className="hidden lg:flex items-center gap-7 text-[13px] font-sans font-medium text-stone-700">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.to || (item.to === '/about' && location.pathname === '/about' && !location.hash);
 
-            <Link 
-              to="/about" 
-              className="hover:text-amber-300 transition-colors py-2"
-            >
-              Experience the Story
-            </Link>
-
-            {/* How We Serve with Interactive Mega-Menu */}
-            <div 
-              className="relative py-2"
-              onMouseEnter={() => setIsServeOpen(true)}
-              onMouseLeave={() => setIsServeOpen(false)}
-            >
-              <button 
-                className="flex items-center gap-1.5 hover:text-amber-300 transition-colors uppercase"
-                onClick={() => setIsServeOpen(!isServeOpen)}
-              >
-                <span>How We Serve</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isServeOpen ? 'rotate-180 text-amber-400' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {isServeOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-full -left-20 w-[420px] p-3 rounded-2xl bg-[#0f0f12]/95 border border-amber-500/25 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] grid gap-1.5 text-left"
+              if (item.hasDropdown) {
+                return (
+                  <div 
+                    key={item.label}
+                    className="relative py-2"
+                    onMouseEnter={() => setIsServeOpen(true)}
+                    onMouseLeave={() => setIsServeOpen(false)}
                   >
-                    <div className="px-3 py-2 border-b border-stone-800 text-[10px] tracking-widest text-amber-400 font-semibold uppercase flex items-center justify-between">
-                      <span>The 5 Doorways of Compassion</span>
-                      <span className="text-stone-500">Hallway</span>
-                    </div>
+                    <button 
+                      className={`flex items-center gap-1 transition-colors hover:text-[#ea580c] ${
+                        location.pathname.startsWith('/how-we-serve') ? 'text-[#ea580c] font-semibold' : ''
+                      }`}
+                      onClick={() => setIsServeOpen(!isServeOpen)}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown className={`w-3.5 h-3.5 text-stone-500 transition-transform duration-200 ${
+                        isServeOpen ? 'rotate-180 text-[#ea580c]' : ''
+                      }`} />
+                    </button>
 
-                    {ministries.map((m) => {
-                      const Icon = m.icon;
-                      return (
-                        <Link
-                          key={m.title}
-                          to={m.to}
-                          onClick={() => setIsServeOpen(false)}
-                          className="group/item flex items-start gap-3 p-2.5 rounded-xl hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition-all"
+                    <AnimatePresence>
+                      {isServeOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                          transition={{ duration: 0.18 }}
+                          className="absolute top-full -left-12 w-[380px] p-2.5 rounded-2xl bg-[#faf6ee] border border-orange-200/90 shadow-xl grid gap-1 text-left"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-stone-900 border border-stone-800 flex items-center justify-center text-stone-300 group-hover/item:text-amber-300 group-hover/item:border-amber-400/40 transition-colors mt-0.5">
-                            <Icon className="w-4 h-4" />
+                          <div className="px-3 py-1.5 border-b border-orange-100 text-[10px] font-mono tracking-wider text-[#ea580c] font-bold uppercase">
+                            How We Serve Ministries
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-serif font-medium text-stone-100 group-hover/item:text-amber-200 normal-case">
-                                {m.title}
-                              </span>
-                              <span className="text-[9px] font-mono text-stone-400 bg-stone-900 px-1.5 py-0.5 rounded border border-stone-800">
-                                {m.tag}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-stone-400 normal-case font-sans">
-                              {m.subtitle}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
 
-            <Link 
-              to="/movement" 
-              className="hover:text-amber-300 transition-colors py-2"
-            >
-              Join the Movement
-            </Link>
+                          {ministries.map((m) => {
+                            const Icon = m.icon;
+                            return (
+                              <Link
+                                key={m.title}
+                                to={m.to}
+                                onClick={() => setIsServeOpen(false)}
+                                className="group/item flex items-start gap-3 p-2 rounded-xl hover:bg-orange-50/80 transition-colors"
+                              >
+                                <div className="w-7 h-7 rounded-lg bg-orange-100/70 text-[#ea580c] flex items-center justify-center mt-0.5">
+                                  <Icon className="w-3.5 h-3.5" />
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-medium text-stone-900 group-hover/item:text-[#ea580c]">
+                                      {m.title}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-stone-500 bg-white px-1.5 py-0.2 rounded border border-orange-100">
+                                      {m.tag}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-stone-500">
+                                    {m.subtitle}
+                                  </p>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              }
 
-            <Link 
-              to="/about" 
-              className="hover:text-amber-300 transition-colors py-2"
-            >
-              Meet Us
-            </Link>
+              return (
+                <Link 
+                  key={item.label}
+                  to={item.to} 
+                  className={`relative py-1.5 transition-colors hover:text-[#ea580c] ${
+                    isActive ? 'text-[#ea580c] font-semibold' : ''
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isActive && (
+                    <motion.span 
+                      layoutId="activeNavDot"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#ea580c] shadow-[0_0_8px_#ea580c]" 
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Right Action Cluster */}
+          {/* 3. Right Action Cluster: Audio + Pill Donate Button */}
           <div className="flex items-center gap-3">
-            {/* Audio Ambient Pill */}
+            {/* Subtle Piano Soundtrack Button */}
             <button
               onClick={toggleAudio}
-              title="Toggle warm piano ambient soundtrack"
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider bg-white/5 hover:bg-white/10 border border-white/10 text-stone-300 transition-all"
+              title="Toggle ambient piano soundscape"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono bg-orange-100/60 hover:bg-orange-200/60 text-stone-700 transition-colors"
             >
               {audioActive ? (
                 <>
-                  <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                  <span className="text-amber-300 text-[11px]">PIANO ON</span>
+                  <Volume2 className="w-3.5 h-3.5 text-[#ea580c] animate-pulse" />
+                  <span className="text-[#ea580c] text-[11px] font-bold">PIANO</span>
                 </>
               ) : (
                 <>
-                  <VolumeX className="w-3.5 h-3.5 text-stone-400" />
+                  <VolumeX className="w-3.5 h-3.5 text-stone-500" />
                   <span className="text-[11px]">SOUND</span>
                 </>
               )}
             </button>
 
-            {/* Donate / Give Hope CTA */}
+            {/* Official Orange Pill Donate CTA */}
             <Link to="/contact">
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-medium text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all font-mono"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="group inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white shadow-sm transition-all"
               >
-                <Heart className="w-3.5 h-3.5 fill-current text-stone-950 group-hover:scale-110 transition-transform" />
-                <span className="font-semibold">Donate / Give Hope</span>
+                <span className="font-serif font-bold text-sm tracking-wide">
+                  Donate
+                </span>
+                <img 
+                  src={btnArrow} 
+                  alt="" 
+                  className="h-5 w-auto object-contain group-hover:translate-x-0.5 transition-transform" 
+                />
               </motion.button>
             </Link>
 
-            {/* Mobile Menu Hamburger */}
+            {/* Mobile Hamburger */}
             <button
               onClick={toggleOpen}
-              aria-label="Open mobile menu"
-              className="lg:hidden p-2 rounded-xl text-stone-300 hover:text-amber-300 hover:bg-white/5 transition-colors"
+              aria-label="Open navigation menu"
+              className="lg:hidden p-2 rounded-xl text-stone-700 hover:text-[#ea580c] hover:bg-orange-100/50 transition-colors"
             >
               <CiMenuFries className="w-6 h-6" />
             </button>
