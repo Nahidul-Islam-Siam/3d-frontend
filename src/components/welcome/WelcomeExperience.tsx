@@ -25,42 +25,74 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
   // Starts as unrevealed cinema on every load/refresh
   const [isRevealed, setIsRevealed] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(26);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [showControls, setShowControls] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
 
-  // Sync video start with preloader wipe: Never play in the background before preloader is done
+  // Sync video start with preloader wipe: Sound ON by default
   useEffect(() => {
+    // Gesture listener to unmute if browser policy initially required user interaction
+    const handleFirstGesture = () => {
+      if (videoRef.current && videoRef.current.muted) {
+        videoRef.current.muted = false;
+        setIsMuted(false);
+      }
+    };
+    window.addEventListener('pointerdown', handleFirstGesture, { once: true });
+    window.addEventListener('keydown', handleFirstGesture, { once: true });
+
+    const startPlaybackWithSound = () => {
+      if (!videoRef.current) return;
+      videoRef.current.currentTime = 0;
+      videoRef.current.muted = false;
+      setIsMuted(false);
+
+      videoRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(() => {
+          // Fallback to muted if browser blocks unmuted autoplay without prior interaction
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            setIsMuted(true);
+            videoRef.current.play().catch(() => {});
+            setIsPlaying(true);
+          }
+        });
+    };
+
     const isDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
     if (isDone) {
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
-        setIsPlaying(true);
-      }
-      return;
+      startPlaybackWithSound();
+      return () => {
+        window.removeEventListener('pointerdown', handleFirstGesture);
+        window.removeEventListener('keydown', handleFirstGesture);
+      };
     }
 
     // Freeze video at 0.00 while preloader is on screen
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
+      videoRef.current.muted = false;
       setIsPlaying(false);
     }
 
     const handlePreloaderComplete = () => {
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
-        setIsPlaying(true);
-      }
+      startPlaybackWithSound();
     };
 
     window.addEventListener('preloader-complete', handlePreloaderComplete);
-    return () => window.removeEventListener('preloader-complete', handlePreloaderComplete);
+    return () => {
+      window.removeEventListener('preloader-complete', handlePreloaderComplete);
+      window.removeEventListener('pointerdown', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+    };
   }, []);
 
   // Trigger the grand reveal sequence (navbar glides in, video docks into card, footer unlocks)
