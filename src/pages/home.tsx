@@ -1,5 +1,6 @@
 import Seo from '../components/Seo';
 import WelcomeExperience from '@/components/welcome/WelcomeExperience';
+import ExpectingYouSection from '@/components/welcome/ExpectingYouSection';
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
         description="An invitation to experience a place where compassion becomes action, hope becomes visible, and every story matters." 
       />
       <WelcomeExperience />
+      <ExpectingYouSection />
     </>
   );
 }

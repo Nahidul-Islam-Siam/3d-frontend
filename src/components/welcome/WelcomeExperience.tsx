@@ -32,6 +32,37 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
   const [showControls, setShowControls] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
 
+  // Sync video start with preloader wipe: Never play in the background before preloader is done
+  useEffect(() => {
+    const isDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
+    if (isDone) {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+      return;
+    }
+
+    // Freeze video at 0.00 while preloader is on screen
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+
+    const handlePreloaderComplete = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+    };
+
+    window.addEventListener('preloader-complete', handlePreloaderComplete);
+    return () => window.removeEventListener('preloader-complete', handlePreloaderComplete);
+  }, []);
+
   // Trigger the grand reveal sequence (navbar glides in, video docks into card, footer unlocks)
   const triggerReveal = useCallback(() => {
     setIsRevealed(true);
@@ -40,6 +71,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
       document.body.style.overflow = '';
     }
   }, []);
+  
 
   // Lock body scroll during full cinema intro, but detect scroll intent to trigger reveal
   useEffect(() => {
@@ -242,7 +274,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
             ref={videoRef}
             src={welcomeVideo}
             playsInline
-            autoPlay
+            preload="auto"
             muted={isMuted}
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}

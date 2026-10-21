@@ -30,6 +30,13 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         setTimeout(() => {
           setIsDone(true);
           if (onComplete) onComplete();
+          // Dispatch right when the wipe starts revealing the screen
+          setTimeout(() => {
+            if (typeof window !== 'undefined') {
+              (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+              window.dispatchEvent(new CustomEvent('preloader-complete'));
+            }
+          }, 600); // Halfway through the 1.2s wipe so screen is clear
         }, 500); // Elegant hold at 100%
       }
     }, 28);
