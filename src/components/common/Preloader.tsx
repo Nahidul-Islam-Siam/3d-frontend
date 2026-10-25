@@ -45,7 +45,15 @@ export default function Preloader({ onComplete }: PreloaderProps) {
   }, [onComplete]);
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence 
+      mode="wait"
+      onExitComplete={() => {
+        if (typeof window !== 'undefined') {
+          (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+          window.dispatchEvent(new CustomEvent('preloader-complete'));
+        }
+      }}
+    >
       {!isDone && (
         <div className="fixed inset-0 z-[100] pointer-events-none select-none overflow-hidden font-sans">
           

@@ -73,3 +73,67 @@
     font-family: 'Playfair Display', Georgia, serif;
   }
 }
+
+/* Lenis Smooth Scroll Optimization */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ─── HIDE DEFAULT SCROLLBAR (Cross-Browser: Chrome, Safari, Edge, Firefox) ─── */
+html, body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+/* Utility to explicitly hide scrollbar on any container */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Modal Custom Scrollbar */
+.custom-modal-scrollbar {
+  -ms-overflow-style: auto;
+  scrollbar-width: thin;
+}
+.custom-modal-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 7px;
+}
+.custom-modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 9999px;
+}
+.custom-modal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.6);
+  border-radius: 9999px;
+}
+.custom-modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.9);
+}
