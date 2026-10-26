@@ -1,8 +1,7 @@
 {
-  "name": "3d-frontend",
+  "name": "live achive believe",
   "private": true,
   "version": "1.0.0",
-  "description": "A modern SaaS starter template built with React, Redux Toolkit, TypeScript, and Tailwind CSS.",
   "license": "MIT",
   "type": "module",
   "scripts": {
