@@ -20,6 +20,7 @@ import doorsSectionImg from '@/assets/welcome/doors-section.png';
 import seenImg from '@/assets/welcome/seen.png';
 import heardImg from '@/assets/welcome/heard.png';
 import hopeImg from '@/assets/welcome/hope.png';
+import auditionBanner from '../../assets/welcome/audition_banner.png';
 import showdownPoster from '@/assets/welcome/showdown-poster.png';
 import leftLeaf from '@/assets/icons/Group.png';
 import rightLeaf from '@/assets/icons/Group-2.png';
@@ -231,11 +232,11 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
         className={`relative rounded-[14px] sm:rounded-[18px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/15 bg-black shrink-0 ${onOpenModal ? 'cursor-pointer group' : ''}`}
       >
         <img
-          src={showdownPoster}
+          src={isModal ? showdownPoster : auditionBanner}
           alt="Showdown Suicide Awareness Event - Where Are You Now? Letters to Etcetera"
           className={isModal 
             ? "w-full h-auto object-cover block" 
-            : "h-auto max-h-[calc(100vh-215px)] sm:max-h-[calc(100vh-225px)] w-auto max-w-full aspect-[1978/2560] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.01]"
+            : "h-auto max-h-[calc(100vh-215px)] sm:max-h-[calc(100vh-225px)] w-auto max-w-full aspect-[1978/1620] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.01]"
           }
         />
         {onOpenModal && (
@@ -916,7 +917,7 @@ export default function ZAxisStage() {
               CHAPTER 4: "WHAT'S COMING UP NEXT" (0.72 to 0.88)
               ═══════════════════════════════════════════════════════════════ */}
           {(() => {
-            const z = getChapterTransform(scrollProgress, 0.70, 0.76, 0.87, 0.92);
+            const z = getChapterTransform(scrollProgress, 0.70, 0.76, 0.86, 0.91);
             return (
               <div
                 style={{
@@ -928,7 +929,7 @@ export default function ZAxisStage() {
                   transformStyle: 'preserve-3d',
                   willChange: 'transform, opacity',
                 }}
-                className="absolute inset-0 w-full h-full overflow-y-auto overscroll-contain custom-modal-scrollbar bg-gradient-to-b from-[#2B173E] via-[#1B0C2A] to-[#140820] text-white px-4 sm:px-6 md:px-10 py-10 sm:py-14"
+                className="absolute inset-0 w-full h-full flex flex-col justify-center items-center bg-[#140820] text-white pt-[78px] sm:pt-[82px] pb-4 px-4 sm:px-6 select-none overflow-hidden"
               >
                 {/* Purple ambient backlights */}
                 <div 
@@ -938,7 +939,7 @@ export default function ZAxisStage() {
 
                 <div 
                   style={{ transform: 'translateZ(30px)', transformStyle: 'preserve-3d' }}
-                  className="w-full relative z-10"
+                  className="w-full relative z-10 flex flex-col items-center justify-center"
                 >
                   <ShowdownSection onOpenModal={openFlyerModal} />
                 </div>
@@ -950,7 +951,7 @@ export default function ZAxisStage() {
               CHAPTER 5: "YOU WERE EXPECTED." + SANCTUARY (0.88 to 1.00)
               ═══════════════════════════════════════════════════════════════ */}
           {(() => {
-            const z = getChapterTransform(scrollProgress, 0.87, 0.92, 1.00, 1.00, true);
+            const z = getChapterTransform(scrollProgress, 0.90, 0.94, 1.00, 1.00, true);
             return (
               <div
                 style={{
