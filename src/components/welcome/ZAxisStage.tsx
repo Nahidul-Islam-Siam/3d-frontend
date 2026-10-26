@@ -13,6 +13,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // Assets
 import welcomeVideo from '@/assets/video/welcome.mp4';
@@ -32,6 +34,7 @@ import FigmaButton from '@/components/common/FigmaButton';
 import Footer from '@/components/partials/footer';
 import SpotlightCanvas from './SpotlightCanvas';
 
+gsap.registerPlugin(ScrollTrigger);
 
 const stats = [
   { value: "12,400+", label: "Meals Shared", icon: mealsIcon },
@@ -52,135 +55,6 @@ const pillars = [
   { title: 'HEARD', subtitle: 'Every story deserves a voice.', image: heardImg },
   { title: 'HOPE', subtitle: 'Every person deserves hope.', image: hopeImg },
 ];
-
-interface ChapterTransform {
-  transform: string;
-  opacity: number;
-  pointerEvents: 'auto' | 'none';
-  visibility: 'visible' | 'hidden';
-  zIndex: number;
-}
-
-// 3D fly-through transformation with deep camera dolly tunnel (Edolus vibes)
-function getChapterTransform(
-  progress: number,
-  enterStart: number,
-  enterEnd: number,
-  exitStart: number,
-  exitEnd: number,
-  isLastChapter: boolean = false
-): ChapterTransform {
-  // Before arrival: waiting deep back in 3D tunnel
-  if (progress < enterStart) {
-    return {
-      transform: 'translateZ(-750px) scale(0.68) translateY(55px) rotateX(4deg)',
-      opacity: 0,
-      pointerEvents: 'none',
-      visibility: 'hidden',
-      zIndex: 5,
-    };
-  }
-
-  // Incoming 3D Dolly Entrance: flying towards camera from deep Z space
-  if (progress >= enterStart && progress < enterEnd) {
-    const rawRatio = (progress - enterStart) / (enterEnd - enterStart);
-    // Smooth cubic deceleration as it locks into the focal plane
-    const easeOutCubic = 1 - Math.pow(1 - rawRatio, 3);
-    const translateZ = -750 * (1 - easeOutCubic);
-    const scale = 0.68 + 0.32 * easeOutCubic;
-    const translateY = 55 * (1 - easeOutCubic);
-    const rotateX = 4 * (1 - easeOutCubic);
-    const opacity = Math.min(1, Math.pow(rawRatio, 0.75));
-
-    return {
-      transform: `translateZ(${translateZ}px) scale(${scale}) translateY(${translateY}px) rotateX(${rotateX}deg)`,
-      opacity,
-      pointerEvents: rawRatio > 0.5 ? 'auto' : 'none',
-      visibility: 'visible',
-      zIndex: 20,
-    };
-  }
-
-  // Active reading plateau: subtle continuous cinematic float through space
-  if (progress >= enterEnd && (isLastChapter || progress <= exitStart)) {
-    const span = Math.max(0.001, exitStart - enterEnd);
-    const rawRatio = Math.min(1, Math.max(0, (progress - enterEnd) / span));
-    // Gentle forward dolly drift (Edolus floating camera feel)
-    const microZ = 35 * rawRatio;
-    const microScale = 1.0 + 0.025 * rawRatio;
-    return {
-      transform: `translateZ(${microZ}px) scale(${microScale}) translateY(0px) rotateX(0deg)`,
-      opacity: 1,
-      pointerEvents: 'auto',
-      visibility: 'visible',
-      zIndex: 25,
-    };
-  }
-
-  // Outgoing 3D Fly-Through Exit: flying PAST the camera into positive Z space (Edolus fly-through)
-  if (!isLastChapter && progress > exitStart && progress <= exitEnd) {
-    const rawRatio = (progress - exitStart) / (exitEnd - exitStart);
-    // Accelerating curve as camera punches through the section
-    const easeInCubic = Math.pow(rawRatio, 2.2);
-    const translateZ = 35 + 680 * easeInCubic;
-    const scale = 1.025 + 0.35 * easeInCubic;
-    const translateY = -45 * easeInCubic;
-    const rotateX = -3 * easeInCubic;
-    // Dissolves outward as it sweeps past camera lens
-    const opacity = Math.max(0, 1 - Math.pow(rawRatio, 1.25));
-
-    return {
-      transform: `translateZ(${translateZ}px) scale(${scale}) translateY(${translateY}px) rotateX(${rotateX}deg)`,
-      opacity,
-      pointerEvents: rawRatio < 0.25 ? 'auto' : 'none',
-      visibility: 'visible',
-      zIndex: 30,
-    };
-  }
-
-  // Passed completely (beyond camera plane)
-  return {
-    transform: 'translateZ(720px) scale(1.38) translateY(-45px)',
-    opacity: 0,
-    pointerEvents: 'none',
-    visibility: 'hidden',
-    zIndex: 5,
-  };
-}
-
-function getVideoTransform(progress: number): ChapterTransform {
-  if (progress <= 0.15) {
-    return {
-      transform: 'translateZ(0px) scale(1)',
-      opacity: 1,
-      pointerEvents: 'auto',
-      visibility: 'visible',
-      zIndex: 25,
-    };
-  }
-  if (progress <= 0.22) {
-    const rawRatio = (progress - 0.15) / 0.07;
-    const easeIn = Math.pow(rawRatio, 2);
-    const translateZ = 680 * easeIn;
-    const scale = 1 + 0.35 * easeIn;
-    const rotateX = -2.5 * easeIn;
-    const opacity = Math.max(0, 1 - Math.pow(rawRatio, 1.3));
-    return {
-      transform: `translateZ(${translateZ}px) scale(${scale}) rotateX(${rotateX}deg)`,
-      opacity,
-      pointerEvents: rawRatio < 0.25 ? 'auto' : 'none',
-      visibility: 'visible',
-      zIndex: 20,
-    };
-  }
-  return {
-    transform: 'translateZ(700px) scale(1.35)',
-    opacity: 0,
-    pointerEvents: 'none',
-    visibility: 'hidden',
-    zIndex: 5,
-  };
-}
 
 interface ShowdownSectionProps {
   isModal?: boolean;
@@ -366,57 +240,61 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
 }
 
 export default function ZAxisStage() {
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pinnedStageRef = useRef<HTMLDivElement | null>(null);
+  const stageBgRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // States
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  // Chapter DOM refs for GSAP animation
+  const ch0Ref = useRef<HTMLDivElement | null>(null);
+  const ch1Ref = useRef<HTMLDivElement | null>(null);
+  const ch2Ref = useRef<HTMLDivElement | null>(null);
+  const ch3Ref = useRef<HTMLDivElement | null>(null);
+  const ch4Ref = useRef<HTMLDivElement | null>(null);
+  const ch5Ref = useRef<HTMLDivElement | null>(null);
+
+  // Discrete application state
   const [isVideoFinished, setIsVideoFinished] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const navbarRevealedRef = useRef<boolean>(false);
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState<boolean>(false);
+  const [isReducedMotion, setIsReducedMotion] = useState<boolean>(false);
+
+  const navbarRevealedRef = useRef<boolean>(false);
+  const hasStartedPlaybackRef = useRef<boolean>(false);
 
   const openFlyerModal = () => {
     setIsFlyerModalOpen(true);
   };
 
-  // Close flyer modal on Escape & lock background scroll
+  // Close flyer modal on Escape, coordinate body overflow & Lenis scroll lock
   useEffect(() => {
+    const lenis = (window as unknown as { __lenis?: { stop: () => void; start: () => void } }).__lenis;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsFlyerModalOpen(false);
       }
     };
+
     if (isFlyerModalOpen) {
       window.addEventListener('keydown', handleKeyDown);
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
+      lenis?.stop();
+
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
         document.body.style.overflow = prevOverflow;
+        lenis?.start();
       };
     }
   }, [isFlyerModalOpen]);
 
-  // Mouse tilt parallax
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  // Camera velocity and inertia pitch (Edolus 3D camera feel)
-  const [currentVelocity, setCurrentVelocity] = useState<number>(0);
-  const [cameraPitch, setCameraPitch] = useState<number>(0);
-  const currentPitchRef = useRef<number>(0);
-
-  // Smooth lerping target progress
-  const targetProgressRef = useRef<number>(0);
-
-  // Handle Video Metadata & Playback Timing
-  const hasStartedPlaybackRef = useRef<boolean>(false);
-
+  // Video playback management & preloader coordination
   const startVideoPlayback = () => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Reset to beginning so viewer experiences the video from second 0
     if (!hasStartedPlaybackRef.current) {
       hasStartedPlaybackRef.current = true;
       video.currentTime = 0;
@@ -433,8 +311,7 @@ export default function ZAxisStage() {
           setIsMuted(false);
         })
         .catch(() => {
-          // If browser policy blocks unmuted autoplay without prior interaction,
-          // play muted first so video starts immediately after loading ends, and unmute on first interaction
+          // Autoplay policy fallback: start muted and unmute on first user interaction
           video.muted = true;
           setIsMuted(true);
           video.play().catch(() => {});
@@ -476,14 +353,13 @@ export default function ZAxisStage() {
     setIsVideoFinished(true);
   };
 
-  // Video will start after loading ends
+  // Video starts when preloader completes
   useEffect(() => {
     const isAlreadyDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
 
     if (isAlreadyDone) {
       startVideoPlayback();
     } else {
-      // Ensure video is paused at start (time 0) while preloader is active
       if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
@@ -500,132 +376,389 @@ export default function ZAxisStage() {
     };
   }, []);
 
-  // Scroll Progress Tracking with Lenis & window support
+  // ═════════════════════════════════════════════════════════════════
+  // GSAP SCROLLTRIGGER MASTER TIMELINE CHOREOGRAPHY
+  // ═════════════════════════════════════════════════════════════════
   useEffect(() => {
-    const updateTarget = () => {
-      if (!scrollContainerRef.current) return;
-      const totalScrollable = scrollContainerRef.current.offsetHeight - window.innerHeight;
-      if (totalScrollable <= 0) return;
-
-      const progress = Math.max(0, Math.min(1, window.scrollY / totalScrollable));
-      targetProgressRef.current = progress;
-    };
-
-    window.addEventListener('scroll', updateTarget, { passive: true });
-    window.addEventListener('resize', updateTarget, { passive: true });
-    updateTarget();
-
-    // Attach to Lenis instance if available
-    const lenisInstance = (window as unknown as { __lenis?: { on: (event: string, cb: () => void) => void } }).__lenis;
-    if (lenisInstance && typeof lenisInstance.on === 'function') {
-      lenisInstance.on('scroll', updateTarget);
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      setIsReducedMotion(true);
+      return;
     }
 
-    return () => {
-      window.removeEventListener('scroll', updateTarget);
-      window.removeEventListener('resize', updateTarget);
-    };
-  }, []);
+    const ctx = gsap.context(() => {
+      const stageBg = stageBgRef.current;
+      const ch0 = ch0Ref.current;
+      const ch1 = ch1Ref.current;
+      const ch2 = ch2Ref.current;
+      const ch3 = ch3Ref.current;
+      const ch4 = ch4Ref.current;
+      const ch5 = ch5Ref.current;
 
-  // Snappy, energetic RAF loop for animated damping, 3D inertia & video scrubbing
-  useEffect(() => {
-    let rafId: number;
-    let currentProgress = targetProgressRef.current;
-
-    const loop = () => {
-      const target = targetProgressRef.current;
-      const diff = target - currentProgress;
-
-      // Track frame velocity for 3D warp particle motes
-      setCurrentVelocity(diff);
-
-      // Responsive, animated interpolation damping
-      if (Math.abs(diff) > 0.0001) {
-        currentProgress += diff * 0.22;
-        setScrollProgress(currentProgress);
-      } else if (currentProgress !== target) {
-        currentProgress = target;
-        setScrollProgress(target);
+      if (!stageBg || !ch0 || !ch1 || !ch2 || !ch3 || !ch4 || !containerRef.current || !pinnedStageRef.current) {
+        return;
       }
 
-      // On scroll while video ends, navbar will show
-      const shouldRevealNavbar = currentProgress >= 0.14 || (isVideoFinished && currentProgress > 0.04);
-      if (shouldRevealNavbar !== navbarRevealedRef.current) {
-        navbarRevealedRef.current = shouldRevealNavbar;
-        window.dispatchEvent(new CustomEvent(shouldRevealNavbar ? 'reveal-navbar' : 'hide-navbar'));
+      // Initial resting properties
+      gsap.set([ch1, ch2, ch3, ch4], {
+        autoAlpha: 0,
+        y: 35,
+        scale: 0.985,
+      });
+      gsap.set(ch0, {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+      });
+      gsap.set(stageBg, {
+        backgroundColor: '#000000',
+      });
+
+      const mm = gsap.matchMedia();
+
+      mm.add({
+        isDesktop: "(min-width: 1024px)",
+        isMobile: "(max-width: 1023px)"
+      }, (context) => {
+        const { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
+        const scrollDistance = isDesktop ? 5200 : 4200;
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top top',
+            end: `+=${scrollDistance}`,
+            pin: pinnedStageRef.current,
+            scrub: 1.0,
+            anticipatePin: 1,
+            onUpdate: (self) => {
+              const p = self.progress;
+
+              // Navbar reveal threshold
+              const shouldReveal = p >= 0.08 || (isVideoFinished && p > 0.02);
+              if (shouldReveal !== navbarRevealedRef.current) {
+                navbarRevealedRef.current = shouldReveal;
+                window.dispatchEvent(new CustomEvent(shouldReveal ? 'reveal-navbar' : 'hide-navbar'));
+              }
+
+              // Pause video when out of view, resume when back at top
+              if (videoRef.current) {
+                if (p > 0.16 && !videoRef.current.paused) {
+                  videoRef.current.pause();
+                } else if (p <= 0.16 && videoRef.current.paused) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }
+            },
+          },
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        // MASTER CHOREOGRAPHY: 10.4 Total Timeline Units
+        // ─────────────────────────────────────────────────────────────
+
+        // Chapter 0: Visually rock solid from 0.0 to 1.0
+        // Transition Ch 0 -> Ch 1: 1.0 to 1.8
+        tl.to(ch0, {
+          autoAlpha: 0,
+          y: -30,
+          scale: 1.015,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 1.0)
+        .to(stageBg, {
+          backgroundColor: '#FAF4E6',
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 1.0)
+        .to(ch1, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 1.0);
+
+        // Chapter 1 Plateau: 1.8 to 3.2 (rock-solid reading interval)
+        // Transition Ch 1 -> Ch 2: 3.2 to 4.0
+        tl.to(ch1, {
+          autoAlpha: 0,
+          y: -28,
+          scale: 0.985,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 3.2)
+        .to(stageBg, {
+          backgroundColor: '#201308',
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 3.2)
+        .to(ch2, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 3.2);
+
+        // Chapter 2 Plateau: 4.0 to 5.4 (stable four-door exploration)
+        // Transition Ch 2 -> Ch 3: 5.4 to 6.2
+        tl.to(ch2, {
+          autoAlpha: 0,
+          y: -28,
+          scale: 0.985,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 5.4)
+        .to(stageBg, {
+          backgroundColor: '#FAF4E6',
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 5.4)
+        .to(ch3, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 5.4);
+
+        // Chapter 3 Plateau: 6.2 to 7.6 (stable 3 pillars reading interval)
+        // Transition Ch 3 -> Ch 4: 7.6 to 8.4
+        tl.to(ch3, {
+          autoAlpha: 0,
+          y: -28,
+          scale: 0.985,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 7.6)
+        .to(stageBg, {
+          backgroundColor: '#140820',
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 7.6)
+        .to(ch4, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 7.6);
+
+        // Chapter 4 Plateau: 8.4 to 9.6 (stable audition showcase)
+        // Transition Ch 4 -> Finale: 9.6 to 10.4
+        tl.to(ch4, {
+          autoAlpha: 0,
+          y: -28,
+          scale: 0.985,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 9.6)
+        .to(stageBg, {
+          backgroundColor: '#FAF4E6',
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 9.6);
+      });
+
+      // Chapter 5 Entrance Animation as user scrolls past the pinned container
+      if (ch5) {
+        gsap.fromTo(ch5, 
+          { autoAlpha: 0.2, y: 40, scale: 0.99 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            ease: 'power1.out',
+            scrollTrigger: {
+              trigger: ch5,
+              start: 'top 90%',
+              end: 'top 45%',
+              scrub: 1.0,
+            }
+          }
+        );
       }
+    }, containerRef);
 
-      // Dynamic 3D camera pitch based on scroll inertia (Edolus camera fly-through)
-      const targetPitch = Math.max(-4.5, Math.min(4.5, -diff * 120));
-      currentPitchRef.current += (targetPitch - currentPitchRef.current) * 0.16;
-      setCameraPitch(currentPitchRef.current);
-
-      // Manage video playback based on chapter visibility
-      if (videoRef.current) {
-        if (currentProgress > 0.22 && !videoRef.current.paused) {
-          videoRef.current.pause();
-        } else if (currentProgress <= 0.18 && videoRef.current.paused) {
-          videoRef.current.play().catch(() => {});
-        }
-      }
-
-      rafId = requestAnimationFrame(loop);
-    };
-
-    rafId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafId);
+    return () => ctx.revert();
   }, [isVideoFinished]);
 
-  // Mouse move tilt
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const { clientX, clientY } = e;
-    const x = (clientX / window.innerWidth - 0.5) * 3;
-    const y = (clientY / window.innerHeight - 0.5) * -3;
-    setTilt({ x, y });
-  };
+  // ═════════════════════════════════════════════════════════════════
+  // REDUCED MOTION ACCESSIBILITY LAYOUT
+  // ═════════════════════════════════════════════════════════════════
+  if (isReducedMotion) {
+    return (
+      <div className="w-full bg-[#FAF4E6] text-stone-900">
+        {/* Chapter 0: Hero */}
+        <section className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
+          <video
+            ref={videoRef}
+            src={welcomeVideo}
+            playsInline
+            controls
+            preload="auto"
+            className="w-full h-full object-cover"
+          />
+        </section>
 
-  const videoZ = getVideoTransform(scrollProgress);
+        {/* Chapter 1: Welcome */}
+        <section className="relative w-full min-h-screen bg-[#FAF4E6] py-20 px-6 sm:px-12 lg:px-20 flex items-center justify-center">
+          <div className="max-w-[1200px] w-full mx-auto space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              <div className="lg:col-span-5 space-y-4">
+                <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Chapter 01</span>
+                </div>
+                <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="text-4xl sm:text-5xl font-bold text-[#F97316] leading-tight uppercase">
+                  WE’VE BEEN<br />EXPECTING YOU.
+                </h2>
+                <div className="space-y-1.5 text-sm sm:text-base text-[#6E6259]">
+                  <p>Every person has a story.</p>
+                  <p>Every story deserves to be heard.</p>
+                  <p>Every person deserves hope.</p>
+                </div>
+              </div>
+              <div className="lg:col-span-7 flex flex-col items-start lg:items-end text-left lg:text-right space-y-4">
+                <p style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="text-lg sm:text-xl lg:text-[22px] leading-relaxed max-w-xl">
+                  <span className="font-bold text-[#18181B]">This isn’t simply a website.</span>{" "}
+                  <span className="text-[#7A6B60]">It’s an invitation to experience a place where compassion becomes action, hope becomes visible, and </span>
+                  <span className="font-bold text-[#18181B]">Every story matters.</span>
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <FigmaButton to="/how-we-serve" variant="primary">Find Your Pathway</FigmaButton>
+                  <FigmaButton to="/movement" variant="outline">Explore The Show</FigmaButton>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-orange-200">
+              {stats.map((s) => (
+                <div key={s.label} className="flex items-center gap-3.5">
+                  <img src={s.icon} alt="" className="w-11 h-11 object-contain" />
+                  <div>
+                    <div className="text-2xl sm:text-3xl font-serif font-bold text-[#231F20]">{s.value}</div>
+                    <div className="text-xs text-[#6E6259]">{s.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
+        {/* Chapter 2: Doors */}
+        <section className="relative w-full min-h-screen bg-[#201308] py-20 px-4 flex items-center justify-center">
+          <div className="relative aspect-[1920/1080] max-w-[1400px] w-full">
+            <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-contain" />
+            {doors.map((d) => (
+              <Link
+                key={d.id}
+                to={d.path}
+                title={d.title}
+                aria-label={`${d.title} - ${d.subtitle}`}
+                style={{ left: d.left, width: d.width, top: '12%', bottom: '6%' }}
+                className="absolute z-20 cursor-pointer block"
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Chapter 3: Pillars */}
+        <section className="relative w-full min-h-screen bg-[#FAF4E6] py-20 px-6 sm:px-12 lg:px-20 flex items-center justify-center">
+          <div className="max-w-[1200px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-5 space-y-4">
+              <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chapter 03</span>
+              </div>
+              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="text-4xl sm:text-5xl font-bold uppercase leading-tight">
+                <span className="text-[#18181B]">EVERY </span>
+                <span className="text-[#F97316]">STORY</span>
+                <br />
+                <span className="text-[#18181B]">MATTERS.</span>
+              </h2>
+              <p className="text-sm sm:text-base text-[#6E6259] leading-relaxed max-w-md">
+                Every story carries meaning, and every voice deserves to be heard. Experience an inspiring journey of real stories, human connection, and hope.
+              </p>
+            </div>
+            <div className="lg:col-span-7 grid grid-cols-3 gap-4 sm:gap-6">
+              {pillars.map((p) => (
+                <div key={p.title} className="flex flex-col items-center text-center">
+                  <div className="w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-stone-200 shadow-md">
+                    <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                  </div>
+                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="mt-3.5 text-lg font-bold text-[#18181B] uppercase">
+                    {p.title}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[#7A6B60]">{p.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Chapter 4: Audition Showdown */}
+        <section className="relative w-full min-h-screen bg-[#140820] py-20 px-4 flex items-center justify-center">
+          <ShowdownSection onOpenModal={openFlyerModal} />
+        </section>
+
+        {/* Chapter 5: Sanctuary Invitation */}
+        <section className="relative w-full bg-[#FAF4E6] py-24 px-6 flex items-center justify-center">
+          <div className="max-w-[760px] mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Chapter 05 • Welcome Home</span>
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="text-4xl sm:text-5xl font-bold uppercase">
+              <span className="text-[#18181B]">YOU WERE </span>
+              <span className="text-[#F97316]">EXPECTED.</span>
+            </h2>
+            <div className="space-y-2.5 text-sm sm:text-base text-[#6E6259] max-w-xl mx-auto">
+              <p>Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.</p>
+              <p>Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.</p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              <FigmaButton to="/about" variant="primary">Explore Our Story</FigmaButton>
+              <FigmaButton to="/movement" variant="outline">Join the Movement</FigmaButton>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <Footer />
+      </div>
+    );
+  }
+
+  // ═════════════════════════════════════════════════════════════════
+  // STANDARD CINEMATIC GSAP SCROLLTRIGGER STAGE
+  // ═════════════════════════════════════════════════════════════════
   return (
-    // Brisk 750vh scroll distance: lively, animated progression without dragging slowly
-    <div 
-      ref={scrollContainerRef} 
-      className="relative w-full h-[750vh] bg-black select-none"
-    >
-      {/* ─── FIXED CINEMATIC VIEWPORT (100vw x 100vh) ─── */}
+    <div className="relative w-full select-none bg-[#FAF4E6]">
+      {/* ─── PINNED CONTAINER (Holds Chapters 0 to 4 in a unified cinematic stage) ─── */}
       <div 
-        onMouseMove={handleMouseMove}
-        style={{
-          perspective: '1000px',
-          perspectiveOrigin: '50% 50%',
-        }}
-        className="fixed inset-0 w-screen h-screen overflow-hidden bg-[#0A0502] flex items-center justify-center z-10"
+        ref={containerRef} 
+        className="relative w-full"
       >
-        {/* Dynamic 3D Camera Rig with Mouse Look & Inertial Pitch */}
         <div 
-          style={{
-            transform: `rotateX(${tilt.y + cameraPitch}deg) rotateY(${tilt.x}deg)`,
-            transformStyle: 'preserve-3d',
-            transition: 'transform 0.15s cubic-bezier(0.1, 1, 0.1, 1)',
-          }}
-          className="relative w-full h-full flex items-center justify-center"
+          ref={pinnedStageRef}
+          className="relative w-full h-screen overflow-hidden flex items-center justify-center"
         >
-          {/* Ambient motes in 3D depth reacting to scroll velocity */}
-          <SpotlightCanvas velocity={currentVelocity} />
+          {/* Animated Background Color Layer */}
+          <div 
+            ref={stageBgRef}
+            className="absolute inset-0 w-full h-full pointer-events-none z-0 transition-colors duration-100 ease-linear"
+          />
+
+          {/* Ambient 3D Particle Canvas */}
+          <SpotlightCanvas />
 
           {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 0: FULL-SCREEN VIDEO (0.00 to 0.18)
+              CHAPTER 0: FULL-SCREEN VIDEO HERO
               ═══════════════════════════════════════════════════════════════ */}
           <div
-            style={{
-              transform: videoZ.transform,
-              opacity: videoZ.opacity,
-              zIndex: videoZ.zIndex,
-              pointerEvents: videoZ.pointerEvents,
-              visibility: videoZ.visibility,
-              willChange: 'transform, opacity',
-            }}
-            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black overflow-hidden"
+            ref={ch0Ref}
+            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black overflow-hidden z-10 will-change-transform will-change-opacity"
           >
             <video
               ref={videoRef}
@@ -637,454 +770,327 @@ export default function ZAxisStage() {
               onEnded={handleVideoEnded}
               className="w-full h-full object-cover pointer-events-none"
             />
-
             {/* Ambient Vignette */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 1: "WE'VE BEEN EXPECTING YOU." (0.15 to 0.40)
+              CHAPTER 1: "WE'VE BEEN EXPECTING YOU."
               ═══════════════════════════════════════════════════════════════ */}
-          {(() => {
-            const z = getChapterTransform(scrollProgress, 0.15, 0.22, 0.34, 0.40);
-            return (
-              <div
-                style={{
-                  transform: z.transform,
-                  opacity: z.opacity,
-                  zIndex: z.zIndex,
-                  pointerEvents: z.pointerEvents,
-                  visibility: z.visibility,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, opacity',
-                }}
-                className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#FAF4E6] px-6 sm:px-12 lg:px-20"
-              >
-                {/* Decorative flourish leaves in deep background layer */}
-                <img 
-                  src={leftLeaf} 
-                  alt="" 
-                  style={{ transform: 'translateZ(-25px)' }}
-                  className="absolute left-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
-                />
-                <img 
-                  src={rightLeaf} 
-                  alt="" 
-                  style={{ transform: 'translateZ(-25px)' }}
-                  className="absolute right-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
-                />
+          <div
+            ref={ch1Ref}
+            className="absolute inset-0 w-full h-full flex items-center justify-center px-6 sm:px-12 lg:px-20 z-20 will-change-transform will-change-opacity"
+          >
+            {/* Decorative flourish leaves */}
+            <img 
+              src={leftLeaf} 
+              alt="" 
+              className="absolute left-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
+            />
+            <img 
+              src={rightLeaf} 
+              alt="" 
+              className="absolute right-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
+            />
 
-                <div 
-                  style={{ transform: 'translateZ(30px)', transformStyle: 'preserve-3d' }}
-                  className="max-w-[1200px] w-full mx-auto relative z-10 space-y-10 sm:space-y-12"
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                    
-                    {/* Left Column */}
-                    <div 
-                      style={{ transform: 'translateZ(25px)' }}
-                      className="lg:col-span-5 space-y-4"
-                    >
-                      <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Chapter 01</span>
-                      </div>
-                      <h2 
-                        style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                        className="text-4xl sm:text-5xl lg:text-[52px] font-playfair font-bold text-[#F97316] tracking-tight leading-[1.06] uppercase"
-                      >
-                        WE’VE BEEN<br />EXPECTING YOU.
-                      </h2>
-                      <div className="space-y-1.5 text-sm sm:text-base text-[#6E6259] font-sans">
-                        <p>Every person has a story.</p>
-                        <p>Every story deserves to be heard.</p>
-                        <p>Every person deserves hope.</p>
-                      </div>
-                    </div>
-
-                    {/* Right Column */}
-                    <div 
-                      style={{ transform: 'translateZ(25px)' }}
-                      className="lg:col-span-7 flex flex-col items-start lg:items-end text-left lg:text-right space-y-4"
-                    >
-                      <p 
-                        style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                        className="text-lg sm:text-xl lg:text-[22px] font-playfair leading-[1.4] max-w-xl text-left lg:text-right"
-                      >
-                        <span className="font-bold text-[#18181B]">This isn’t simply a website.</span>{" "}
-                        <span className="text-[#7A6B60]">
-                          It’s an invitation to experience a place where compassion becomes action, hope becomes visible, and{" "}
-                        </span>
-                        <span className="font-bold text-[#18181B]">Every story matters.</span>
-                      </p>
-
-                      <p 
-                        style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                        className="text-lg sm:text-xl font-playfair font-semibold text-[#F97316]"
-                      >
-                        Including yours.
-                      </p>
-
-                      <div 
-                        style={{ transform: 'translateZ(30px)' }}
-                        className="flex flex-wrap items-center gap-3 pt-1"
-                      >
-                        <FigmaButton to="/how-we-serve" variant="primary">
-                          Find Your Pathway
-                        </FigmaButton>
-                        <FigmaButton to="/movement" variant="outline">
-                          Explore The Show
-                        </FigmaButton>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* 4 Stat Badges */}
-                  <div 
-                    style={{ transform: 'translateZ(20px)' }}
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-orange-200/80"
-                  >
-                    {stats.map((s) => (
-                      <div key={s.label} className="flex items-center gap-3.5 group">
-                        <img src={s.icon} alt="" className="w-11 h-11 object-contain flex-shrink-0 group-hover:scale-105 transition-transform" />
-                        <div>
-                          <div className="text-2xl sm:text-3xl font-serif font-bold text-[#231F20] leading-none">
-                            {s.value}
-                          </div>
-                          <div className="text-xs text-[#6E6259] mt-1 whitespace-nowrap">
-                            {s.label}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 2: "WHERE WOULD YOU LIKE TO GO?" (0.36 to 0.54)
-              ═══════════════════════════════════════════════════════════════ */}
-          {(() => {
-            const z = getChapterTransform(scrollProgress, 0.34, 0.40, 0.52, 0.58);
-            return (
-              <div
-                style={{
-                  transform: z.transform,
-                  opacity: z.opacity,
-                  zIndex: z.zIndex,
-                  pointerEvents: z.pointerEvents,
-                  visibility: z.visibility,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, opacity',
-                }}
-                className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#201308] overflow-hidden select-none"
-              >
-                {/* 3D Doors Graphic - 1:1 identical to Figma design frame without duplicate headers or frames */}
-                <div 
-                  style={{ transform: 'translateZ(10px)', transformStyle: 'preserve-3d' }}
-                  className="relative w-full h-full max-w-[1920px] pt-[74px] pb-6 px-4 flex items-center justify-center"
-                >
-                  <div 
-                    style={{ transformStyle: 'preserve-3d' }}
-                    className="relative aspect-[1920/1080] max-h-full max-w-full w-full h-auto flex items-center justify-center"
-                  >
-                    <img 
-                      src={doorsSectionImg} 
-                      alt="Where would you like to go? Four open doors" 
-                      className="w-full h-full object-contain block select-none pointer-events-none" 
-                    />
-
-                    {/* Clickable links positioned over each door (no overlay or highlight) */}
-                    {doors.map((d) => (
-                      <Link
-                        key={d.id}
-                        to={d.path}
-                        title={d.title}
-                        aria-label={`${d.title} - ${d.subtitle}`}
-                        style={{
-                          left: d.left,
-                          width: d.width,
-                          top: '12%',
-                          bottom: '6%',
-                        }}
-                        className="absolute z-20 cursor-pointer block"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 3: "EVERY STORY MATTERS." (0.54 to 0.72)
-              ═══════════════════════════════════════════════════════════════ */}
-          {(() => {
-            const z = getChapterTransform(scrollProgress, 0.52, 0.58, 0.70, 0.76);
-            return (
-              <div
-                style={{
-                  transform: z.transform,
-                  opacity: z.opacity,
-                  zIndex: z.zIndex,
-                  pointerEvents: z.pointerEvents,
-                  visibility: z.visibility,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, opacity',
-                }}
-                className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#FAF4E6] px-6 sm:px-12 lg:px-20"
-              >
-                <div 
-                  style={{ transform: 'translateZ(30px)', transformStyle: 'preserve-3d' }}
-                  className="max-w-[1200px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
-                >
-                  
-                  {/* Left Column */}
-                  <div 
-                    style={{ transform: 'translateZ(25px)' }}
-                    className="lg:col-span-5 space-y-4"
-                  >
-                    <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Chapter 03</span>
-                    </div>
-
-                    <h2 
-                      style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                      className="text-4xl sm:text-5xl lg:text-[50px] font-bold tracking-tight uppercase leading-[1.08]"
-                    >
-                      <span className="text-[#18181B]">EVERY </span>
-                      <span className="text-[#F97316]">STORY</span>
-                      <br />
-                      <span className="text-[#18181B]">MATTERS.</span>
-                    </h2>
-
-                    <p className="text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-md">
-                      Every story carries meaning, and every voice deserves to be heard. Experience an inspiring journey of real stories, human connection, and hope.
-                    </p>
-                  </div>
-
-                  {/* Right Column: 3 Pillar Cards */}
-                  <div 
-                    style={{ transform: 'translateZ(20px)', transformStyle: 'preserve-3d' }}
-                    className="lg:col-span-7 grid grid-cols-3 gap-4 sm:gap-6"
-                  >
-                    {pillars.map((p) => (
-                      <div 
-                        key={p.title} 
-                        style={{ transformStyle: 'preserve-3d' }}
-                        className="group flex flex-col items-center text-center cursor-default transition-transform duration-300 hover:scale-105"
-                      >
-                        <div 
-                          style={{ transform: 'translateZ(25px)' }}
-                          className="w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-stone-200 shadow-md border border-[#ecdac2] group-hover:shadow-2xl transition-all duration-500"
-                        >
-                          <img
-                            src={p.image}
-                            alt={p.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                          />
-                        </div>
-                        <h3 
-                          style={{ 
-                            fontFamily: "'Playfair Display', Georgia, serif",
-                            transform: 'translateZ(35px)' 
-                          }}
-                          className="mt-3.5 text-lg sm:text-xl font-bold tracking-wider text-[#18181B] uppercase group-hover:text-[#F97316] transition-colors"
-                        >
-                          {p.title}
-                        </h3>
-                        <p 
-                          style={{ transform: 'translateZ(20px)' }}
-                          className="mt-0.5 text-xs text-[#7A6B60] font-sans"
-                        >
-                          {p.subtitle}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 4: "WHAT'S COMING UP NEXT" (0.72 to 0.88)
-              ═══════════════════════════════════════════════════════════════ */}
-          {(() => {
-            const z = getChapterTransform(scrollProgress, 0.70, 0.76, 0.86, 0.91);
-            return (
-              <div
-                style={{
-                  transform: z.transform,
-                  opacity: z.opacity,
-                  zIndex: z.zIndex,
-                  pointerEvents: z.pointerEvents,
-                  visibility: z.visibility,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, opacity',
-                }}
-                className="absolute inset-0 w-full h-full flex flex-col justify-center items-center bg-[#140820] text-white pt-[78px] sm:pt-[82px] pb-4 px-4 sm:px-6 select-none overflow-hidden"
-              >
-                {/* Purple ambient backlights */}
-                <div 
-                  style={{ transform: 'translateZ(-40px)' }}
-                  className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#F97316]/15 rounded-full blur-[100px] pointer-events-none" 
-                />
-
-                <div 
-                  style={{ transform: 'translateZ(30px)', transformStyle: 'preserve-3d' }}
-                  className="w-full relative z-10 flex flex-col items-center justify-center"
-                >
-                  <ShowdownSection onOpenModal={openFlyerModal} />
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 5: "YOU WERE EXPECTED." + SANCTUARY (0.88 to 1.00)
-              ═══════════════════════════════════════════════════════════════ */}
-          {(() => {
-            const z = getChapterTransform(scrollProgress, 0.90, 0.94, 1.00, 1.00, true);
-            return (
-              <div
-                style={{
-                  transform: z.transform,
-                  opacity: z.opacity,
-                  zIndex: z.zIndex,
-                  pointerEvents: z.pointerEvents,
-                  visibility: z.visibility,
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, opacity',
-                }}
-                className="absolute inset-0 w-full h-full flex flex-col justify-between items-center bg-[#FAF4E6] pt-16 sm:pt-20 pb-0 px-0 overflow-y-auto overscroll-contain custom-modal-scrollbar"
-              >
-                {/* Flourish leaves in deep plane */}
-                <img 
-                  src={leftLeaf} 
-                  alt="" 
-                  style={{ transform: 'translateZ(-25px)' }}
-                  className="absolute left-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
-                />
-                <img 
-                  src={rightLeaf} 
-                  alt="" 
-                  style={{ transform: 'translateZ(-25px)' }}
-                  className="absolute right-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
-                />
-
-                {/* Main Sanctuary Invitation */}
-                <div 
-                  style={{ transform: 'translateZ(35px)', transformStyle: 'preserve-3d' }}
-                  className="max-w-[760px] mx-auto text-center my-auto space-y-6 relative z-10 px-6 sm:px-10 py-6"
-                >
+            <div className="max-w-[1200px] w-full mx-auto relative z-10 space-y-10 sm:space-y-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                
+                {/* Left Column */}
+                <div className="lg:col-span-5 space-y-4">
                   <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Chapter 05 • Welcome Home</span>
+                    <span>Chapter 01</span>
                   </div>
-
-                  <h2
+                  <h2 
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
+                    className="text-4xl sm:text-5xl lg:text-[52px] font-playfair font-bold text-[#F97316] tracking-tight leading-[1.06] uppercase"
                   >
-                    <span className="text-[#18181B]">YOU WERE </span>
-                    <span className="text-[#F97316]">EXPECTED.</span>
+                    WE’VE BEEN<br />EXPECTING YOU.
                   </h2>
-
-                  <div className="space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
-                    <p>
-                      Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
-                    </p>
-                    <p>
-                      Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.
-                    </p>
+                  <div className="space-y-1.5 text-sm sm:text-base text-[#6E6259] font-sans">
+                    <p>Every person has a story.</p>
+                    <p>Every story deserves to be heard.</p>
+                    <p>Every person deserves hope.</p>
                   </div>
+                </div>
 
-                  <div 
-                    style={{ transform: 'translateZ(30px)' }}
-                    className="flex flex-wrap items-center justify-center gap-4 pt-2"
+                {/* Right Column */}
+                <div className="lg:col-span-7 flex flex-col items-start lg:items-end text-left lg:text-right space-y-4">
+                  <p 
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    className="text-lg sm:text-xl lg:text-[22px] font-playfair leading-[1.4] max-w-xl text-left lg:text-right"
                   >
-                    <FigmaButton to="/about" variant="primary">
-                      Explore Our Story
+                    <span className="font-bold text-[#18181B]">This isn’t simply a website.</span>{" "}
+                    <span className="text-[#7A6B60]">
+                      It’s an invitation to experience a place where compassion becomes action, hope becomes visible, and{" "}
+                    </span>
+                    <span className="font-bold text-[#18181B]">Every story matters.</span>
+                  </p>
+
+                  <p 
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    className="text-lg sm:text-xl font-playfair font-semibold text-[#F97316]"
+                  >
+                    Including yours.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <FigmaButton to="/how-we-serve" variant="primary">
+                      Find Your Pathway
                     </FigmaButton>
                     <FigmaButton to="/movement" variant="outline">
-                      Join the Movement
+                      Explore The Show
                     </FigmaButton>
                   </div>
                 </div>
 
-                {/* ─── OFFICIAL FULL FIGMA FOOTER (Full Width) ─── */}
-                <div 
-                  style={{ transform: 'translateZ(20px)' }}
-                  className="w-full pt-8 pb-0 relative z-10 shrink-0"
-                >
-                  <Footer className="w-full px-4 sm:px-6 md:px-10 lg:px-12 xl:px-16 pt-0 pb-6 bg-transparent" />
-                </div>
-
               </div>
-            );
-          })()}
 
-        </div>
+              {/* 4 Stat Badges */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-orange-200/80">
+                {stats.map((s) => (
+                  <div key={s.label} className="flex items-center gap-3.5 group">
+                    <img src={s.icon} alt="" className="w-11 h-11 object-contain flex-shrink-0 group-hover:scale-105 transition-transform" />
+                    <div>
+                      <div className="text-2xl sm:text-3xl font-serif font-bold text-[#231F20] leading-none">
+                        {s.value}
+                      </div>
+                      <div className="text-xs text-[#6E6259] mt-1 whitespace-nowrap">
+                        {s.label}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-        {/* ─── SHOWDOWN FULL FLYER MODAL (Portaled to document.body with z-[99999]) ─── */}
-        {typeof document !== 'undefined' && createPortal(
-          <AnimatePresence>
-            {isFlyerModalOpen && (
-              <div 
-                className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 md:p-6"
-                onWheel={(e) => e.stopPropagation()}
-                onTouchMove={(e) => e.stopPropagation()}
-              >
-                {/* Dark blur backdrop covering the whole screen including navbar */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  onClick={() => setIsFlyerModalOpen(false)}
-                  className="fixed inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
+            </div>
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════════
+              CHAPTER 2: "WHERE WOULD YOU LIKE TO GO?" (Four Doors)
+              ═══════════════════════════════════════════════════════════════ */}
+          <div
+            ref={ch2Ref}
+            className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden select-none z-20 will-change-transform will-change-opacity"
+          >
+            <div className="relative w-full h-full max-w-[1920px] pt-[74px] pb-6 px-4 flex items-center justify-center">
+              <div className="relative aspect-[1920/1080] max-h-full max-w-full w-full h-auto flex items-center justify-center">
+                <img 
+                  src={doorsSectionImg} 
+                  alt="Where would you like to go? Four open doors" 
+                  className="w-full h-full object-contain block select-none pointer-events-none" 
                 />
 
-                {/* Modal Dialog Container */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.92, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.94, y: 15 }}
-                  transition={{ type: 'spring', damping: 28, stiffness: 340 }}
-                  className="relative z-10 flex flex-col w-full max-w-[880px] h-[92vh] bg-[#14061F] border border-orange-500/30 rounded-[20px] sm:rounded-[24px] shadow-[0_25px_80px_rgba(0,0,0,0.95)] overflow-hidden"
-                >
-                  {/* Floating Close Button */}
-                  <button
-                    onClick={() => setIsFlyerModalOpen(false)}
-                    aria-label="Close modal"
-                    className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 p-2 rounded-full bg-black/60 hover:bg-black/90 text-stone-300 hover:text-white border border-white/20 transition-all cursor-pointer backdrop-blur-md shadow-lg"
-                  >
-                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-
-                  {/* Modal Content - Scrollable complete Figma design with full-width banner */}
-                  <div 
-                    data-lenis-prevent
-                    className="flex-1 min-h-0 bg-gradient-to-b from-[#14061F] via-[#0E0316] to-[#0A0210] overflow-y-auto overscroll-contain custom-modal-scrollbar p-4 sm:p-8"
-                  >
-                    <ShowdownSection isModal={true} />
-                  </div>
-                </motion.div>
+                {/* 4 Exact interactive door hitboxes linking to destinations */}
+                {doors.map((d) => (
+                  <Link
+                    key={d.id}
+                    to={d.path}
+                    title={d.title}
+                    aria-label={`${d.title} - ${d.subtitle}`}
+                    style={{
+                      left: d.left,
+                      width: d.width,
+                      top: '12%',
+                      bottom: '6%',
+                    }}
+                    className="absolute z-20 cursor-pointer block"
+                  />
+                ))}
               </div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
+            </div>
+          </div>
 
+          {/* ═══════════════════════════════════════════════════════════════
+              CHAPTER 3: "EVERY STORY MATTERS." (Three Pillars)
+              ═══════════════════════════════════════════════════════════════ */}
+          <div
+            ref={ch3Ref}
+            className="absolute inset-0 w-full h-full flex items-center justify-center px-6 sm:px-12 lg:px-20 z-20 will-change-transform will-change-opacity"
+          >
+            <div className="max-w-[1200px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              
+              {/* Left Column */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Chapter 03</span>
+                </div>
 
+                <h2 
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-4xl sm:text-5xl lg:text-[50px] font-bold tracking-tight uppercase leading-[1.08]"
+                >
+                  <span className="text-[#18181B]">EVERY </span>
+                  <span className="text-[#F97316]">STORY</span>
+                  <br />
+                  <span className="text-[#18181B]">MATTERS.</span>
+                </h2>
+
+                <p className="text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-md">
+                  Every story carries meaning, and every voice deserves to be heard. Experience an inspiring journey of real stories, human connection, and hope.
+                </p>
+              </div>
+
+              {/* Right Column: 3 Pillar Cards */}
+              <div className="lg:col-span-7 grid grid-cols-3 gap-4 sm:gap-6">
+                {pillars.map((p) => (
+                  <div 
+                    key={p.title} 
+                    className="group flex flex-col items-center text-center cursor-default transition-transform duration-300 hover:scale-105"
+                  >
+                    <div className="w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-stone-200 shadow-md border border-[#ecdac2] group-hover:shadow-2xl transition-all duration-500">
+                      <img
+                        src={p.image}
+                        alt={p.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                    </div>
+                    <h3 
+                      style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                      className="mt-3.5 text-lg sm:text-xl font-bold tracking-wider text-[#18181B] uppercase group-hover:text-[#F97316] transition-colors"
+                    >
+                      {p.title}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-[#7A6B60] font-sans">
+                      {p.subtitle}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════════
+              CHAPTER 4: "WHAT'S COMING UP NEXT" (Audition Showdown)
+              ═══════════════════════════════════════════════════════════════ */}
+          <div
+            ref={ch4Ref}
+            className="absolute inset-0 w-full h-full flex flex-col justify-center items-center text-white pt-[78px] sm:pt-[82px] pb-4 px-4 sm:px-6 select-none overflow-hidden z-20 will-change-transform will-change-opacity"
+          >
+            {/* Ambient Backlight */}
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#F97316]/15 rounded-full blur-[100px] pointer-events-none" />
+
+            <div className="w-full relative z-10 flex flex-col items-center justify-center">
+              <ShowdownSection onOpenModal={openFlyerModal} />
+            </div>
+          </div>
+
+        </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          CHAPTER 5: "YOU WERE EXPECTED." (Sanctuary Invitation)
+          Seamless natural flow out of the pinned sequence into the finale
+          ═══════════════════════════════════════════════════════════════ */}
+      <section 
+        ref={ch5Ref}
+        className="relative w-full min-h-[75vh] flex flex-col justify-center items-center bg-[#FAF4E6] px-6 sm:px-10 pt-20 pb-16 overflow-hidden z-20 will-change-transform will-change-opacity"
+      >
+        {/* Flourish leaves */}
+        <img 
+          src={leftLeaf} 
+          alt="" 
+          className="absolute left-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
+        />
+        <img 
+          src={rightLeaf} 
+          alt="" 
+          className="absolute right-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
+        />
+
+        {/* Main Sanctuary Invitation Card */}
+        <div className="max-w-[760px] mx-auto text-center space-y-6 relative z-10 px-4 my-auto">
+          <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Chapter 05 • Welcome Home</span>
+          </div>
+
+          <h2
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
+          >
+            <span className="text-[#18181B]">YOU WERE </span>
+            <span className="text-[#F97316]">EXPECTED.</span>
+          </h2>
+
+          <div className="space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
+            <p>
+              Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
+            </p>
+            <p>
+              Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <FigmaButton to="/about" variant="primary">
+              Explore Our Story
+            </FigmaButton>
+            <FigmaButton to="/movement" variant="outline">
+              Join the Movement
+            </FigmaButton>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── NATURAL CONTINUATION: FULL-WIDTH OFFICIAL FOOTER ─── */}
+      <div className="relative w-full z-30 bg-[#FAF4E6]">
+        <Footer />
+      </div>
+
+      {/* ─── SHOWDOWN FULL FLYER MODAL (Portaled to document.body) ─── */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isFlyerModalOpen && (
+            <div 
+              className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 md:p-6"
+              onWheel={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+            >
+              {/* Dark blur backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                onClick={() => setIsFlyerModalOpen(false)}
+                className="fixed inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
+              />
+
+              {/* Modal Dialog Container */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 15 }}
+                transition={{ type: 'spring', damping: 28, stiffness: 340 }}
+                className="relative z-10 flex flex-col w-full max-w-[880px] h-[92vh] bg-[#14061F] border border-orange-500/30 rounded-[20px] sm:rounded-[24px] shadow-[0_25px_80px_rgba(0,0,0,0.95)] overflow-hidden"
+              >
+                {/* Floating Close Button */}
+                <button
+                  onClick={() => setIsFlyerModalOpen(false)}
+                  aria-label="Close modal"
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 p-2 rounded-full bg-black/60 hover:bg-black/90 text-stone-300 hover:text-white border border-white/20 transition-all cursor-pointer backdrop-blur-md shadow-lg"
+                >
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+
+                {/* Modal Content */}
+                <div 
+                  data-lenis-prevent
+                  className="flex-1 min-h-0 bg-gradient-to-b from-[#14061F] via-[#0E0316] to-[#0A0210] overflow-y-auto overscroll-contain custom-modal-scrollbar p-4 sm:p-8"
+                >
+                  <ShowdownSection isModal={true} />
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
     </div>
   );
 }
