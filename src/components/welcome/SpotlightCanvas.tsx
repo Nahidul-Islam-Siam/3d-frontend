@@ -28,7 +28,9 @@ function AtmosphericMotes({ count = 160, velocity = 0 }: AtmosphericMotesProps) 
       const array = positionsAttr.array as Float32Array;
 
       // 3D forward stream along Z: ambient drift + scroll velocity warp
-      const scrollPush = velocity * 45;
+      const lenis = typeof window !== 'undefined' ? (window as unknown as { __lenis?: { velocity?: number } }).__lenis : null;
+      const effectiveVelocity = velocity !== 0 ? velocity : (lenis && typeof lenis.velocity === 'number' ? lenis.velocity * 0.003 : 0);
+      const scrollPush = effectiveVelocity * 45;
 
       for (let i = 0; i < count; i++) {
         // Slow ambient vertical float
