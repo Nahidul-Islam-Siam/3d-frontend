@@ -455,8 +455,8 @@ export default function ZAxisStage() {
         isMobile: "(max-width: 1023px)"
       }, (context) => {
         const { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
-        // Increased scroll travel by ~35% for a deliberate, cinematic pacing
-        const scrollDistance = isDesktop ? 7000 : 5500;
+        // Pinned scroll distance calibrated to end at Chapter 4 without trailing blank space
+        const scrollDistance = isDesktop ? 6000 : 4600;
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -464,7 +464,7 @@ export default function ZAxisStage() {
             start: 'top top',
             end: `+=${scrollDistance}`,
             pin: pinnedStageRef.current,
-            scrub: 1.0,
+            scrub: 0.4,
             anticipatePin: 1,
             onUpdate: (self) => {
               const p = self.progress;
@@ -702,82 +702,36 @@ export default function ZAxisStage() {
           ease: 'power2.out',
         }, 11.55);
 
-        // ═════════════════════════════════════════════════════════════
-        // CHAPTER 4: What's Coming Up Next (Audition Showcase)
-        // Plateau: 12.2 to 14.0 (Generous 1.8 units = ~830px reading hold)
-        // Transition Ch 4 -> Finale: 14.0 to 15.2
-        // ═════════════════════════════════════════════════════════════
-        tl.to('.ch4-pill', {
-          autoAlpha: 0,
-          y: 10,
-          duration: 0.5,
-          ease: 'power1.in',
-        }, 14.0)
-        .to(['.ch4-banner', '.ch4-header'], {
-          autoAlpha: 0,
-          y: -25,
-          scale: 0.97,
-          duration: 0.9,
-          ease: 'power1.inOut',
-        }, 14.1)
-        .to('.ch4-glow', {
-          autoAlpha: 0,
-          scale: 0.9,
-          duration: 0.8,
-          ease: 'power1.in',
-        }, 14.2)
-        .to(ch4, {
-          autoAlpha: 0,
-          duration: 0.5,
-        }, 14.7)
-        .to(stageBg, {
-          backgroundColor: '#FAF4E6',
-          duration: 1.2,
-          ease: 'power1.inOut',
-        }, 14.0);
+        // Reading hold on Chapter 4: Chapter 4 stays fully visible in the viewport.
+        // It is NOT faded out to a blank section.
+        tl.to({}, { duration: 1.2 }, 12.0);
       });
 
       // Chapter 5 Entrance Animation as user scrolls past the pinned container
       if (ch5) {
-        const ch5Tl = gsap.timeline({
+        gsap.from(ch5.querySelectorAll('.ch5-badge, .ch5-heading, .ch5-body, .ch5-buttons'), {
+          autoAlpha: 0,
+          y: 28,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: ch5,
             start: 'top 85%',
-            end: 'top 30%',
-            scrub: 1.0,
+            toggleActions: 'play none none none',
           }
         });
 
-        ch5Tl.fromTo('.ch5-badge', 
-          { autoAlpha: 0, y: 25 }, 
-          { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 
-          0
-        )
-        .fromTo('.ch5-heading', 
-          { autoAlpha: 0, y: 35 }, 
-          { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 
-          0.1
-        )
-        .fromTo('.ch5-body', 
-          { autoAlpha: 0, y: 25 }, 
-          { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 
-          0.2
-        )
-        .fromTo('.ch5-buttons', 
-          { autoAlpha: 0, y: 20, scale: 0.97 }, 
-          { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, ease: 'power2.out' }, 
-          0.3
-        )
-        .fromTo('.ch5-leaf-left', 
-          { autoAlpha: 0, x: -25 }, 
-          { autoAlpha: 0.6, x: 0, duration: 0.9, ease: 'power1.out' }, 
-          0.15
-        )
-        .fromTo('.ch5-leaf-right', 
-          { autoAlpha: 0, x: 25 }, 
-          { autoAlpha: 0.6, x: 0, duration: 0.9, ease: 'power1.out' }, 
-          0.15
-        );
+        gsap.from(ch5.querySelectorAll('.ch5-leaf-left, .ch5-leaf-right'), {
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: 'power1.out',
+          scrollTrigger: {
+            trigger: ch5,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          }
+        });
       }
     }, containerRef);
 
@@ -1214,7 +1168,7 @@ export default function ZAxisStage() {
           ═══════════════════════════════════════════════════════════════ */}
       <section 
         ref={ch5Ref}
-        className="relative w-full min-h-[75vh] flex flex-col justify-center items-center bg-[#FAF4E6] px-6 sm:px-10 pt-20 pb-16 overflow-hidden z-20 will-change-transform will-change-opacity"
+        className="relative w-full min-h-[55vh] flex flex-col justify-center items-center bg-[#FAF4E6] px-6 sm:px-10 pt-16 pb-14 overflow-hidden z-20"
       >
         {/* Flourish leaves */}
         <img 
