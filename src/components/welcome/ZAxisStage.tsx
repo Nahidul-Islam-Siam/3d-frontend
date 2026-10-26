@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles,
   ArrowRight,
+  ArrowDown,
   ExternalLink,
   X,
   Maximize2,
@@ -66,7 +67,7 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
     <div className={`w-full mx-auto flex flex-col items-center ${isModal ? 'max-w-[840px] space-y-6 sm:space-y-8 px-2 sm:px-4 py-2' : 'max-w-[720px] space-y-2.5 sm:space-y-3.5 px-2'}`}>
       
       {/* ─── 1. TOP HEADER: REAL TEXT & INTERACTIVE BUTTONS ─── */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 pb-2 border-b border-white/10 shrink-0">
+      <div className={`${isModal ? '' : 'ch4-header'} w-full flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 pb-2 border-b border-white/10 shrink-0`}>
         <div className="space-y-0.5 text-left">
           <h2 
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
@@ -103,7 +104,7 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
       {/* ─── 2. POSTER BANNER: FITTED FULLY ON SCREEN (NO SIDED CUT-OFF) ─── */}
       <div 
         onClick={onOpenModal}
-        className={`relative rounded-[14px] sm:rounded-[18px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/15 bg-black shrink-0 ${onOpenModal ? 'cursor-pointer group' : ''}`}
+        className={`${isModal ? '' : 'ch4-banner'} relative rounded-[14px] sm:rounded-[18px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/15 bg-black shrink-0 ${onOpenModal ? 'cursor-pointer group' : ''}`}
       >
         <img
           src={isModal ? showdownPoster : auditionBanner}
@@ -124,7 +125,7 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
       </div>
 
       {/* ─── 3. "IMPORTANT INFORMATION" PILL BUTTON ─── */}
-      <div className="flex flex-col items-center justify-center pt-0.5 shrink-0">
+      <div className={`${isModal ? '' : 'ch4-pill'} flex flex-col items-center justify-center pt-0.5 shrink-0`}>
         <button 
           type="button"
           onClick={onOpenModal}
@@ -376,8 +377,19 @@ export default function ZAxisStage() {
     };
   }, []);
 
+  const handleScrollToStory = () => {
+    const lenis = (window as unknown as { __lenis?: { scrollTo: (target: number | string, opts?: object) => void } }).__lenis;
+    if (lenis && typeof lenis.scrollTo === 'function') {
+      lenis.scrollTo(700);
+    } else {
+      window.scrollTo({ top: 700, behavior: 'smooth' });
+    }
+  };
+
   // ═════════════════════════════════════════════════════════════════
   // GSAP SCROLLTRIGGER MASTER TIMELINE CHOREOGRAPHY
+  // Refined with +35% scroll distance, generous plateaus,
+  // staggered multi-element choreography, and continuous overlapping handoffs
   // ═════════════════════════════════════════════════════════════════
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -399,11 +411,9 @@ export default function ZAxisStage() {
         return;
       }
 
-      // Initial resting properties
+      // Base chapter container initial states
       gsap.set([ch1, ch2, ch3, ch4], {
         autoAlpha: 0,
-        y: 35,
-        scale: 0.985,
       });
       gsap.set(ch0, {
         autoAlpha: 1,
@@ -414,6 +424,30 @@ export default function ZAxisStage() {
         backgroundColor: '#000000',
       });
 
+      // Internal sub-elements initial states for staggered entrance
+      // Chapter 1
+      gsap.set('.ch1-left-col', { autoAlpha: 0, y: 35 });
+      gsap.set('.ch1-right-col', { autoAlpha: 0, y: 30 });
+      gsap.set('.ch1-stat-item', { autoAlpha: 0, y: 25 });
+      gsap.set('.ch1-leaf-left', { autoAlpha: 0, x: -25 });
+      gsap.set('.ch1-leaf-right', { autoAlpha: 0, x: 25 });
+
+      // Chapter 2
+      gsap.set('.ch2-content', { autoAlpha: 0, y: 40, scale: 0.96 });
+
+      // Chapter 3
+      gsap.set('.ch3-left-col', { autoAlpha: 0, y: 35 });
+      gsap.set('.ch3-card-item', { autoAlpha: 0, y: 45, scale: 0.95 });
+
+      // Chapter 4
+      gsap.set('.ch4-glow', { autoAlpha: 0, scale: 0.85 });
+      gsap.set('.ch4-header', { autoAlpha: 0, y: 25 });
+      gsap.set('.ch4-banner', { autoAlpha: 0, y: 35, scale: 0.96 });
+      gsap.set('.ch4-pill', { autoAlpha: 0, y: 20 });
+
+      // Chapter 0 Scroll Prompt
+      gsap.set('.ch0-prompt', { autoAlpha: 1, y: 0 });
+
       const mm = gsap.matchMedia();
 
       mm.add({
@@ -421,7 +455,8 @@ export default function ZAxisStage() {
         isMobile: "(max-width: 1023px)"
       }, (context) => {
         const { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
-        const scrollDistance = isDesktop ? 5200 : 4200;
+        // Increased scroll travel by ~35% for a deliberate, cinematic pacing
+        const scrollDistance = isDesktop ? 7000 : 5500;
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -434,8 +469,8 @@ export default function ZAxisStage() {
             onUpdate: (self) => {
               const p = self.progress;
 
-              // Navbar reveal threshold
-              const shouldReveal = p >= 0.08 || (isVideoFinished && p > 0.02);
+              // Navbar reveal threshold (reveals smoothly during Chapter 0 exit)
+              const shouldReveal = p >= 0.07 || (isVideoFinished && p > 0.02);
               if (shouldReveal !== navbarRevealedRef.current) {
                 navbarRevealedRef.current = shouldReveal;
                 window.dispatchEvent(new CustomEvent(shouldReveal ? 'reveal-navbar' : 'hide-navbar'));
@@ -443,9 +478,9 @@ export default function ZAxisStage() {
 
               // Pause video when out of view, resume when back at top
               if (videoRef.current) {
-                if (p > 0.16 && !videoRef.current.paused) {
+                if (p > 0.15 && !videoRef.current.paused) {
                   videoRef.current.pause();
-                } else if (p <= 0.16 && videoRef.current.paused) {
+                } else if (p <= 0.15 && videoRef.current.paused) {
                   videoRef.current.play().catch(() => {});
                 }
               }
@@ -454,129 +489,294 @@ export default function ZAxisStage() {
         });
 
         // ─────────────────────────────────────────────────────────────
-        // MASTER CHOREOGRAPHY: 10.4 Total Timeline Units
+        // REFINED CHOREOGRAPHY: 15.2 Total Timeline Units
+        // Generous plateaus, deliberate transitions, staggered elements
         // ─────────────────────────────────────────────────────────────
 
-        // Chapter 0: Visually rock solid from 0.0 to 1.0
-        // Transition Ch 0 -> Ch 1: 1.0 to 1.8
+        // Chapter 0: Prompt fades out smoothly as soon as user begins scrolling
+        tl.to('.ch0-prompt', {
+          autoAlpha: 0,
+          y: 16,
+          duration: 0.6,
+          ease: 'power1.out',
+        }, 0.08);
+
+        // ═════════════════════════════════════════════════════════════
+        // CHAPTER 0: Full-Screen Video Hero
+        // Plateau: 0.0 to 1.4 (Stable hold, viewer absorbs the mood)
+        // Transition Ch 0 -> Ch 1: 1.4 to 2.6
+        // ═════════════════════════════════════════════════════════════
         tl.to(ch0, {
           autoAlpha: 0,
-          y: -30,
-          scale: 1.015,
-          duration: 0.8,
+          y: -35,
+          scale: 1.02,
+          duration: 1.2,
           ease: 'power1.inOut',
-        }, 1.0)
+        }, 1.4)
         .to(stageBg, {
           backgroundColor: '#FAF4E6',
-          duration: 0.8,
+          duration: 1.2,
           ease: 'power1.inOut',
-        }, 1.0)
+        }, 1.4)
+
+        // Chapter 1 Staggered Entrance (Overlapping start at 1.6)
         .to(ch1, {
           autoAlpha: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 1.6)
+        .to('.ch1-left-col', {
+          autoAlpha: 1,
           y: 0,
-          scale: 1,
+          duration: 1.0,
+          ease: 'power2.out',
+        }, 1.6)
+        .to(['.ch1-leaf-left', '.ch1-leaf-right'], {
+          autoAlpha: 0.7,
+          x: 0,
+          duration: 1.0,
+          ease: 'power1.out',
+        }, 1.7)
+        .to('.ch1-right-col', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.0,
+          ease: 'power2.out',
+        }, 1.75)
+        .to('.ch1-stat-item', {
+          autoAlpha: 1,
+          y: 0,
           duration: 0.8,
-          ease: 'power1.inOut',
-        }, 1.0);
+          stagger: 0.08,
+          ease: 'power2.out',
+        }, 1.9);
 
-        // Chapter 1 Plateau: 1.8 to 3.2 (rock-solid reading interval)
-        // Transition Ch 1 -> Ch 2: 3.2 to 4.0
-        tl.to(ch1, {
+        // ═════════════════════════════════════════════════════════════
+        // CHAPTER 1: We've Been Expecting You
+        // Plateau: 2.6 to 4.6 (Generous 2.0 units = ~920px reading hold)
+        // Transition Ch 1 -> Ch 2: 4.6 to 5.8
+        // ═════════════════════════════════════════════════════════════
+        tl.to('.ch1-stat-item', {
           autoAlpha: 0,
-          y: -28,
-          scale: 0.985,
+          y: 15,
+          duration: 0.6,
+          stagger: 0.05,
+          ease: 'power1.in',
+        }, 4.6)
+        .to(['.ch1-left-col', '.ch1-right-col'], {
+          autoAlpha: 0,
+          y: -25,
           duration: 0.8,
           ease: 'power1.inOut',
-        }, 3.2)
+        }, 4.8)
+        .to(['.ch1-leaf-left', '.ch1-leaf-right'], {
+          autoAlpha: 0,
+          duration: 0.6,
+          ease: 'power1.in',
+        }, 4.8)
+        .to(ch1, {
+          autoAlpha: 0,
+          duration: 0.6,
+        }, 5.2)
         .to(stageBg, {
           backgroundColor: '#201308',
-          duration: 0.8,
+          duration: 1.2,
           ease: 'power1.inOut',
-        }, 3.2)
+        }, 4.6)
+
+        // Chapter 2 Entrance (Overlapping start at 4.8)
         .to(ch2, {
           autoAlpha: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 4.8)
+        .to('.ch2-content', {
+          autoAlpha: 1,
           y: 0,
           scale: 1,
-          duration: 0.8,
-          ease: 'power1.inOut',
-        }, 3.2);
+          duration: 1.1,
+          ease: 'power2.out',
+        }, 4.9);
 
-        // Chapter 2 Plateau: 4.0 to 5.4 (stable four-door exploration)
-        // Transition Ch 2 -> Ch 3: 5.4 to 6.2
-        tl.to(ch2, {
+        // ═════════════════════════════════════════════════════════════
+        // CHAPTER 2: Where Would You Like To Go? (Four Doors)
+        // Plateau: 5.8 to 7.8 (Generous 2.0 units = ~920px exploration hold)
+        // Transition Ch 2 -> Ch 3: 7.8 to 9.0
+        // ═════════════════════════════════════════════════════════════
+        tl.to('.ch2-content', {
           autoAlpha: 0,
           y: -28,
-          scale: 0.985,
-          duration: 0.8,
+          scale: 0.97,
+          duration: 0.9,
           ease: 'power1.inOut',
-        }, 5.4)
+        }, 7.8)
+        .to(ch2, {
+          autoAlpha: 0,
+          duration: 0.5,
+        }, 8.4)
         .to(stageBg, {
           backgroundColor: '#FAF4E6',
-          duration: 0.8,
+          duration: 1.2,
           ease: 'power1.inOut',
-        }, 5.4)
+        }, 7.8)
+
+        // Chapter 3 Entrance (Overlapping start at 8.0)
         .to(ch3, {
           autoAlpha: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 8.0)
+        .to('.ch3-left-col', {
+          autoAlpha: 1,
           y: 0,
-          scale: 1,
-          duration: 0.8,
-          ease: 'power1.inOut',
-        }, 5.4);
-
-        // Chapter 3 Plateau: 6.2 to 7.6 (stable 3 pillars reading interval)
-        // Transition Ch 3 -> Ch 4: 7.6 to 8.4
-        tl.to(ch3, {
-          autoAlpha: 0,
-          y: -28,
-          scale: 0.985,
-          duration: 0.8,
-          ease: 'power1.inOut',
-        }, 7.6)
-        .to(stageBg, {
-          backgroundColor: '#140820',
-          duration: 0.8,
-          ease: 'power1.inOut',
-        }, 7.6)
-        .to(ch4, {
+          duration: 1.0,
+          ease: 'power2.out',
+        }, 8.1)
+        .to('.ch3-card-item', {
           autoAlpha: 1,
           y: 0,
           scale: 1,
-          duration: 0.8,
-          ease: 'power1.inOut',
-        }, 7.6);
+          duration: 0.9,
+          stagger: 0.12,
+          ease: 'power2.out',
+        }, 8.25);
 
-        // Chapter 4 Plateau: 8.4 to 9.6 (stable audition showcase)
-        // Transition Ch 4 -> Finale: 9.6 to 10.4
-        tl.to(ch4, {
+        // ═════════════════════════════════════════════════════════════
+        // CHAPTER 3: Every Story Matters (Three Pillars)
+        // Plateau: 9.0 to 11.0 (Generous 2.0 units = ~920px reading hold)
+        // Transition Ch 3 -> Ch 4: 11.0 to 12.2
+        // ═════════════════════════════════════════════════════════════
+        tl.to('.ch3-card-item', {
           autoAlpha: 0,
-          y: -28,
-          scale: 0.985,
+          y: -20,
+          scale: 0.97,
+          duration: 0.7,
+          stagger: 0.06,
+          ease: 'power1.in',
+        }, 11.0)
+        .to('.ch3-left-col', {
+          autoAlpha: 0,
+          y: -25,
           duration: 0.8,
           ease: 'power1.inOut',
-        }, 9.6)
+        }, 11.1)
+        .to(ch3, {
+          autoAlpha: 0,
+          duration: 0.5,
+        }, 11.6)
+        .to(stageBg, {
+          backgroundColor: '#140820',
+          duration: 1.2,
+          ease: 'power1.inOut',
+        }, 11.0)
+
+        // Chapter 4 Entrance (Overlapping start at 11.2)
+        .to(ch4, {
+          autoAlpha: 1,
+          duration: 0.8,
+          ease: 'power1.inOut',
+        }, 11.2)
+        .to('.ch4-glow', {
+          autoAlpha: 0.25,
+          scale: 1.05,
+          duration: 1.0,
+          ease: 'power1.out',
+        }, 11.2)
+        .to('.ch4-header', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.9,
+          ease: 'power2.out',
+        }, 11.3)
+        .to('.ch4-banner', {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 1.0,
+          ease: 'power2.out',
+        }, 11.4)
+        .to('.ch4-pill', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+        }, 11.55);
+
+        // ═════════════════════════════════════════════════════════════
+        // CHAPTER 4: What's Coming Up Next (Audition Showcase)
+        // Plateau: 12.2 to 14.0 (Generous 1.8 units = ~830px reading hold)
+        // Transition Ch 4 -> Finale: 14.0 to 15.2
+        // ═════════════════════════════════════════════════════════════
+        tl.to('.ch4-pill', {
+          autoAlpha: 0,
+          y: 10,
+          duration: 0.5,
+          ease: 'power1.in',
+        }, 14.0)
+        .to(['.ch4-banner', '.ch4-header'], {
+          autoAlpha: 0,
+          y: -25,
+          scale: 0.97,
+          duration: 0.9,
+          ease: 'power1.inOut',
+        }, 14.1)
+        .to('.ch4-glow', {
+          autoAlpha: 0,
+          scale: 0.9,
+          duration: 0.8,
+          ease: 'power1.in',
+        }, 14.2)
+        .to(ch4, {
+          autoAlpha: 0,
+          duration: 0.5,
+        }, 14.7)
         .to(stageBg, {
           backgroundColor: '#FAF4E6',
-          duration: 0.8,
+          duration: 1.2,
           ease: 'power1.inOut',
-        }, 9.6);
+        }, 14.0);
       });
 
       // Chapter 5 Entrance Animation as user scrolls past the pinned container
       if (ch5) {
-        gsap.fromTo(ch5, 
-          { autoAlpha: 0.2, y: 40, scale: 0.99 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            ease: 'power1.out',
-            scrollTrigger: {
-              trigger: ch5,
-              start: 'top 90%',
-              end: 'top 45%',
-              scrub: 1.0,
-            }
+        const ch5Tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: ch5,
+            start: 'top 85%',
+            end: 'top 30%',
+            scrub: 1.0,
           }
+        });
+
+        ch5Tl.fromTo('.ch5-badge', 
+          { autoAlpha: 0, y: 25 }, 
+          { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 
+          0
+        )
+        .fromTo('.ch5-heading', 
+          { autoAlpha: 0, y: 35 }, 
+          { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 
+          0.1
+        )
+        .fromTo('.ch5-body', 
+          { autoAlpha: 0, y: 25 }, 
+          { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 
+          0.2
+        )
+        .fromTo('.ch5-buttons', 
+          { autoAlpha: 0, y: 20, scale: 0.97 }, 
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.7, ease: 'power2.out' }, 
+          0.3
+        )
+        .fromTo('.ch5-leaf-left', 
+          { autoAlpha: 0, x: -25 }, 
+          { autoAlpha: 0.6, x: 0, duration: 0.9, ease: 'power1.out' }, 
+          0.15
+        )
+        .fromTo('.ch5-leaf-right', 
+          { autoAlpha: 0, x: 25 }, 
+          { autoAlpha: 0.6, x: 0, duration: 0.9, ease: 'power1.out' }, 
+          0.15
         );
       }
     }, containerRef);
@@ -600,6 +800,17 @@ export default function ZAxisStage() {
             preload="auto"
             className="w-full h-full object-cover"
           />
+          <div className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-2 pointer-events-none select-none">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-white/40 flex items-center justify-center shrink-0">
+              <ArrowDown className="w-3 h-3 text-white/80" />
+            </div>
+            <span 
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/85 whitespace-nowrap font-medium"
+            >
+              SCROLL TO ENTER THE STORY
+            </span>
+          </div>
         </section>
 
         {/* Chapter 1: Welcome */}
@@ -772,6 +983,22 @@ export default function ZAxisStage() {
             />
             {/* Ambient Vignette */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
+
+            {/* Scroll prompt at bottom of video (visible if not scrolled) */}
+            <div 
+              onClick={handleScrollToStory}
+              className="ch0-prompt absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-2 cursor-pointer select-none group pointer-events-auto"
+            >
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-white/40 group-hover:border-white/80 flex items-center justify-center shrink-0 transition-colors">
+                <ArrowDown className="w-3 h-3 text-white/80 group-hover:text-white transition-colors animate-bounce" />
+              </div>
+              <span 
+                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/85 group-hover:text-white transition-colors whitespace-nowrap font-medium"
+              >
+                SCROLL TO ENTER THE STORY
+              </span>
+            </div>
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════
@@ -785,19 +1012,19 @@ export default function ZAxisStage() {
             <img 
               src={leftLeaf} 
               alt="" 
-              className="absolute left-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
+              className="ch1-leaf-left absolute left-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
             />
             <img 
               src={rightLeaf} 
               alt="" 
-              className="absolute right-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
+              className="ch1-leaf-right absolute right-0 bottom-12 w-28 sm:w-40 opacity-70 pointer-events-none select-none" 
             />
 
             <div className="max-w-[1200px] w-full mx-auto relative z-10 space-y-10 sm:space-y-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                 
                 {/* Left Column */}
-                <div className="lg:col-span-5 space-y-4">
+                <div className="ch1-left-col lg:col-span-5 space-y-4">
                   <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Chapter 01</span>
@@ -816,7 +1043,7 @@ export default function ZAxisStage() {
                 </div>
 
                 {/* Right Column */}
-                <div className="lg:col-span-7 flex flex-col items-start lg:items-end text-left lg:text-right space-y-4">
+                <div className="ch1-right-col lg:col-span-7 flex flex-col items-start lg:items-end text-left lg:text-right space-y-4">
                   <p 
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                     className="text-lg sm:text-xl lg:text-[22px] font-playfair leading-[1.4] max-w-xl text-left lg:text-right"
@@ -850,7 +1077,7 @@ export default function ZAxisStage() {
               {/* 4 Stat Badges */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-orange-200/80">
                 {stats.map((s) => (
-                  <div key={s.label} className="flex items-center gap-3.5 group">
+                  <div key={s.label} className="ch1-stat-item flex items-center gap-3.5 group">
                     <img src={s.icon} alt="" className="w-11 h-11 object-contain flex-shrink-0 group-hover:scale-105 transition-transform" />
                     <div>
                       <div className="text-2xl sm:text-3xl font-serif font-bold text-[#231F20] leading-none">
@@ -874,7 +1101,7 @@ export default function ZAxisStage() {
             ref={ch2Ref}
             className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden select-none z-20 will-change-transform will-change-opacity"
           >
-            <div className="relative w-full h-full max-w-[1920px] pt-[74px] pb-6 px-4 flex items-center justify-center">
+            <div className="ch2-content relative w-full h-full max-w-[1920px] pt-[74px] pb-6 px-4 flex items-center justify-center">
               <div className="relative aspect-[1920/1080] max-h-full max-w-full w-full h-auto flex items-center justify-center">
                 <img 
                   src={doorsSectionImg} 
@@ -912,7 +1139,7 @@ export default function ZAxisStage() {
             <div className="max-w-[1200px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
               {/* Left Column */}
-              <div className="lg:col-span-5 space-y-4">
+              <div className="ch3-left-col lg:col-span-5 space-y-4">
                 <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Chapter 03</span>
@@ -938,7 +1165,7 @@ export default function ZAxisStage() {
                 {pillars.map((p) => (
                   <div 
                     key={p.title} 
-                    className="group flex flex-col items-center text-center cursor-default transition-transform duration-300 hover:scale-105"
+                    className="ch3-card-item group flex flex-col items-center text-center cursor-default transition-transform duration-300 hover:scale-105"
                   >
                     <div className="w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-stone-200 shadow-md border border-[#ecdac2] group-hover:shadow-2xl transition-all duration-500">
                       <img
@@ -971,7 +1198,7 @@ export default function ZAxisStage() {
             className="absolute inset-0 w-full h-full flex flex-col justify-center items-center text-white pt-[78px] sm:pt-[82px] pb-4 px-4 sm:px-6 select-none overflow-hidden z-20 will-change-transform will-change-opacity"
           >
             {/* Ambient Backlight */}
-            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#F97316]/15 rounded-full blur-[100px] pointer-events-none" />
+            <div className="ch4-glow absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#F97316]/15 rounded-full blur-[100px] pointer-events-none" />
 
             <div className="w-full relative z-10 flex flex-col items-center justify-center">
               <ShowdownSection onOpenModal={openFlyerModal} />
@@ -993,30 +1220,30 @@ export default function ZAxisStage() {
         <img 
           src={leftLeaf} 
           alt="" 
-          className="absolute left-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
+          className="ch5-leaf-left absolute left-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
         />
         <img 
           src={rightLeaf} 
           alt="" 
-          className="absolute right-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
+          className="ch5-leaf-right absolute right-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
         />
 
         {/* Main Sanctuary Invitation Card */}
         <div className="max-w-[760px] mx-auto text-center space-y-6 relative z-10 px-4 my-auto">
-          <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+          <div className="ch5-badge inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Chapter 05 • Welcome Home</span>
           </div>
 
           <h2
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
+            className="ch5-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
           >
             <span className="text-[#18181B]">YOU WERE </span>
             <span className="text-[#F97316]">EXPECTED.</span>
           </h2>
 
-          <div className="space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
+          <div className="ch5-body space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
             <p>
               Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
             </p>
@@ -1025,7 +1252,7 @@ export default function ZAxisStage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <div className="ch5-buttons flex flex-wrap items-center justify-center gap-4 pt-2">
             <FigmaButton to="/about" variant="primary">
               Explore Our Story
             </FigmaButton>
