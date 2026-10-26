@@ -253,6 +253,7 @@ export default function ZAxisStage() {
   const ch3Ref = useRef<HTMLDivElement | null>(null);
   const ch4Ref = useRef<HTMLDivElement | null>(null);
   const ch5Ref = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
 
   // Discrete application state
   const [isVideoFinished, setIsVideoFinished] = useState<boolean>(false);
@@ -380,9 +381,9 @@ export default function ZAxisStage() {
   const handleScrollToStory = () => {
     const lenis = (window as unknown as { __lenis?: { scrollTo: (target: number | string, opts?: object) => void } }).__lenis;
     if (lenis && typeof lenis.scrollTo === 'function') {
-      lenis.scrollTo(700);
+      lenis.scrollTo(320);
     } else {
-      window.scrollTo({ top: 700, behavior: 'smooth' });
+      window.scrollTo({ top: 320, behavior: 'smooth' });
     }
   };
 
@@ -406,13 +407,14 @@ export default function ZAxisStage() {
       const ch3 = ch3Ref.current;
       const ch4 = ch4Ref.current;
       const ch5 = ch5Ref.current;
+      const footerEl = footerRef.current;
 
-      if (!stageBg || !ch0 || !ch1 || !ch2 || !ch3 || !ch4 || !containerRef.current || !pinnedStageRef.current) {
+      if (!stageBg || !ch0 || !ch1 || !ch2 || !ch3 || !ch4 || !ch5 || !containerRef.current || !pinnedStageRef.current) {
         return;
       }
 
       // Base chapter container initial states
-      gsap.set([ch1, ch2, ch3, ch4], {
+      gsap.set([ch1, ch2, ch3, ch4, ch5], {
         autoAlpha: 0,
       });
       gsap.set(ch0, {
@@ -445,6 +447,15 @@ export default function ZAxisStage() {
       gsap.set('.ch4-banner', { autoAlpha: 0, y: 35, scale: 0.96 });
       gsap.set('.ch4-pill', { autoAlpha: 0, y: 20 });
 
+      // Chapter 5: 3D Z-Axis stage section initial states
+      gsap.set(ch5, { autoAlpha: 0, scale: 0.94, y: 35 });
+      gsap.set('.ch5-badge', { autoAlpha: 0, y: 20 });
+      gsap.set('.ch5-heading', { autoAlpha: 0, y: 30, scale: 0.96 });
+      gsap.set('.ch5-body', { autoAlpha: 0, y: 20 });
+      gsap.set('.ch5-buttons', { autoAlpha: 0, y: 20 });
+      gsap.set('.ch5-leaf-left', { autoAlpha: 0, x: -25 });
+      gsap.set('.ch5-leaf-right', { autoAlpha: 0, x: 25 });
+
       // Chapter 0 Scroll Prompt
       gsap.set('.ch0-prompt', { autoAlpha: 1, y: 0 });
 
@@ -455,8 +466,8 @@ export default function ZAxisStage() {
         isMobile: "(max-width: 1023px)"
       }, (context) => {
         const { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
-        // Pinned scroll distance calibrated to end at Chapter 4 without trailing blank space
-        const scrollDistance = isDesktop ? 6000 : 4600;
+        // Ultra-efficient, fluid scroll travel: ~350px per section (~2-3 natural wheel clicks) across all 5 chapters
+        const scrollDistance = isDesktop ? 1750 : 1400;
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -464,13 +475,13 @@ export default function ZAxisStage() {
             start: 'top top',
             end: `+=${scrollDistance}`,
             pin: pinnedStageRef.current,
-            scrub: 0.4,
+            scrub: 0.25,
             anticipatePin: 1,
             onUpdate: (self) => {
               const p = self.progress;
 
               // Navbar reveal threshold (reveals smoothly during Chapter 0 exit)
-              const shouldReveal = p >= 0.07 || (isVideoFinished && p > 0.02);
+              const shouldReveal = p >= 0.05 || (isVideoFinished && p > 0.015);
               if (shouldReveal !== navbarRevealedRef.current) {
                 navbarRevealedRef.current = shouldReveal;
                 window.dispatchEvent(new CustomEvent(shouldReveal ? 'reveal-navbar' : 'hide-navbar'));
@@ -478,9 +489,9 @@ export default function ZAxisStage() {
 
               // Pause video when out of view, resume when back at top
               if (videoRef.current) {
-                if (p > 0.15 && !videoRef.current.paused) {
+                if (p > 0.18 && !videoRef.current.paused) {
                   videoRef.current.pause();
-                } else if (p <= 0.15 && videoRef.current.paused) {
+                } else if (p <= 0.18 && videoRef.current.paused) {
                   videoRef.current.play().catch(() => {});
                 }
               }
@@ -488,250 +499,346 @@ export default function ZAxisStage() {
           },
         });
 
-        // ─────────────────────────────────────────────────────────────
-        // REFINED CHOREOGRAPHY: 15.2 Total Timeline Units
-        // Generous plateaus, deliberate transitions, staggered elements
-        // ─────────────────────────────────────────────────────────────
+        // ═════════════════════════════════════════════════════════════
+        // ELEGANT & EFFORTLESS 3D Z-AXIS CHAPTER CHOREOGRAPHY
+        // Seamless handoffs between all 5 chapters on the Z-axis
+        // ═════════════════════════════════════════════════════════════
 
-        // Chapter 0: Prompt fades out smoothly as soon as user begins scrolling
+        // Chapter 0 Prompt: fades immediately upon initial scroll
         tl.to('.ch0-prompt', {
           autoAlpha: 0,
           y: 16,
-          duration: 0.6,
+          duration: 0.15,
           ease: 'power1.out',
-        }, 0.08);
+        }, 0);
 
-        // ═════════════════════════════════════════════════════════════
-        // CHAPTER 0: Full-Screen Video Hero
-        // Plateau: 0.0 to 1.4 (Stable hold, viewer absorbs the mood)
-        // Transition Ch 0 -> Ch 1: 1.4 to 2.6
-        // ═════════════════════════════════════════════════════════════
+        // ─────────────────────────────────────────────────────────────
+        // TRANSITION CH 0 -> CH 1 (0.05 to 1.00)
+        // ─────────────────────────────────────────────────────────────
         tl.to(ch0, {
           autoAlpha: 0,
           y: -35,
           scale: 1.02,
-          duration: 1.2,
+          duration: 0.95,
           ease: 'power1.inOut',
-        }, 1.4)
+        }, 0.05)
         .to(stageBg, {
           backgroundColor: '#FAF4E6',
-          duration: 1.2,
+          duration: 0.95,
           ease: 'power1.inOut',
-        }, 1.4)
-
-        // Chapter 1 Staggered Entrance (Overlapping start at 1.6)
+        }, 0.05)
         .to(ch1, {
           autoAlpha: 1,
           duration: 0.8,
           ease: 'power1.inOut',
-        }, 1.6)
+        }, 0.15)
         .to('.ch1-left-col', {
           autoAlpha: 1,
           y: 0,
-          duration: 1.0,
+          duration: 0.75,
           ease: 'power2.out',
-        }, 1.6)
+        }, 0.20)
         .to(['.ch1-leaf-left', '.ch1-leaf-right'], {
           autoAlpha: 0.7,
           x: 0,
-          duration: 1.0,
+          duration: 0.75,
           ease: 'power1.out',
-        }, 1.7)
+        }, 0.25)
         .to('.ch1-right-col', {
           autoAlpha: 1,
           y: 0,
-          duration: 1.0,
+          duration: 0.75,
           ease: 'power2.out',
-        }, 1.75)
+        }, 0.25)
         .to('.ch1-stat-item', {
           autoAlpha: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.08,
+          duration: 0.65,
+          stagger: 0.04,
           ease: 'power2.out',
-        }, 1.9);
+        }, 0.30);
 
-        // ═════════════════════════════════════════════════════════════
-        // CHAPTER 1: We've Been Expecting You
-        // Plateau: 2.6 to 4.6 (Generous 2.0 units = ~920px reading hold)
-        // Transition Ch 1 -> Ch 2: 4.6 to 5.8
-        // ═════════════════════════════════════════════════════════════
+        // Micro-hold on Chapter 1: 1.00 to 1.08 (duration 0.08)
+
+        // ─────────────────────────────────────────────────────────────
+        // TRANSITION CH 1 -> CH 2 (1.08 to 2.08)
+        // ─────────────────────────────────────────────────────────────
         tl.to('.ch1-stat-item', {
           autoAlpha: 0,
           y: 15,
-          duration: 0.6,
-          stagger: 0.05,
+          duration: 0.45,
+          stagger: 0.03,
           ease: 'power1.in',
-        }, 4.6)
+        }, 1.08)
         .to(['.ch1-left-col', '.ch1-right-col'], {
           autoAlpha: 0,
           y: -25,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power1.inOut',
-        }, 4.8)
+        }, 1.15)
         .to(['.ch1-leaf-left', '.ch1-leaf-right'], {
           autoAlpha: 0,
-          duration: 0.6,
+          duration: 0.45,
           ease: 'power1.in',
-        }, 4.8)
+        }, 1.15)
         .to(ch1, {
           autoAlpha: 0,
-          duration: 0.6,
-        }, 5.2)
+          duration: 0.45,
+        }, 1.45)
         .to(stageBg, {
           backgroundColor: '#201308',
-          duration: 1.2,
+          duration: 0.95,
           ease: 'power1.inOut',
-        }, 4.6)
-
-        // Chapter 2 Entrance (Overlapping start at 4.8)
+        }, 1.08)
         .to(ch2, {
           autoAlpha: 1,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power1.inOut',
-        }, 4.8)
+        }, 1.25)
         .to('.ch2-content', {
           autoAlpha: 1,
           y: 0,
           scale: 1,
-          duration: 1.1,
+          duration: 0.8,
           ease: 'power2.out',
-        }, 4.9);
+        }, 1.28);
 
-        // ═════════════════════════════════════════════════════════════
-        // CHAPTER 2: Where Would You Like To Go? (Four Doors)
-        // Plateau: 5.8 to 7.8 (Generous 2.0 units = ~920px exploration hold)
-        // Transition Ch 2 -> Ch 3: 7.8 to 9.0
-        // ═════════════════════════════════════════════════════════════
+        // Micro-hold on Chapter 2 (Four Doors): 2.08 to 2.16 (duration 0.08)
+
+        // ─────────────────────────────────────────────────────────────
+        // TRANSITION CH 2 -> CH 3 (2.16 to 3.16)
+        // ─────────────────────────────────────────────────────────────
         tl.to('.ch2-content', {
           autoAlpha: 0,
-          y: -28,
-          scale: 0.97,
-          duration: 0.9,
+          y: -25,
+          scale: 0.98,
+          duration: 0.65,
           ease: 'power1.inOut',
-        }, 7.8)
+        }, 2.16)
         .to(ch2, {
           autoAlpha: 0,
-          duration: 0.5,
-        }, 8.4)
+          duration: 0.45,
+        }, 2.45)
         .to(stageBg, {
           backgroundColor: '#FAF4E6',
-          duration: 1.2,
+          duration: 0.95,
           ease: 'power1.inOut',
-        }, 7.8)
-
-        // Chapter 3 Entrance (Overlapping start at 8.0)
+        }, 2.16)
         .to(ch3, {
           autoAlpha: 1,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power1.inOut',
-        }, 8.0)
+        }, 2.30)
         .to('.ch3-left-col', {
           autoAlpha: 1,
           y: 0,
-          duration: 1.0,
+          duration: 0.75,
           ease: 'power2.out',
-        }, 8.1)
+        }, 2.35)
         .to('.ch3-card-item', {
           autoAlpha: 1,
           y: 0,
           scale: 1,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: 'power2.out',
-        }, 8.25);
-
-        // ═════════════════════════════════════════════════════════════
-        // CHAPTER 3: Every Story Matters (Three Pillars)
-        // Plateau: 9.0 to 11.0 (Generous 2.0 units = ~920px reading hold)
-        // Transition Ch 3 -> Ch 4: 11.0 to 12.2
-        // ═════════════════════════════════════════════════════════════
-        tl.to('.ch3-card-item', {
-          autoAlpha: 0,
-          y: -20,
-          scale: 0.97,
           duration: 0.7,
           stagger: 0.06,
+          ease: 'power2.out',
+        }, 2.40);
+
+        // Micro-hold on Chapter 3 (Three Pillars): 3.16 to 3.24 (duration 0.08)
+
+        // ─────────────────────────────────────────────────────────────
+        // TRANSITION CH 3 -> CH 4 (3.24 to 4.24)
+        // ─────────────────────────────────────────────────────────────
+        tl.to('.ch3-card-item', {
+          autoAlpha: 0,
+          y: -18,
+          scale: 0.98,
+          duration: 0.55,
+          stagger: 0.04,
           ease: 'power1.in',
-        }, 11.0)
+        }, 3.24)
         .to('.ch3-left-col', {
           autoAlpha: 0,
-          y: -25,
-          duration: 0.8,
+          y: -20,
+          duration: 0.6,
           ease: 'power1.inOut',
-        }, 11.1)
+        }, 3.32)
         .to(ch3, {
           autoAlpha: 0,
-          duration: 0.5,
-        }, 11.6)
+          duration: 0.45,
+        }, 3.55)
         .to(stageBg, {
           backgroundColor: '#140820',
-          duration: 1.2,
+          duration: 0.95,
           ease: 'power1.inOut',
-        }, 11.0)
-
-        // Chapter 4 Entrance (Overlapping start at 11.2)
+        }, 3.24)
         .to(ch4, {
           autoAlpha: 1,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power1.inOut',
-        }, 11.2)
+        }, 3.38)
         .to('.ch4-glow', {
           autoAlpha: 0.25,
           scale: 1.05,
-          duration: 1.0,
+          duration: 0.75,
           ease: 'power1.out',
-        }, 11.2)
+        }, 3.38)
         .to('.ch4-header', {
           autoAlpha: 1,
           y: 0,
-          duration: 0.9,
+          duration: 0.7,
           ease: 'power2.out',
-        }, 11.3)
+        }, 3.45)
         .to('.ch4-banner', {
           autoAlpha: 1,
           y: 0,
           scale: 1,
-          duration: 1.0,
+          duration: 0.75,
           ease: 'power2.out',
-        }, 11.4)
+        }, 3.50)
         .to('.ch4-pill', {
           autoAlpha: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.65,
           ease: 'power2.out',
-        }, 11.55);
+        }, 3.60);
 
-        // Reading hold on Chapter 4: Chapter 4 stays fully visible in the viewport.
-        // It is NOT faded out to a blank section.
-        tl.to({}, { duration: 1.2 }, 12.0);
+        // Micro-hold on Chapter 4 (Audition Showcase): 4.24 to 4.32 (duration 0.08)
+
+        // ─────────────────────────────────────────────────────────────
+        // TRANSITION CH 4 -> CH 5 (4.32 to 5.32) - 3D Z-AXIS EMERGENCE
+        // ─────────────────────────────────────────────────────────────
+        tl.to(['.ch4-banner', '.ch4-header', '.ch4-pill'], {
+          autoAlpha: 0,
+          y: -30,
+          scale: 0.96,
+          duration: 0.6,
+          stagger: 0.04,
+          ease: 'power1.in',
+        }, 4.32)
+        .to('.ch4-glow', {
+          autoAlpha: 0,
+          duration: 0.5,
+        }, 4.32)
+        .to(ch4, {
+          autoAlpha: 0,
+          duration: 0.45,
+        }, 4.60)
+        .to(stageBg, {
+          backgroundColor: '#FAF4E6',
+          duration: 0.95,
+          ease: 'power1.inOut',
+        }, 4.32)
+        .to(ch5, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.85,
+          ease: 'power2.out',
+        }, 4.45)
+        .to('.ch5-badge', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power2.out',
+        }, 4.50)
+        .to('.ch5-heading', {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.75,
+          ease: 'power2.out',
+        }, 4.55)
+        .to(['.ch5-leaf-left', '.ch5-leaf-right'], {
+          autoAlpha: 0.6,
+          x: 0,
+          duration: 0.75,
+          ease: 'power1.out',
+        }, 4.55)
+        .to('.ch5-body', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power2.out',
+        }, 4.60)
+        .to('.ch5-buttons', {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.65,
+          ease: 'power2.out',
+        }, 4.65);
+
+        // Settle hold on Chapter 5 (Sanctuary Finale): 5.32 to 5.50 (duration 0.18)
+        // Chapter 5 remains fully visible and interactive on the Z-axis.
+        tl.to({}, { duration: 0.18 }, 5.32);
       });
 
-      // Chapter 5 Entrance Animation as user scrolls past the pinned container
-      if (ch5) {
-        gsap.from(ch5.querySelectorAll('.ch5-badge, .ch5-heading, .ch5-body, .ch5-buttons'), {
-          autoAlpha: 0,
-          y: 28,
-          duration: 0.7,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: ch5,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          }
-        });
+      // Footer Entrance Animation: seamlessly reveals with depth, stagger & elegance
+      if (footerEl) {
+        const footerCard = footerEl.querySelector('.footer-card');
+        const footerCols = footerEl.querySelectorAll('.footer-col');
+        const footerEventBox = footerEl.querySelector('.footer-event-box');
+        const footerBottom = footerEl.querySelector('.footer-bottom');
 
-        gsap.from(ch5.querySelectorAll('.ch5-leaf-left, .ch5-leaf-right'), {
-          autoAlpha: 0,
-          duration: 0.8,
-          ease: 'power1.out',
-          scrollTrigger: {
-            trigger: ch5,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          }
-        });
+        if (footerCard) {
+          gsap.from(footerCard, {
+            autoAlpha: 0,
+            y: 45,
+            scale: 0.98,
+            duration: 0.85,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: footerEl,
+              start: 'top 88%',
+              toggleActions: 'play reverse play reverse',
+            }
+          });
+        }
+
+        if (footerCols && footerCols.length > 0) {
+          gsap.from(footerCols, {
+            autoAlpha: 0,
+            y: 30,
+            duration: 0.75,
+            stagger: 0.09,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: footerEl,
+              start: 'top 82%',
+              toggleActions: 'play reverse play reverse',
+            }
+          });
+        }
+
+        if (footerEventBox) {
+          gsap.from(footerEventBox, {
+            autoAlpha: 0,
+            scale: 0.95,
+            y: 20,
+            duration: 0.8,
+            delay: 0.15,
+            ease: 'back.out(1.3)',
+            scrollTrigger: {
+              trigger: footerEl,
+              start: 'top 82%',
+              toggleActions: 'play reverse play reverse',
+            }
+          });
+        }
+
+        if (footerBottom) {
+          gsap.from(footerBottom, {
+            autoAlpha: 0,
+            y: 15,
+            duration: 0.65,
+            ease: 'power1.out',
+            scrollTrigger: {
+              trigger: footerEl,
+              start: 'top 75%',
+              toggleActions: 'play reverse play reverse',
+            }
+          });
+        }
       }
     }, containerRef);
 
@@ -900,13 +1007,14 @@ export default function ZAxisStage() {
   // ═════════════════════════════════════════════════════════════════
   return (
     <div className="relative w-full select-none bg-[#FAF4E6]">
-      {/* ─── PINNED CONTAINER (Holds Chapters 0 to 4 in a unified cinematic stage) ─── */}
+      {/* ─── PINNED CONTAINER (Holds Chapters 0 to 5 in a unified cinematic 3D Z-axis stage) ─── */}
       <div 
         ref={containerRef} 
         className="relative w-full"
       >
         <div 
           ref={pinnedStageRef}
+          style={{ perspective: '1200px' }}
           className="relative w-full h-screen overflow-hidden flex items-center justify-center"
         >
           {/* Animated Background Color Layer */}
@@ -1159,67 +1267,66 @@ export default function ZAxisStage() {
             </div>
           </div>
 
+          {/* ═══════════════════════════════════════════════════════════════
+              CHAPTER 5: "YOU WERE EXPECTED." (Sanctuary Invitation - 3D Z-Axis Stage)
+              ═══════════════════════════════════════════════════════════════ */}
+          <div
+            ref={ch5Ref}
+            className="absolute inset-0 w-full h-full flex flex-col justify-center items-center px-6 sm:px-12 lg:px-20 z-20 overflow-hidden select-none will-change-transform will-change-opacity pointer-events-auto"
+          >
+            {/* Flourish leaves */}
+            <img 
+              src={leftLeaf} 
+              alt="" 
+              className="ch5-leaf-left absolute left-2 sm:left-6 lg:left-12 top-1/2 -translate-y-1/2 w-36 sm:w-52 lg:w-64 opacity-60 pointer-events-none select-none" 
+            />
+            <img 
+              src={rightLeaf} 
+              alt="" 
+              className="ch5-leaf-right absolute right-2 sm:right-6 lg:right-12 top-1/2 -translate-y-1/2 w-36 sm:w-52 lg:w-64 opacity-60 pointer-events-none select-none" 
+            />
+
+            {/* Main Sanctuary Invitation Card */}
+            <div className="max-w-[760px] mx-auto text-center space-y-6 relative z-10 px-4 my-auto">
+              <div className="ch5-badge inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chapter 05 • Welcome Home</span>
+              </div>
+
+              <h2
+                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                className="ch5-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
+              >
+                <span className="text-[#18181B]">YOU WERE </span>
+                <span className="text-[#F97316]">EXPECTED.</span>
+              </h2>
+
+              <div className="ch5-body space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
+                <p>
+                  Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
+                </p>
+                <p>
+                  Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.
+                </p>
+              </div>
+
+              <div className="ch5-buttons flex flex-wrap items-center justify-center gap-4 pt-2">
+                <FigmaButton to="/about" variant="primary">
+                  Explore Our Story
+                </FigmaButton>
+                <FigmaButton to="/movement" variant="outline">
+                  Join the Movement
+                </FigmaButton>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          CHAPTER 5: "YOU WERE EXPECTED." (Sanctuary Invitation)
-          Seamless natural flow out of the pinned sequence into the finale
-          ═══════════════════════════════════════════════════════════════ */}
-      <section 
-        ref={ch5Ref}
-        className="relative w-full min-h-[55vh] flex flex-col justify-center items-center bg-[#FAF4E6] px-6 sm:px-10 pt-16 pb-14 overflow-hidden z-20"
-      >
-        {/* Flourish leaves */}
-        <img 
-          src={leftLeaf} 
-          alt="" 
-          className="ch5-leaf-left absolute left-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
-        />
-        <img 
-          src={rightLeaf} 
-          alt="" 
-          className="ch5-leaf-right absolute right-0 top-1/4 w-32 sm:w-44 opacity-60 pointer-events-none select-none" 
-        />
-
-        {/* Main Sanctuary Invitation Card */}
-        <div className="max-w-[760px] mx-auto text-center space-y-6 relative z-10 px-4 my-auto">
-          <div className="ch5-badge inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Chapter 05 • Welcome Home</span>
-          </div>
-
-          <h2
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="ch5-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
-          >
-            <span className="text-[#18181B]">YOU WERE </span>
-            <span className="text-[#F97316]">EXPECTED.</span>
-          </h2>
-
-          <div className="ch5-body space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
-            <p>
-              Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
-            </p>
-            <p>
-              Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.
-            </p>
-          </div>
-
-          <div className="ch5-buttons flex flex-wrap items-center justify-center gap-4 pt-2">
-            <FigmaButton to="/about" variant="primary">
-              Explore Our Story
-            </FigmaButton>
-            <FigmaButton to="/movement" variant="outline">
-              Join the Movement
-            </FigmaButton>
-          </div>
-        </div>
-      </section>
-
       {/* ─── NATURAL CONTINUATION: FULL-WIDTH OFFICIAL FOOTER ─── */}
-      <div className="relative w-full z-30 bg-[#FAF4E6]">
-        <Footer />
+      <div ref={footerRef} className="relative w-full z-30 bg-[#FAF4E6]">
+        <Footer isHome={true} />
       </div>
 
       {/* ─── SHOWDOWN FULL FLYER MODAL (Portaled to document.body) ─── */}

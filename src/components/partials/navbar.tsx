@@ -53,7 +53,7 @@ const ministries = [
 ];
 
 export default function Navbar() {
-  const [scrollY, setScrollY] = useState(0);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isServeOpen, setIsServeOpen] = useState(false);
   const location = useLocation();
@@ -76,27 +76,18 @@ export default function Navbar() {
     const handleHide = () => setIsRevealed(false);
 
     const handleScroll = () => {
-      const currentY = window.scrollY;
-      setScrollY(currentY);
+      const isPast = window.scrollY > 20;
+      setHasScrolled(prev => prev !== isPast ? isPast : prev);
     };
 
     window.addEventListener('reveal-navbar', handleReveal);
     window.addEventListener('hide-navbar', handleHide);
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Connect to Lenis if active
-    const lenis = (window as unknown as { __lenis?: { on: (event: string, cb: () => void) => void; off?: (event: string, cb: () => void) => void } }).__lenis;
-    if (lenis && typeof lenis.on === 'function') {
-      lenis.on('scroll', handleScroll);
-    }
-
     return () => {
       window.removeEventListener('reveal-navbar', handleReveal);
       window.removeEventListener('hide-navbar', handleHide);
       window.removeEventListener('scroll', handleScroll);
-      if (lenis && typeof lenis.off === 'function') {
-        lenis.off('scroll', handleScroll);
-      }
     };
   }, [isHomePage]);
 
@@ -121,7 +112,7 @@ export default function Navbar() {
         }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 left-0 right-0 h-[74px] z-50 bg-[#FAF4E6] border-b border-[#e9dcbe] transition-shadow duration-300 ${
-          scrollY > 20 ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''
+          hasScrolled ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''
         } ${isRevealed ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
         <div className="w-full h-full px-6 sm:px-10 lg:px-16 xl:px-24 flex items-center justify-between">
