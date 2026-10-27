@@ -19,53 +19,92 @@ export default function WelcomeExperience({ onEnterStory }: WelcomeExperiencePro
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // States
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  // Starts as unrevealed cinema on every load/refresh
+  const [isRevealed, setIsRevealed] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(26);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
-  const [isPlayingNormal, setIsPlayingNormal] = useState<boolean>(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showControls, setShowControls] = useState<boolean>(false);
+  const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
 
-  // Target and current time for RAF lerping
-  const targetTimeRef = useRef<number>(0);
-  const currentTimeRef = useRef<number>(0);
-  const isScrubbingRef = useRef<boolean>(true);
+  // Sync video start with preloader wipe: Sound ON by default
+  useEffect(() => {
+    // Gesture listener to unmute if browser policy initially required user interaction
+    const handleFirstGesture = () => {
+      if (videoRef.current && videoRef.current.muted) {
+        videoRef.current.muted = false;
+        setIsMuted(false);
+      }
+    };
+    window.addEventListener('pointerdown', handleFirstGesture, { once: true });
+    window.addEventListener('keydown', handleFirstGesture, { once: true });
 
-  // Calculate duration once video metadata loads
-  const handleLoadedMetadata = () => {
+    const startPlaybackWithSound = () => {
+      if (!videoRef.current) return;
+      videoRef.current.currentTime = 0;
+      videoRef.current.muted = false;
+      setIsMuted(false);
+
+      videoRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(() => {
+          // Fallback to muted if browser blocks unmuted autoplay without prior interaction
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            setIsMuted(true);
+            videoRef.current.play().catch(() => {});
+            setIsPlaying(true);
+          }
+        });
+    };
+
+    const isDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
+    if (isDone) {
+      startPlaybackWithSound();
+      return () => {
+        window.removeEventListener('pointerdown', handleFirstGesture);
+        window.removeEventListener('keydown', handleFirstGesture);
+      };
+    }
+
+    // Freeze video at 0.00 while preloader is on screen
     if (videoRef.current) {
       const dur = videoRef.current.duration || 26;
       setDuration(dur);
       setIsVideoLoaded(true);
       videoRef.current.currentTime = 0;
+      videoRef.current.muted = false;
+      setIsPlaying(false);
     }
-  };
 
-  // Scroll listener that binds scroll position to video progress
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current || isPlayingNormal) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const totalScrollable = containerRef.current.offsetHeight - window.innerHeight;
-
-      if (totalScrollable <= 0) return;
-
-      // Calculate how far we've scrolled inside this container
-      const currentScroll = -rect.top;
-      const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
-
-      setScrollProgress(progress);
-      targetTimeRef.current = progress * duration;
+    const handlePreloaderComplete = () => {
+      startPlaybackWithSound();
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    window.addEventListener('preloader-complete', handlePreloaderComplete);
+    return () => {
+      window.removeEventListener('preloader-complete', handlePreloaderComplete);
+      window.removeEventListener('pointerdown', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+    };
+  }, []);
 
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [duration, isPlayingNormal]);
+  // Trigger the grand reveal sequence (navbar glides in, video docks into card, footer unlocks)
+  const triggerReveal = useCallback(() => {
+    setIsRevealed(true);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('reveal-navbar'));
+      document.body.style.overflow = '';
+    }
+  }, []);
+  
 
-  // Smooth RAF loop to lerp video.currentTime without browser decoding lag
+  // Lock body scroll during full cinema intro, but detect scroll intent to trigger reveal
   useEffect(() => {
     let rafId: number;
 
