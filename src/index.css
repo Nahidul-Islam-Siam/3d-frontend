@@ -65,8 +65,12 @@
     font-family: Helvetica, Arial, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-title {
+  h1, h2, h3, h4, h5, h6, .font-title, .font-serif, .font-playfair {
     font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  h1 span, h2 span, h3 span, h4 span, h5 span, h6 span, .font-title span, .font-serif span, .font-playfair span {
+    font-family: inherit;
   }
 
   button, [type="button"], [type="submit"], [role="button"], .btn {
