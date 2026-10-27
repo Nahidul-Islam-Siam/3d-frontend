@@ -589,7 +589,7 @@ export default function ZAxisStage() {
             playsInline
             controls
             preload="auto"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain lg:object-cover portrait:object-contain"
           />
           <div className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-2 pointer-events-none select-none">
             <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-white/40 flex items-center justify-center shrink-0">
@@ -649,9 +649,9 @@ export default function ZAxisStage() {
         </section>
 
         {/* Chapter 2: Doors */}
-        <section className="relative w-full min-h-screen bg-[#201308] py-20 px-4 flex items-center justify-center">
-          <div className="relative aspect-[1920/1188] max-w-[1420px] w-full">
-            <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-contain block select-none pointer-events-none" />
+        <section className="relative w-full bg-[#301F10] flex items-center justify-center overflow-hidden">
+          <div className="relative aspect-[1920/1188] w-full">
+            <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-cover block select-none pointer-events-none" />
 
             {/* Luminous Orange Door Outlines (Hover Effect) */}
             <svg
@@ -850,7 +850,7 @@ export default function ZAxisStage() {
               muted={isMuted}
               onLoadedMetadata={handleLoadedMetadata}
               onEnded={handleVideoEnded}
-              className="w-full h-full object-cover pointer-events-none"
+              className="w-full h-full object-contain lg:object-cover portrait:object-contain pointer-events-none"
             />
             {/* Ambient Vignette */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
@@ -973,16 +973,14 @@ export default function ZAxisStage() {
           ═══════════════════════════════════════════════════════════════ */}
       <section 
         id="chapter-02"
-        className="relative w-full min-h-screen bg-[#201308] flex items-center justify-center py-16 sm:py-24 px-4 overflow-hidden select-none"
+        className="relative w-full bg-[#301F10] flex items-center justify-center overflow-hidden select-none"
       >
-        <div className="relative w-full max-w-[1420px] flex items-center justify-center">
-          <div className="relative aspect-[1920/1188] max-w-full w-full h-auto flex items-center justify-center">
-            <img 
-              src={doorsSectionImg} 
-              alt="Where would you like to go? Four open doors" 
-              className="w-full h-full object-contain block select-none pointer-events-none" 
-            />
-
+        <div className="relative w-full aspect-[1920/1188] flex items-center justify-center">
+          <img 
+            src={doorsSectionImg} 
+            alt="Where would you like to go? Four open doors" 
+            className="w-full h-full object-cover block select-none pointer-events-none" 
+          />
             {/* ─── Luminous Orange Door Outlines (Hover Effect) ─── */}
             <svg
               viewBox="0 0 1920 1188"
@@ -1061,7 +1059,6 @@ export default function ZAxisStage() {
               />
             ))}
           </div>
-        </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════

@@ -189,7 +189,7 @@ export default function WelcomeExperience({ onEnterStory }: WelcomeExperiencePro
             muted={isMuted}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={() => setIsPlayingNormal(false)}
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-full object-contain lg:object-cover portrait:object-contain pointer-events-none"
           />
 
           {/* Cinematic Vignette Overlay */}
