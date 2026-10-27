@@ -10,8 +10,7 @@ import {
   Maximize2,
   Mail,
   Phone,
-  Globe,
-  ChevronDown
+  Globe
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
@@ -112,14 +111,21 @@ interface ShowdownSectionProps {
 
 function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps) {
   return (
-    <div className={`w-full mx-auto flex flex-col items-center ${isModal ? 'max-w-[840px] space-y-6 sm:space-y-8 px-2 sm:px-4 py-2' : 'max-w-[720px] space-y-2.5 sm:space-y-3.5 px-2'}`}>
+    <div 
+      className={`mx-auto flex flex-col items-center ${
+        isModal 
+          ? 'w-full max-w-[840px] space-y-6 sm:space-y-8 px-2 sm:px-4 py-2' 
+          : 'w-full space-y-3 sm:space-y-4 px-4 sm:px-6'
+      }`}
+      style={!isModal ? { width: 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' } : undefined}
+    >
       
-      {/* ─── 1. TOP HEADER: REAL TEXT & INTERACTIVE BUTTONS ─── */}
-      <div className={`${isModal ? '' : 'ch4-header'} w-full flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 pb-2 border-b border-white/10 shrink-0`}>
-        <div className="space-y-0.5 text-left">
+      {/* ─── 1. TOP HEADER: REAL TEXT & INTERACTIVE BUTTONS (EXACT FIGMA FRAME 338) ─── */}
+      <div className={`${isModal ? '' : 'ch4-header'} w-full flex flex-col sm:flex-row sm:items-end justify-between gap-3 shrink-0`}>
+        <div className="space-y-1 text-left">
           <h2 
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-xl sm:text-2xl lg:text-[28px] font-bold text-white tracking-tight leading-tight"
+            className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-white tracking-tight leading-tight"
           >
             What’s Coming Up Next
           </h2>
@@ -128,12 +134,12 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           <a
             href="https://tickets.liveachievebelieve.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-[11px] font-serif font-bold uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-[11px] sm:text-xs font-serif font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(249,115,22,0.4)] hover:scale-105 transition-all cursor-pointer"
           >
             <span>TICKETS OPEN NOW</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -141,26 +147,23 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
           <button
             type="button"
             onClick={onOpenModal}
-            className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-white/5 hover:bg-white/15 border border-white/20 text-white text-[11px] font-serif font-medium tracking-wider hover:scale-105 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] sm:text-xs font-serif font-medium tracking-wider hover:scale-105 transition-all cursor-pointer"
           >
-            <span>Audition The Show</span>
+            <span>Audition</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* ─── 2. POSTER BANNER: FITTED FULLY ON SCREEN (NO SIDED CUT-OFF) ─── */}
+      {/* ─── 2. POSTER BANNER: EXACT FIGMA FRAME 338 ─── */}
       <div 
         onClick={onOpenModal}
-        className={`${isModal ? '' : 'ch4-banner'} relative rounded-[14px] sm:rounded-[18px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/15 bg-black shrink-0 ${onOpenModal ? 'cursor-pointer group' : ''}`}
+        className={`${isModal ? '' : 'ch4-banner'} relative w-full rounded-[18px] sm:rounded-[24px] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-white/15 bg-black shrink-0 ${onOpenModal ? 'cursor-pointer group' : ''}`}
       >
         <img
           src={isModal ? showdownPoster : auditionBanner}
           alt="Showdown Suicide Awareness Event - Where Are You Now? Letters to Etcetera"
-          className={isModal 
-            ? "w-full h-auto object-cover block" 
-            : "h-auto max-h-[calc(100vh-215px)] sm:max-h-[calc(100vh-225px)] w-auto max-w-full aspect-[1978/1620] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.01]"
-          }
+          className="w-full h-auto aspect-[1978/1620] object-cover block transition-transform duration-700 ease-out group-hover:scale-[1.015]"
         />
         {onOpenModal && (
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
@@ -170,18 +173,6 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
             </div>
           </div>
         )}
-      </div>
-
-      {/* ─── 3. "IMPORTANT INFORMATION" PILL BUTTON ─── */}
-      <div className={`${isModal ? '' : 'ch4-pill'} flex flex-col items-center justify-center pt-0.5 shrink-0`}>
-        <button 
-          type="button"
-          onClick={onOpenModal}
-          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#241135] hover:bg-[#34184c] border border-purple-400/30 text-stone-300 hover:text-white text-[11px] font-sans tracking-wide shadow-md transition-all cursor-pointer group"
-        >
-          <span>Important Information & Audition Details</span>
-          <ChevronDown className="w-3.5 h-3.5 text-purple-300 group-hover:translate-y-0.5 transition-transform" />
-        </button>
       </div>
 
       {/* ─── 4. BOTTOM 2-COLUMN INFORMATION CARD: REAL TEXT & BUTTONS (Rendered in modal) ─── */}
@@ -492,10 +483,9 @@ export default function ZAxisStage() {
       gsap.set('.ch3-card-item', { autoAlpha: 0, y: 45, scale: 0.95 });
 
       // Chapter 4
-      gsap.set('.ch4-glow', { autoAlpha: 0, scale: 0.85 });
+      gsap.set(['.ch4-glow-left', '.ch4-glow-right'], { autoAlpha: 0, scale: 0.85 });
       gsap.set('.ch4-header', { autoAlpha: 0, y: 25 });
       gsap.set('.ch4-banner', { autoAlpha: 0, y: 35, scale: 0.96 });
-      gsap.set('.ch4-pill', { autoAlpha: 0, y: 20 });
 
       // Chapter 5: 3D Z-Axis stage section initial states
       gsap.set(ch5, { autoAlpha: 0, scale: 0.94, y: 35 });
@@ -718,7 +708,7 @@ export default function ZAxisStage() {
           duration: 0.45,
         }, 3.55)
         .to(stageBg, {
-          backgroundColor: '#140820',
+          backgroundColor: '#2B173E',
           duration: 0.95,
           ease: 'power1.inOut',
         }, 3.24)
@@ -727,9 +717,9 @@ export default function ZAxisStage() {
           duration: 0.75,
           ease: 'power1.inOut',
         }, 3.38)
-        .to('.ch4-glow', {
-          autoAlpha: 0.25,
-          scale: 1.05,
+        .to(['.ch4-glow-left', '.ch4-glow-right'], {
+          autoAlpha: 1,
+          scale: 1,
           duration: 0.75,
           ease: 'power1.out',
         }, 3.38)
@@ -745,20 +735,14 @@ export default function ZAxisStage() {
           scale: 1,
           duration: 0.75,
           ease: 'power2.out',
-        }, 3.50)
-        .to('.ch4-pill', {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.65,
-          ease: 'power2.out',
-        }, 3.60);
+        }, 3.50);
 
         // Micro-hold on Chapter 4 (Audition Showcase): 4.24 to 4.32 (duration 0.08)
 
         // ─────────────────────────────────────────────────────────────
         // TRANSITION CH 4 -> CH 5 (4.32 to 5.32) - 3D Z-AXIS EMERGENCE
         // ─────────────────────────────────────────────────────────────
-        tl.to(['.ch4-banner', '.ch4-header', '.ch4-pill'], {
+        tl.to(['.ch4-banner', '.ch4-header'], {
           autoAlpha: 0,
           y: -30,
           scale: 0.96,
@@ -766,7 +750,7 @@ export default function ZAxisStage() {
           stagger: 0.04,
           ease: 'power1.in',
         }, 4.32)
-        .to('.ch4-glow', {
+        .to(['.ch4-glow-left', '.ch4-glow-right'], {
           autoAlpha: 0,
           duration: 0.5,
         }, 4.32)
@@ -970,7 +954,7 @@ export default function ZAxisStage() {
 
         {/* Chapter 2: Doors */}
         <section className="relative w-full min-h-screen bg-[#201308] py-20 px-4 flex items-center justify-center">
-          <div className="relative aspect-[1920/1188] max-w-[1400px] w-full">
+          <div className="relative aspect-[1920/1188] max-w-[1420px] w-full">
             <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-contain block select-none pointer-events-none" />
 
             {/* Luminous Orange Door Outlines (Hover Effect) */}
@@ -1081,7 +1065,7 @@ export default function ZAxisStage() {
         </section>
 
         {/* Chapter 4: Audition Showdown */}
-        <section className="relative w-full min-h-screen bg-[#140820] py-20 px-4 flex items-center justify-center">
+        <section className="relative w-full min-h-screen bg-[#2B173E] py-20 px-4 flex items-center justify-center">
           <ShowdownSection onOpenModal={openFlyerModal} />
         </section>
 
@@ -1274,7 +1258,7 @@ export default function ZAxisStage() {
             ref={ch2Ref}
             className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden select-none z-20 will-change-transform will-change-opacity"
           >
-            <div className="ch2-content relative w-full h-full max-w-[1920px] pt-[74px] pb-6 px-4 flex items-center justify-center">
+            <div className="ch2-content relative w-full h-full max-w-[1420px] pt-[74px] pb-6 px-4 flex items-center justify-center">
               <div className="relative aspect-[1920/1188] max-h-full max-w-full w-full h-auto flex items-center justify-center">
                 <img 
                   src={doorsSectionImg} 
@@ -1429,10 +1413,11 @@ export default function ZAxisStage() {
               ═══════════════════════════════════════════════════════════════ */}
           <div
             ref={ch4Ref}
-            className="absolute inset-0 w-full h-full flex flex-col justify-center items-center text-white pt-[78px] sm:pt-[82px] pb-4 px-4 sm:px-6 select-none overflow-hidden z-20 will-change-transform will-change-opacity"
+            className="absolute inset-0 w-full h-full flex flex-col justify-center items-center text-white pt-[74px] pb-4 px-4 select-none overflow-hidden z-20 will-change-transform will-change-opacity"
           >
-            {/* Ambient Backlight */}
-            <div className="ch4-glow absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#F97316]/15 rounded-full blur-[100px] pointer-events-none" />
+            {/* Ambient Backlight matching Figma Frame 338 */}
+            <div className="ch4-glow-left absolute -top-12 -left-20 w-[650px] lg:w-[850px] h-[650px] bg-[#F97316]/25 rounded-full blur-[140px] pointer-events-none" />
+            <div className="ch4-glow-right absolute -bottom-12 -right-20 w-[600px] lg:w-[800px] h-[600px] bg-[#F97316]/20 rounded-full blur-[140px] pointer-events-none" />
 
             <div className="w-full relative z-10 flex flex-col items-center justify-center">
               <ShowdownSection onOpenModal={openFlyerModal} />
@@ -1444,18 +1429,18 @@ export default function ZAxisStage() {
               ═══════════════════════════════════════════════════════════════ */}
           <div
             ref={ch5Ref}
-            className="absolute inset-0 w-full h-full flex flex-col justify-center items-center px-6 sm:px-12 lg:px-20 z-20 overflow-hidden select-none will-change-transform will-change-opacity pointer-events-auto"
+            className="absolute inset-0 w-full h-full bg-[#FAF4E6] flex flex-col justify-center items-center px-6 sm:px-12 lg:px-20 z-20 overflow-hidden select-none will-change-transform will-change-opacity pointer-events-auto"
           >
-            {/* Flourish leaves */}
+            {/* Flourish leaves (centered with Expected section, kept well clear of the footer) */}
             <img 
               src={leftLeaf} 
               alt="" 
-              className="ch5-leaf-left absolute left-2 sm:left-6 lg:left-12 top-1/2 -translate-y-1/2 w-36 sm:w-52 lg:w-64 opacity-60 pointer-events-none select-none" 
+              className="ch5-leaf-left absolute left-2 sm:left-6 lg:left-12 top-[38%] -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
             />
             <img 
               src={rightLeaf} 
               alt="" 
-              className="ch5-leaf-right absolute right-2 sm:right-6 lg:right-12 top-1/2 -translate-y-1/2 w-36 sm:w-52 lg:w-64 opacity-60 pointer-events-none select-none" 
+              className="ch5-leaf-right absolute right-2 sm:right-6 lg:right-12 top-[38%] -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
             />
 
             {/* Main Sanctuary Invitation Card */}
@@ -1497,7 +1482,10 @@ export default function ZAxisStage() {
       </div>
 
       {/* ─── NATURAL CONTINUATION: FULL-WIDTH OFFICIAL FOOTER ─── */}
-      <div ref={footerRef} className="relative w-full z-30 bg-[#FAF4E6]">
+      <div 
+        ref={footerRef} 
+        className="relative w-full z-20 bg-[#FAF4E6] -mt-44 sm:-mt-52 lg:-mt-56"
+      >
         <Footer isHome={true} />
       </div>
 
