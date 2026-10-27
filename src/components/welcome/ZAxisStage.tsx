@@ -1433,7 +1433,7 @@ export default function ZAxisStage() {
           >
             {/* Flourish leaves (centered with Expected section, kept well clear of the footer) */}
             <img 
-              src={leftLeaf} 
+              src={leftLeaf}  
               alt="" 
               className="ch5-leaf-left absolute left-2 sm:left-6 lg:left-12 top-[38%] -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
             />

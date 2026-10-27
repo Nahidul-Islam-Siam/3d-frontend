@@ -98,10 +98,9 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
   return (
     <footer 
       ref={footerRef}
-      className={`w-full bg-[#FAF4E6] text-stone-800 ${isHome ? 'pt-0 sm:pt-1' : 'pt-6'} pb-8 px-4 sm:px-6 md:px-10 lg:px-12 xl:px-16 font-sans select-none ${className}`}
+      className={`w-full bg-[#FAF4E6] text-stone-800 border-t border-[#F9D3B2] rounded-t-[32px] sm:rounded-t-[40px] pt-[64px] pb-[64px] px-6 sm:px-10 md:px-16 lg:px-20 min-[1440px]:px-[250px] font-sans select-none ${className}`}
     >
-      {/* Top Rounded Border Frame (Full Width) */}
-      <div className="footer-card w-full rounded-t-[32px] sm:rounded-t-[40px] border-t border-x border-[#FDBA74]/90 bg-[#FAF4E6] px-6 sm:px-10 lg:px-12 xl:px-16 pt-10 pb-8 will-change-transform will-change-opacity">
+      <div className="footer-card w-full will-change-transform will-change-opacity">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-start">
           
           {/* Col 1: Brand Info */}
@@ -182,9 +181,9 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
             </ul>
           </div>
 
-          {/* Col 4: Next Event Broadcast Box */}
+          {/* Col 4: Next Event Broadcast Box (Same border color #F9D3B2 as main frame) */}
           <div className="footer-col footer-event-col lg:col-span-4 xl:col-span-4 will-change-transform will-change-opacity">
-            <div className="footer-event-box rounded-2xl border border-[#F97316]/60 bg-[#FAF1E3]/60 p-5 sm:p-6 space-y-2.5 will-change-transform will-change-opacity">
+            <div className="footer-event-box rounded-2xl border border-[#F9D3B2] bg-[#FAEAD5] p-5 sm:p-6 space-y-2.5 will-change-transform will-change-opacity">
               <span className="block text-[11px] font-bold tracking-wider text-[#F97316] uppercase font-sans">
                 NEXT EVENT BROADCAST
               </span>
@@ -208,21 +207,21 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
           </div>
 
         </div>
-      </div>
 
-      {/* Bottom Sub-Bar with thin divider (Full Width) */}
-      <div className="footer-bottom w-full px-6 sm:px-10 lg:px-12 xl:px-16 pt-6 border-t border-[#E8DAC2] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600 font-sans will-change-transform will-change-opacity">
-        <p>
-          © 2025 Live Achieve Believe (LAB) Foundation. All rights reserved.
-        </p>
+        {/* Bottom Sub-Bar with thin divider (Contained inside the padded footer) */}
+        <div className="footer-bottom w-full mt-10 sm:mt-12 pt-6 border-t border-[#F9D3B2]/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600 font-sans will-change-transform will-change-opacity">
+          <p>
+            © 2025 Live Achieve Believe (LAB) Foundation. All rights reserved.
+          </p>
 
-        <div className="flex items-center gap-6 text-stone-600 font-sans">
-          <Link to="/privacy" className="hover:text-[#F97316] transition-colors">
-            Privacy Policy
-          </Link>
-          <Link to="/terms" className="hover:text-[#F97316] transition-colors">
-            Terms and Condition
-          </Link>
+          <div className="flex items-center gap-6 text-stone-600 font-sans">
+            <Link to="/privacy" className="hover:text-[#F97316] transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="hover:text-[#F97316] transition-colors">
+              Terms and Condition
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
