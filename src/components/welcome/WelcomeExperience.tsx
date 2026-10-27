@@ -1,206 +1,94 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, 
   Pause, 
-  RotateCcw, 
   Volume2, 
   VolumeX, 
-  Maximize, 
-  Minimize, 
-  ArrowDown
+  ArrowDown,
+  RotateCcw
 } from 'lucide-react';
 import welcomeVideo from '@/assets/video/welcome.mp4';
 import SpotlightCanvas from './SpotlightCanvas';
-import ScrollIndicator3D from './ScrollIndicator3D';
 
 interface WelcomeExperienceProps {
-  onEnterHallway?: () => void;
+  onEnterStory?: () => void;
 }
 
-export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+export default function WelcomeExperience({ onEnterStory }: WelcomeExperienceProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Starts as unrevealed cinema on every load/refresh
-  const [isRevealed, setIsRevealed] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
+  // States
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [duration, setDuration] = useState<number>(26);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [showControls, setShowControls] = useState<boolean>(false);
-  const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isPlayingNormal, setIsPlayingNormal] = useState<boolean>(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState<boolean>(false);
 
-  // Sync video start with preloader wipe: Sound ON by default
-  useEffect(() => {
-    // Gesture listener to unmute if browser policy initially required user interaction
-    const handleFirstGesture = () => {
-      if (videoRef.current && videoRef.current.muted) {
-        videoRef.current.muted = false;
-        setIsMuted(false);
-      }
-    };
-    window.addEventListener('pointerdown', handleFirstGesture, { once: true });
-    window.addEventListener('keydown', handleFirstGesture, { once: true });
+  // Target and current time for RAF lerping
+  const targetTimeRef = useRef<number>(0);
+  const currentTimeRef = useRef<number>(0);
+  const isScrubbingRef = useRef<boolean>(true);
 
-    const startPlaybackWithSound = () => {
-      if (!videoRef.current) return;
-      videoRef.current.currentTime = 0;
-      videoRef.current.muted = false;
-      setIsMuted(false);
-
-      videoRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch(() => {
-          // Fallback to muted if browser blocks unmuted autoplay without prior interaction
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            setIsMuted(true);
-            videoRef.current.play().catch(() => {});
-            setIsPlaying(true);
-          }
-        });
-    };
-
-    const isDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
-    if (isDone) {
-      startPlaybackWithSound();
-      return () => {
-        window.removeEventListener('pointerdown', handleFirstGesture);
-        window.removeEventListener('keydown', handleFirstGesture);
-      };
-    }
-
-    // Freeze video at 0.00 while preloader is on screen
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-      videoRef.current.muted = false;
-      setIsPlaying(false);
-    }
-
-    const handlePreloaderComplete = () => {
-      startPlaybackWithSound();
-    };
-
-    window.addEventListener('preloader-complete', handlePreloaderComplete);
-    return () => {
-      window.removeEventListener('preloader-complete', handlePreloaderComplete);
-      window.removeEventListener('pointerdown', handleFirstGesture);
-      window.removeEventListener('keydown', handleFirstGesture);
-    };
-  }, []);
-
-  // Trigger the grand reveal sequence (navbar glides in, video docks into card, footer unlocks)
-  const triggerReveal = useCallback(() => {
-    setIsRevealed(true);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('reveal-navbar'));
-      document.body.style.overflow = '';
-    }
-  }, []);
-  
-
-  // Lock body scroll during full cinema intro, but detect scroll intent to trigger reveal
-  useEffect(() => {
-    if (!isRevealed) {
-      document.body.style.overflow = 'hidden';
-
-      // Wheel listener: Scrolling down reveals the page immediately
-      const handleWheel = (e: WheelEvent) => {
-        if (e.deltaY > 15) {
-          triggerReveal();
-        }
-      };
-
-      // Touch listener: Swiping up reveals the page
-      let startY = 0;
-      const handleTouchStart = (e: TouchEvent) => {
-        startY = e.touches[0].clientY;
-      };
-      const handleTouchMove = (e: TouchEvent) => {
-        const currentY = e.touches[0].clientY;
-        if (startY - currentY > 25) {
-          triggerReveal();
-        }
-      };
-
-      // Key listener: Arrow down or space reveals
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
-          triggerReveal();
-        }
-      };
-
-      window.addEventListener('wheel', handleWheel, { passive: true });
-      window.addEventListener('touchstart', handleTouchStart, { passive: true });
-      window.addEventListener('touchmove', handleTouchMove, { passive: true });
-      window.addEventListener('keydown', handleKeyDown);
-
-      return () => {
-        document.body.style.overflow = '';
-        window.removeEventListener('wheel', handleWheel);
-        window.removeEventListener('touchstart', handleTouchStart);
-        window.removeEventListener('touchmove', handleTouchMove);
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    } else {
-      document.body.style.overflow = '';
-    }
-  }, [isRevealed, triggerReveal]);
-
-  // Sync fullscreen state
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  // Time update listener - automatically reveals page at 21.5s when host says "Welcome home"
-  const handleTimeUpdate = () => {
-    if (!videoRef.current) return;
-    const time = videoRef.current.currentTime;
-    setCurrentTime(time);
-
-    // Auto-reveal when host welcomes visitor home and golden doors illuminate
-    if (!isRevealed && time >= 21.5) {
-      triggerReveal();
-    }
-  };
-
+  // Calculate duration once video metadata loads
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
-      setDuration(videoRef.current.duration || 26);
+      const dur = videoRef.current.duration || 26;
+      setDuration(dur);
+      setIsVideoLoaded(true);
+      videoRef.current.currentTime = 0;
     }
   };
 
-  const handleEnded = () => {
-    setIsPlaying(false);
-    if (!isRevealed) {
-      triggerReveal();
-    }
-  };
+  // Scroll listener that binds scroll position to video progress
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current || isPlayingNormal) return;
 
-  // Toggle Play / Pause
-  const togglePlay = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    }
-    setShowPlayPulse(true);
-    setTimeout(() => setShowPlayPulse(false), 600);
-  };
+      const rect = containerRef.current.getBoundingClientRect();
+      const totalScrollable = containerRef.current.offsetHeight - window.innerHeight;
+
+      if (totalScrollable <= 0) return;
+
+      // Calculate how far we've scrolled inside this container
+      const currentScroll = -rect.top;
+      const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
+
+      setScrollProgress(progress);
+      targetTimeRef.current = progress * duration;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [duration, isPlayingNormal]);
+
+  // Smooth RAF loop to lerp video.currentTime without browser decoding lag
+  useEffect(() => {
+    let rafId: number;
+
+    const lerpLoop = () => {
+      if (videoRef.current && isVideoLoaded && !isPlayingNormal) {
+        // Smoothly interpolate current time towards target time
+        const diff = targetTimeRef.current - currentTimeRef.current;
+        if (Math.abs(diff) > 0.02) {
+          currentTimeRef.current += diff * 0.18;
+          // Apply to HTML5 video element
+          try {
+            videoRef.current.currentTime = currentTimeRef.current;
+          } catch {
+            // Ignore minor abort errors during rapid scrubbing
+          }
+        }
+      }
+      rafId = requestAnimationFrame(lerpLoop);
+    };
+
+    rafId = requestAnimationFrame(lerpLoop);
+    return () => cancelAnimationFrame(rafId);
+  }, [isVideoLoaded, isPlayingNormal]);
 
   // Toggle Mute / Unmute
   const toggleMute = (e?: React.MouseEvent) => {
@@ -209,304 +97,207 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
     const nextMuted = !isMuted;
     videoRef.current.muted = nextMuted;
     setIsMuted(nextMuted);
-    if (nextMuted === false && !isPlaying) {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    }
   };
 
-  // Click on screen during cinema mode: if muted -> unmute; otherwise toggle play
-  const handleScreenClick = () => {
-    if (isMuted) {
-      if (videoRef.current) {
-        videoRef.current.muted = false;
-        setIsMuted(false);
-        if (!isPlaying) {
-          videoRef.current.play().catch(() => {});
-          setIsPlaying(true);
-        }
-      }
+  // Toggle Standard Play / Pause Mode
+  const togglePlayMode = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!videoRef.current) return;
+
+    if (isPlayingNormal) {
+      videoRef.current.pause();
+      setIsPlayingNormal(false);
+      isScrubbingRef.current = true;
     } else {
-      togglePlay();
+      videoRef.current.muted = isMuted;
+      videoRef.current.play().then(() => {
+        setIsPlayingNormal(true);
+        isScrubbingRef.current = false;
+      }).catch(() => {
+        // Fallback to muted if browser autoplay policy blocks unmuted
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          setIsMuted(true);
+          videoRef.current.play().catch(() => {});
+          setIsPlayingNormal(true);
+          isScrubbingRef.current = false;
+        }
+      });
     }
   };
 
-  // Replay video from start
+  // Replay from start
   const handleReplay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!videoRef.current) return;
+    targetTimeRef.current = 0;
+    currentTimeRef.current = 0;
     videoRef.current.currentTime = 0;
-    videoRef.current.play().catch(() => {});
-    setIsPlaying(true);
-  };
-
-  // Fullscreen toggle
-  const toggleFullscreen = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!containerRef.current) return;
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
+    if (isPlayingNormal) {
+      videoRef.current.play().catch(() => {});
     }
   };
 
-  // Scrubber seek
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const seekTime = parseFloat(e.target.value);
-    if (videoRef.current) {
-      videoRef.current.currentTime = seekTime;
-      setCurrentTime(seekTime);
-    }
-  };
-
-  // Smooth scroll past the video into story
-  const scrollToStory = () => {
-    if (onEnterHallway) {
-      onEnterHallway();
+  // Smoothly scroll down past the video track to enter the story
+  const scrollToContent = () => {
+    if (onEnterStory) {
+      onEnterStory();
       return;
     }
     const target = document.getElementById('story-start');
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+      const scrollYTarget = window.innerHeight * 2.2;
+      window.scrollTo({ top: scrollYTarget, behavior: 'smooth' });
     }
   };
 
-  const formatTime = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // Docking transformation as scroll reaches the end of the video track
+  // Progress 0.0 -> 0.70: Fullscreen immersion
+  // Progress 0.70 -> 1.0: Scales smoothly into rounded cinema card and fades in next section
+  const scale = 1 - Math.max(0, (scrollProgress - 0.7) / 0.3) * 0.08;
+  const borderRadius = Math.min(36, Math.max(0, (scrollProgress - 0.7) / 0.3) * 36);
 
   return (
-    <div className={`w-full transition-colors duration-1000 ${isRevealed ? 'bg-[#FAF4E6] py-3 md:py-6 px-4 sm:px-6 lg:px-8' : 'bg-black p-0'}`}>
-      <div className={`w-full ${isRevealed ? 'max-w-[1856px] mx-auto' : ''}`}>
+    // Tall scroll trigger container (240vh provides ample smooth scrubbing room)
+    <div 
+      ref={containerRef} 
+      className="relative w-full h-[240vh] bg-black select-none"
+    >
+      {/* Sticky Fullscreen Frame */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-black">
         
-        {/* SINGLE CONTINUOUS CINEMA CONTAINER */}
-        <div
-          ref={containerRef}
-          onClick={!isRevealed ? handleScreenClick : undefined}
-          onMouseEnter={() => setShowControls(true)}
-          onMouseLeave={() => setShowControls(false)}
-          className={
-            isRevealed
-              ? "relative w-full rounded-[24px] md:rounded-[32px] overflow-hidden bg-black shadow-2xl aspect-[16/9] md:aspect-[21/10] lg:h-[870px] max-h-[88vh] flex items-center justify-center select-none group transition-all duration-1000 ease-out"
-              : "fixed inset-0 z-40 w-screen h-screen rounded-none bg-black overflow-hidden flex items-center justify-center select-none cursor-pointer transition-all duration-1000 ease-out"
-          }
-        >
-          {/* Subtle 3D Dust Particles (Clean, no wireframe sphere) */}
-          {!isRevealed && <SpotlightCanvas />}
+        {/* Subtle Ambient 3D Dust Motes */}
+        <SpotlightCanvas />
 
-          {/* THE SINGLE CONTINUOUS HTML5 VIDEO */}
+        {/* Video Card with Dynamic Scroll Scale & Rounded Corners */}
+        <div 
+          style={{
+            transform: `scale(${scale})`,
+            borderRadius: `${borderRadius}px`,
+            transition: 'transform 0.1s linear, border-radius 0.15s ease-out',
+          }}
+          className="relative w-full h-full max-w-[1920px] overflow-hidden bg-black shadow-2xl flex items-center justify-center"
+        >
+          {/* Main Video */}
           <video
             ref={videoRef}
             src={welcomeVideo}
             playsInline
             preload="auto"
             muted={isMuted}
-            onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
-            onEnded={handleEnded}
-            className={`w-full h-full object-cover ${isRevealed ? 'cursor-pointer' : 'pointer-events-none'}`}
-            onClick={isRevealed ? () => togglePlay() : undefined}
+            onEnded={() => setIsPlayingNormal(false)}
+            className="w-full h-full object-contain lg:object-cover portrait:object-contain pointer-events-none"
           />
 
-          {/* ──────────────────────────────────────────────────────────
-              CINEMA HUD (ONLY VISIBLE DURING !isRevealed CINEMA MODE)
-              Clean theater: Only Sound Toggle + 3D Scroll Indicator
-              ────────────────────────────────────────────────────────── */}
-          {!isRevealed && (
-            <>
-              {/* Subtle Screen Ambient Vignette */}
-              <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.65)_100%)]" />
+          {/* Cinematic Vignette Overlay */}
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.65)_100%)]" />
 
-              {/* Sound Toggle Pill (Top Right) */}
-              <div className="absolute top-6 right-6 md:right-12 z-50 pointer-events-auto">
-                <button
-                  onClick={(e) => toggleMute(e)}
-                  aria-label={isMuted ? "Unmute sound" : "Mute sound"}
-                  className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-serif font-bold tracking-wider uppercase transition-all backdrop-blur-md shadow-2xl ${
-                    isMuted 
-                      ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white shadow-[0_0_30px_rgba(249,115,22,0.6)] animate-pulse hover:scale-105' 
-                      : 'bg-black/60 hover:bg-black/80 text-stone-200 border border-white/20'
-                  }`}
-                >
-                  {isMuted ? (
-                    <>
-                      <VolumeX className="w-4 h-4 text-white" />
-                      <span>Tap for Sound</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      <span>Sound On</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Central Play/Pause Pulse indicator */}
-              <AnimatePresence>
-                {showPlayPulse && (
-                  <motion.div
-                    initial={{ scale: 0.7, opacity: 0 }}
-                    animate={{ scale: 1.2, opacity: 1 }}
-                    exit={{ scale: 1.4, opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="absolute pointer-events-none w-20 h-20 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-2xl"
-                  >
-                    {isPlaying ? <Play className="w-8 h-8 ml-1 text-[#F97316]" /> : <Pause className="w-8 h-8 text-white" />}
-                  </motion.div>
+          {/* ─── HUD TOP CONTROLS ─── */}
+          <div className="absolute top-6 left-6 right-6 md:top-8 md:left-10 md:right-10 z-30 flex items-center justify-between pointer-events-auto">
+            <div className="flex items-center gap-2">
+              {/* Play/Pause Mode Badge */}
+              <button
+                onClick={togglePlayMode}
+                aria-label={isPlayingNormal ? "Pause autoplay" : "Play continuously"}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-stone-200 text-xs font-serif tracking-wider uppercase transition-all hover:scale-105 shadow-xl"
+              >
+                {isPlayingNormal ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 text-[#F97316]" />
+                    <span>Pause</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 text-[#F97316]" />
+                    <span>Auto-Play Video</span>
+                  </>
                 )}
-              </AnimatePresence>
+              </button>
 
-              {/* Bottom Minimal 3D Scroll Indicator (Centered) */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-                <ScrollIndicator3D onClick={triggerReveal} />
-              </div>
-            </>
-          )}
+              {/* Reset / Replay Button */}
+              <button
+                onClick={handleReplay}
+                aria-label="Replay from start"
+                title="Replay from beginning"
+                className="p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-stone-300 hover:text-white transition-all hover:scale-105 shadow-xl"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
-          {/* ──────────────────────────────────────────────────────────
-              DOCKED CARD CONTROLS (ONLY VISIBLE ONCE isRevealed)
-              ────────────────────────────────────────────────────────── */}
-          {isRevealed && (
-            <>
-              {/* Floating Sound Toggle Pill (Top Right) */}
-              <div className="absolute top-5 right-5 md:top-8 md:right-8 z-30">
-                <button
-                  onClick={(e) => toggleMute(e)}
-                  aria-label={isMuted ? "Unmute Welcome Video" : "Mute Welcome Video"}
-                  className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-serif font-bold tracking-wider uppercase transition-all backdrop-blur-md shadow-xl ${
-                    isMuted
-                      ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)]'
-                      : 'bg-black/60 hover:bg-black/80 text-stone-200 border border-white/20'
-                  }`}
-                >
-                  {isMuted ? (
-                    <>
-                      <VolumeX className="w-4 h-4 text-white" />
-                      <span>Tap for Sound</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      <span>Sound On</span>
-                    </>
-                  )}
-                </button>
-              </div>
+            {/* Sound Toggle Pill */}
+            <button
+              onClick={toggleMute}
+              aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+              className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-serif font-bold tracking-wider uppercase transition-all backdrop-blur-md shadow-2xl ${
+                isMuted
+                  ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white shadow-[0_0_25px_rgba(249,115,22,0.5)] animate-pulse hover:scale-105'
+                  : 'bg-black/60 hover:bg-black/80 text-stone-200 border border-white/20'
+              }`}
+            >
+              {isMuted ? (
+                <>
+                  <VolumeX className="w-4 h-4 text-white" />
+                  <span>Tap for Sound</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 text-emerald-400" />
+                  <span>Sound On</span>
+                </>
+              )}
+            </button>
+          </div>
 
-              {/* Central Play/Replay Button when Paused or Ended */}
-              <AnimatePresence>
-                {!isPlaying && (
-                  <motion.button
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    onClick={(e) => togglePlay(e)}
-                    aria-label="Play video"
-                    className="absolute z-20 w-16 h-16 md:w-20 md:h-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/30 backdrop-blur-md text-white flex items-center justify-center shadow-2xl transition-transform hover:scale-110"
-                  >
-                    <Play className="w-7 h-7 md:w-9 md:h-9 translate-x-0.5 text-[#F97316]" />
-                  </motion.button>
-                )}
-              </AnimatePresence>
-
-              {/* Centered Figma 844:103 "SCROLL TO ENTER THE STORY" Indicator */}
-              <motion.button
-                onClick={scrollToStory}
-                initial={{ opacity: 0, y: 12 }}
+          {/* ─── CENTERED "SCROLL TO ENTER THE STORY" INDICATOR (FIGMA 844:103) ─── */}
+          <AnimatePresence>
+            {scrollProgress < 0.25 && !isPlayingNormal && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                aria-label="Scroll to enter the story"
-                className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-black/45 hover:bg-black/70 border border-[#F5F1E8]/60 backdrop-blur-md text-[#F5F1E8] transition-all hover:scale-105 shadow-[0_4px_20px_rgba(0,0,0,0.5)] cursor-pointer group/btn"
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.5 }}
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-auto"
               >
-                <div className="w-6 h-6 rounded-full border border-[#F5F1E8] flex items-center justify-center">
-                  <ArrowDown className="w-3.5 h-3.5 group-hover/btn:translate-y-0.5 transition-transform" />
-                </div>
-                <span className="font-serif font-bold text-xs md:text-sm tracking-wider uppercase whitespace-nowrap">
-                  SCROLL TO ENTER THE STORY
-                </span>
-              </motion.button>
-
-              {/* On-Hover Video Controls Bar */}
-              <div
-                className={`absolute inset-x-0 bottom-0 z-20 pt-16 pb-4 px-6 md:px-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${
-                  showControls || !isPlaying ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-                }`}
-              >
-                {/* Timeline Progress Bar */}
-                <div className="relative w-full flex items-center mb-3">
-                  <input
-                    type="range"
-                    min={0}
-                    max={duration || 100}
-                    step={0.1}
-                    value={currentTime}
-                    onChange={handleSeek}
-                    className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-[#F97316] hover:h-2 transition-all"
-                    style={{
-                      background: `linear-gradient(to right, #F97316 0%, #F97316 ${progressPercent}%, rgba(255,255,255,0.2) ${progressPercent}%, rgba(255,255,255,0.2) 100%)`
-                    }}
-                  />
-                </div>
-
-                {/* Controls Buttons */}
-                <div className="flex items-center justify-between text-xs font-mono text-stone-300">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={(e) => togglePlay(e)}
-                      aria-label={isPlaying ? "Pause" : "Play"}
-                      className="p-1.5 hover:text-white transition-colors"
+                <button
+                  onClick={scrollToContent}
+                  aria-label="Scroll to enter the story"
+                  className="group flex flex-col items-center gap-3 cursor-pointer text-white transition-transform hover:scale-105"
+                >
+                  <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-black/55 hover:bg-black/80 border border-white/40 backdrop-blur-md text-[#FAF4E6] shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+                    <div className="w-6 h-6 rounded-full border border-white/80 flex items-center justify-center">
+                      <ArrowDown className="w-3.5 h-3.5 text-[#F97316] animate-bounce" />
+                    </div>
+                    <span 
+                      style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                      className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase whitespace-nowrap"
                     >
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    </button>
-
-                    <button
-                      onClick={(e) => handleReplay(e)}
-                      aria-label="Replay from start"
-                      className="p-1.5 hover:text-white transition-colors"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                    </button>
-
-                    <button
-                      onClick={(e) => toggleMute(e)}
-                      aria-label={isMuted ? "Unmute" : "Mute"}
-                      className="p-1.5 hover:text-white transition-colors"
-                    >
-                      {isMuted ? <VolumeX className="w-4 h-4 text-orange-400" /> : <Volume2 className="w-4 h-4" />}
-                    </button>
-
-                    <span className="font-mono text-[11px] text-stone-400">
-                      {formatTime(currentTime)} / {formatTime(duration)}
+                      SCROLL TO ENTER THE STORY
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={(e) => toggleFullscreen(e)}
-                      aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                      className="p-1.5 hover:text-white transition-colors"
-                    >
-                      {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+                  <span className="text-[11px] font-mono tracking-widest uppercase text-stone-400/90 drop-shadow">
+                    Scroll down to play
+                  </span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ─── BOTTOM SCRUBBER PROGRESS LINE ─── */}
+          <div className="absolute bottom-0 inset-x-0 h-1 bg-white/10 pointer-events-none">
+            <div 
+              style={{ width: `${scrollProgress * 100}%` }}
+              className="h-full bg-gradient-to-r from-[#F97316] to-[#f59e0b] shadow-[0_0_12px_rgba(249,115,22,0.8)] transition-all duration-75"
+            />
+          </div>
 
         </div>
-      </div>
 
-      {/* Target anchor for smooth scroll past the video */}
-      {isRevealed && <div id="story-start" className="w-full pt-8" />}
+      </div>
     </div>
   );
 }

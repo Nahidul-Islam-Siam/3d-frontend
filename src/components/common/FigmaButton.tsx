@@ -6,11 +6,13 @@ import frame7Arrow from '@/assets/icons/Frame 7.png';
 export interface FigmaButtonProps {
   children: React.ReactNode;
   to?: string;
+  href?: string;
   onClick?: (e: React.MouseEvent) => void;
   variant?: 'primary' | 'outline' | 'dark' | 'white';
   size?: 'sm' | 'md' | 'lg';
   showArrow?: boolean;
   arrowIcon?: string;
+  rightIcon?: React.ReactNode;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
   target?: string;
@@ -21,11 +23,13 @@ export interface FigmaButtonProps {
 export default function FigmaButton({
   children,
   to,
+  href,
   onClick,
   variant = 'primary',
   size = 'md',
   showArrow = true,
   arrowIcon,
+  rightIcon,
   className = '',
   type = 'button',
   target,
@@ -80,7 +84,15 @@ export default function FigmaButton({
   const baseClasses = `group inline-flex items-center gap-2.5 sm:gap-3 rounded-full font-playfair font-semibold tracking-wide transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] select-none ${sizeStyles} ${containerStyles} ${className}`;
 
   const renderBadge = () => {
-    if (!showArrow) return null;
+    if (!showArrow && !rightIcon) return null;
+
+    if (rightIcon) {
+      return (
+        <span className="flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-200">
+          {rightIcon}
+        </span>
+      );
+    }
 
     if (activeArrowIcon) {
       return (
@@ -120,6 +132,25 @@ export default function FigmaButton({
       {renderBadge()}
     </>
   );
+
+  const isExternal = Boolean(href) || (typeof to === 'string' && (to.startsWith('http://') || to.startsWith('https://') || to.startsWith('//') || to.startsWith('mailto:')));
+  const destination = href || to;
+
+  if (isExternal && destination) {
+    return (
+      <a
+        href={destination}
+        target={target || '_blank'}
+        rel={rel || 'noopener noreferrer'}
+        style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+        className={baseClasses}
+        aria-label={ariaLabel}
+        onClick={onClick}
+      >
+        {content}
+      </a>
+    );
+  }
 
   if (to) {
     return (
