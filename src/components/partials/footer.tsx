@@ -98,7 +98,7 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
   return (
     <footer 
       ref={footerRef}
-      className={`w-full bg-[#FAF4E6] text-stone-800 pt-6 pb-8 px-4 sm:px-6 md:px-10 lg:px-12 xl:px-16 font-sans select-none ${className}`}
+      className={`w-full bg-[#FAF4E6] text-stone-800 ${isHome ? 'pt-0 sm:pt-1' : 'pt-6'} pb-8 px-4 sm:px-6 md:px-10 lg:px-12 xl:px-16 font-sans select-none ${className}`}
     >
       {/* Top Rounded Border Frame (Full Width) */}
       <div className="footer-card w-full rounded-t-[32px] sm:rounded-t-[40px] border-t border-x border-[#FDBA74]/90 bg-[#FAF4E6] px-6 sm:px-10 lg:px-12 xl:px-16 pt-10 pb-8 will-change-transform will-change-opacity">
