@@ -13,7 +13,7 @@ import {
   Globe,
   ChevronDown
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -45,10 +45,58 @@ const stats = [
 ];
 
 const doors = [
-  { id: 'story', title: 'Experience the Story', subtitle: 'watch & feel it', path: '/about', tag: 'Documentary', left: '10%', width: '19%' },
-  { id: 'serve', title: 'How We Serve', subtitle: 'step into our work', path: '/how-we-serve', tag: 'Pathways', left: '30%', width: '19%' },
-  { id: 'movement', title: 'Join the Movement', subtitle: 'be part of it', path: '/movement', tag: 'Community', left: '51%', width: '19%' },
-  { id: 'meet', title: 'Meet Us', subtitle: 'the people here', path: '/meet-us', tag: 'Stewards', left: '71%', width: '19%' },
+  { 
+    id: 'story', 
+    title: 'Experience the Story', 
+    subtitle: 'watch & feel it', 
+    path: '/about', 
+    tag: 'Documentary', 
+    left: '13%', 
+    width: '16%',
+    type: 'polygon' as const,
+    points: '256,430 550,258 550,760 256,932'
+  },
+  { 
+    id: 'serve', 
+    title: 'How We Serve', 
+    subtitle: 'step into our work', 
+    path: '/how-we-serve', 
+    tag: 'Pathways', 
+    left: '30.8%', 
+    width: '18%',
+    type: 'rect' as const,
+    x: 596,
+    y: 236,
+    widthPx: 338,
+    heightPx: 554,
+    rx: 10
+  },
+  { 
+    id: 'movement', 
+    title: 'Join the Movement', 
+    subtitle: 'be part of it', 
+    path: '/movement', 
+    tag: 'Community', 
+    left: '51.2%', 
+    width: '18%',
+    type: 'rect' as const,
+    x: 986,
+    y: 236,
+    widthPx: 338,
+    heightPx: 554,
+    rx: 10
+  },
+  { 
+    id: 'meet', 
+    title: 'Meet Us', 
+    subtitle: 'the people here', 
+    path: '/meet-us', 
+    tag: 'Stewards', 
+    left: '71%', 
+    width: '16%',
+    type: 'polygon' as const,
+    points: '1370,258 1664,430 1664,932 1370,760'
+  },
 ];
 
 const pillars = [
@@ -241,6 +289,7 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
 }
 
 export default function ZAxisStage() {
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pinnedStageRef = useRef<HTMLDivElement | null>(null);
   const stageBgRef = useRef<HTMLDivElement | null>(null);
@@ -260,6 +309,7 @@ export default function ZAxisStage() {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState<boolean>(false);
   const [isReducedMotion, setIsReducedMotion] = useState<boolean>(false);
+  const [hoveredDoor, setHoveredDoor] = useState<string | null>(null);
 
   const navbarRevealedRef = useRef<boolean>(false);
   const hasStartedPlaybackRef = useRef<boolean>(false);
@@ -920,16 +970,77 @@ export default function ZAxisStage() {
 
         {/* Chapter 2: Doors */}
         <section className="relative w-full min-h-screen bg-[#201308] py-20 px-4 flex items-center justify-center">
-          <div className="relative aspect-[1920/1080] max-w-[1400px] w-full">
-            <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-contain" />
+          <div className="relative aspect-[1920/1188] max-w-[1400px] w-full">
+            <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-contain block select-none pointer-events-none" />
+
+            {/* Luminous Orange Door Outlines (Hover Effect) */}
+            <svg
+              viewBox="0 0 1920 1188"
+              className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs>
+                <filter id="rm-door-orange-glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#F97316" floodOpacity="0.85" />
+                  <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#F97316" floodOpacity="0.45" />
+                </filter>
+              </defs>
+
+              {doors.map((d) => {
+                const isHovered = hoveredDoor === d.id;
+                return d.type === 'rect' ? (
+                  <rect
+                    key={d.id}
+                    x={d.x}
+                    y={d.y}
+                    width={d.widthPx}
+                    height={d.heightPx}
+                    rx={d.rx}
+                    ry={d.rx}
+                    fill="transparent"
+                    stroke="#F97316"
+                    strokeWidth="3.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    filter={isHovered ? 'url(#rm-door-orange-glow)' : undefined}
+                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
+                    style={{ pointerEvents: 'all' }}
+                    opacity={isHovered ? 1 : 0}
+                    onMouseEnter={() => setHoveredDoor(d.id)}
+                    onMouseLeave={() => setHoveredDoor(null)}
+                    onClick={() => navigate(d.path)}
+                  />
+                ) : (
+                  <polygon
+                    key={d.id}
+                    points={d.points}
+                    fill="transparent"
+                    stroke="#F97316"
+                    strokeWidth="3.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    filter={isHovered ? 'url(#rm-door-orange-glow)' : undefined}
+                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
+                    style={{ pointerEvents: 'all' }}
+                    opacity={isHovered ? 1 : 0}
+                    onMouseEnter={() => setHoveredDoor(d.id)}
+                    onMouseLeave={() => setHoveredDoor(null)}
+                    onClick={() => navigate(d.path)}
+                  />
+                );
+              })}
+            </svg>
+
             {doors.map((d) => (
               <Link
                 key={d.id}
                 to={d.path}
-                title={d.title}
-                aria-label={`${d.title} - ${d.subtitle}`}
-                style={{ left: d.left, width: d.width, top: '12%', bottom: '6%' }}
-                className="absolute z-20 cursor-pointer block"
+                title={`${d.title} — ${d.subtitle}`}
+                aria-label={`${d.title} — ${d.subtitle}`}
+                onMouseEnter={() => setHoveredDoor(d.id)}
+                onMouseLeave={() => setHoveredDoor(null)}
+                style={{ left: d.left, width: d.width, top: '18%', bottom: '8%' }}
+                className="absolute z-20 cursor-pointer block group"
               />
             ))}
           </div>
@@ -1164,27 +1275,88 @@ export default function ZAxisStage() {
             className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden select-none z-20 will-change-transform will-change-opacity"
           >
             <div className="ch2-content relative w-full h-full max-w-[1920px] pt-[74px] pb-6 px-4 flex items-center justify-center">
-              <div className="relative aspect-[1920/1080] max-h-full max-w-full w-full h-auto flex items-center justify-center">
+              <div className="relative aspect-[1920/1188] max-h-full max-w-full w-full h-auto flex items-center justify-center">
                 <img 
                   src={doorsSectionImg} 
                   alt="Where would you like to go? Four open doors" 
                   className="w-full h-full object-contain block select-none pointer-events-none" 
                 />
 
-                {/* 4 Exact interactive door hitboxes linking to destinations */}
+                {/* ─── Luminous Orange Door Outlines (Hover Effect) ─── */}
+                <svg
+                  viewBox="0 0 1920 1188"
+                  className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <defs>
+                    {/* Brand Orange Luminous Glow Filter */}
+                    <filter id="door-orange-glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#F97316" floodOpacity="0.85" />
+                      <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#F97316" floodOpacity="0.45" />
+                    </filter>
+                  </defs>
+
+                  {doors.map((d) => {
+                    const isHovered = hoveredDoor === d.id;
+                    return d.type === 'rect' ? (
+                      <rect
+                        key={d.id}
+                        x={d.x}
+                        y={d.y}
+                        width={d.widthPx}
+                        height={d.heightPx}
+                        rx={d.rx}
+                        ry={d.rx}
+                        fill="transparent"
+                        stroke="#F97316"
+                        strokeWidth="3.5"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                        filter={isHovered ? 'url(#door-orange-glow)' : undefined}
+                        className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
+                        style={{ pointerEvents: 'all' }}
+                        opacity={isHovered ? 1 : 0}
+                        onMouseEnter={() => setHoveredDoor(d.id)}
+                        onMouseLeave={() => setHoveredDoor(null)}
+                        onClick={() => navigate(d.path)}
+                      />
+                    ) : (
+                      <polygon
+                        key={d.id}
+                        points={d.points}
+                        fill="transparent"
+                        stroke="#F97316"
+                        strokeWidth="3.5"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                        filter={isHovered ? 'url(#door-orange-glow)' : undefined}
+                        className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
+                        style={{ pointerEvents: 'all' }}
+                        opacity={isHovered ? 1 : 0}
+                        onMouseEnter={() => setHoveredDoor(d.id)}
+                        onMouseLeave={() => setHoveredDoor(null)}
+                        onClick={() => navigate(d.path)}
+                      />
+                    );
+                  })}
+                </svg>
+
+                {/* ─── Interactive Hitbox Links Over Each Door & Label ─── */}
                 {doors.map((d) => (
                   <Link
                     key={d.id}
                     to={d.path}
-                    title={d.title}
-                    aria-label={`${d.title} - ${d.subtitle}`}
+                    title={`${d.title} — ${d.subtitle}`}
+                    aria-label={`${d.title} — ${d.subtitle}`}
+                    onMouseEnter={() => setHoveredDoor(d.id)}
+                    onMouseLeave={() => setHoveredDoor(null)}
                     style={{
                       left: d.left,
                       width: d.width,
-                      top: '12%',
-                      bottom: '6%',
+                      top: '18%',
+                      bottom: '8%',
                     }}
-                    className="absolute z-20 cursor-pointer block"
+                    className="absolute z-20 cursor-pointer block group"
                   />
                 ))}
               </div>
