@@ -5,7 +5,6 @@ import {
   Sparkles,
   ArrowRight,
   ArrowDown,
-  ExternalLink,
   X,
   Maximize2,
   Mail,
@@ -150,15 +149,14 @@ function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps)
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0">
-          <a
+          <FigmaButton
             href="https://tickets.liveachievebelieve.org"
             target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-[11px] sm:text-xs font-serif font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(249,115,22,0.4)] hover:scale-105 transition-all cursor-pointer"
+            variant="primary"
+            size="sm"
           >
-            <span>TICKETS OPEN NOW</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+            TICKETS OPEN NOW
+          </FigmaButton>
           <button
             type="button"
             onClick={onOpenModal}
