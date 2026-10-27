@@ -99,9 +99,24 @@ const doors = [
 ];
 
 const pillars = [
-  { title: 'SEEN', subtitle: 'People deserve to be seen', image: seenImg },
-  { title: 'HEARD', subtitle: 'Every story deserves a voice.', image: heardImg },
-  { title: 'HOPE', subtitle: 'Every person deserves hope.', image: hopeImg },
+  { 
+    title: 'SEEN', 
+    subtitle: 'People deserve to be seen', 
+    image: seenImg,
+    offsetClass: '-translate-y-4 sm:-translate-y-6 lg:-translate-y-10 xl:-translate-y-12' 
+  },
+  { 
+    title: 'HEARD', 
+    subtitle: 'Every story deserves a voice.', 
+    image: heardImg,
+    offsetClass: 'translate-y-0' 
+  },
+  { 
+    title: 'HOPE', 
+    subtitle: 'Every person deserves hope.', 
+    image: hopeImg,
+    offsetClass: 'translate-y-4 sm:translate-y-6 lg:translate-y-10 xl:translate-y-12' 
+  },
 ];
 
 interface ShowdownSectionProps {
@@ -289,11 +304,6 @@ export default function ZAxisStage() {
   // Chapter DOM refs for GSAP animation
   const ch0Ref = useRef<HTMLDivElement | null>(null);
   const ch1Ref = useRef<HTMLDivElement | null>(null);
-  const ch2Ref = useRef<HTMLDivElement | null>(null);
-  const ch3Ref = useRef<HTMLDivElement | null>(null);
-  const ch4Ref = useRef<HTMLDivElement | null>(null);
-  const ch5Ref = useRef<HTMLDivElement | null>(null);
-  const footerRef = useRef<HTMLDivElement | null>(null);
 
   // Discrete application state
   const [isVideoFinished, setIsVideoFinished] = useState<boolean>(false);
@@ -422,16 +432,14 @@ export default function ZAxisStage() {
   const handleScrollToStory = () => {
     const lenis = (window as unknown as { __lenis?: { scrollTo: (target: number | string, opts?: object) => void } }).__lenis;
     if (lenis && typeof lenis.scrollTo === 'function') {
-      lenis.scrollTo(320);
+      lenis.scrollTo(700);
     } else {
-      window.scrollTo({ top: 320, behavior: 'smooth' });
+      window.scrollTo({ top: 700, behavior: 'smooth' });
     }
   };
 
   // ═════════════════════════════════════════════════════════════════
-  // GSAP SCROLLTRIGGER MASTER TIMELINE CHOREOGRAPHY
-  // Refined with +35% scroll distance, generous plateaus,
-  // staggered multi-element choreography, and continuous overlapping handoffs
+  // GSAP SCROLLTRIGGER: CHAPTER 0 (VIDEO) -> CHAPTER 1 TRANSITION
   // ═════════════════════════════════════════════════════════════════
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -444,18 +452,13 @@ export default function ZAxisStage() {
       const stageBg = stageBgRef.current;
       const ch0 = ch0Ref.current;
       const ch1 = ch1Ref.current;
-      const ch2 = ch2Ref.current;
-      const ch3 = ch3Ref.current;
-      const ch4 = ch4Ref.current;
-      const ch5 = ch5Ref.current;
-      const footerEl = footerRef.current;
 
-      if (!stageBg || !ch0 || !ch1 || !ch2 || !ch3 || !ch4 || !ch5 || !containerRef.current || !pinnedStageRef.current) {
+      if (!stageBg || !ch0 || !ch1 || !containerRef.current || !pinnedStageRef.current) {
         return;
       }
 
-      // Base chapter container initial states
-      gsap.set([ch1, ch2, ch3, ch4, ch5], {
+      // Initial resting properties
+      gsap.set(ch1, {
         autoAlpha: 0,
       });
       gsap.set(ch0, {
@@ -467,36 +470,12 @@ export default function ZAxisStage() {
         backgroundColor: '#000000',
       });
 
-      // Internal sub-elements initial states for staggered entrance
-      // Chapter 1
+      // Internal sub-elements of Chapter 1
       gsap.set('.ch1-left-col', { autoAlpha: 0, y: 35 });
       gsap.set('.ch1-right-col', { autoAlpha: 0, y: 30 });
       gsap.set('.ch1-stat-item', { autoAlpha: 0, y: 25 });
       gsap.set('.ch1-leaf-left', { autoAlpha: 0, x: -25 });
       gsap.set('.ch1-leaf-right', { autoAlpha: 0, x: 25 });
-
-      // Chapter 2
-      gsap.set('.ch2-content', { autoAlpha: 0, y: 40, scale: 0.96 });
-
-      // Chapter 3
-      gsap.set('.ch3-left-col', { autoAlpha: 0, y: 35 });
-      gsap.set('.ch3-card-item', { autoAlpha: 0, y: 45, scale: 0.95 });
-
-      // Chapter 4
-      gsap.set(['.ch4-glow-left', '.ch4-glow-right'], { autoAlpha: 0, scale: 0.85 });
-      gsap.set('.ch4-header', { autoAlpha: 0, y: 25 });
-      gsap.set('.ch4-banner', { autoAlpha: 0, y: 35, scale: 0.96 });
-
-      // Chapter 5: 3D Z-Axis stage section initial states
-      gsap.set(ch5, { autoAlpha: 0, scale: 0.94, y: 35 });
-      gsap.set('.ch5-badge', { autoAlpha: 0, y: 20 });
-      gsap.set('.ch5-heading', { autoAlpha: 0, y: 30, scale: 0.96 });
-      gsap.set('.ch5-body', { autoAlpha: 0, y: 20 });
-      gsap.set('.ch5-buttons', { autoAlpha: 0, y: 20 });
-      gsap.set('.ch5-leaf-left', { autoAlpha: 0, x: -25 });
-      gsap.set('.ch5-leaf-right', { autoAlpha: 0, x: 25 });
-
-      // Chapter 0 Scroll Prompt
       gsap.set('.ch0-prompt', { autoAlpha: 1, y: 0 });
 
       const mm = gsap.matchMedia();
@@ -506,8 +485,8 @@ export default function ZAxisStage() {
         isMobile: "(max-width: 1023px)"
       }, (context) => {
         const { isDesktop } = context.conditions as { isDesktop: boolean; isMobile: boolean };
-        // Ultra-efficient, fluid scroll travel: ~350px per section (~2-3 natural wheel clicks) across all 5 chapters
-        const scrollDistance = isDesktop ? 1750 : 1400;
+        // Scroll distance dedicated exclusively to Chapter 0 -> Chapter 1 video transition
+        const scrollDistance = isDesktop ? 700 : 550;
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -520,8 +499,8 @@ export default function ZAxisStage() {
             onUpdate: (self) => {
               const p = self.progress;
 
-              // Navbar reveal threshold (reveals smoothly during Chapter 0 exit)
-              const shouldReveal = p >= 0.05 || (isVideoFinished && p > 0.015);
+              // Navbar reveal threshold
+              const shouldReveal = p >= 0.08 || (isVideoFinished && p > 0.02);
               if (shouldReveal !== navbarRevealedRef.current) {
                 navbarRevealedRef.current = shouldReveal;
                 window.dispatchEvent(new CustomEvent(shouldReveal ? 'reveal-navbar' : 'hide-navbar'));
@@ -529,20 +508,15 @@ export default function ZAxisStage() {
 
               // Pause video when out of view, resume when back at top
               if (videoRef.current) {
-                if (p > 0.18 && !videoRef.current.paused) {
+                if (p > 0.25 && !videoRef.current.paused) {
                   videoRef.current.pause();
-                } else if (p <= 0.18 && videoRef.current.paused) {
+                } else if (p <= 0.25 && videoRef.current.paused) {
                   videoRef.current.play().catch(() => {});
                 }
               }
             },
           },
         });
-
-        // ═════════════════════════════════════════════════════════════
-        // ELEGANT & EFFORTLESS 3D Z-AXIS CHAPTER CHOREOGRAPHY
-        // Seamless handoffs between all 5 chapters on the Z-axis
-        // ═════════════════════════════════════════════════════════════
 
         // Chapter 0 Prompt: fades immediately upon initial scroll
         tl.to('.ch0-prompt', {
@@ -552,9 +526,7 @@ export default function ZAxisStage() {
           ease: 'power1.out',
         }, 0);
 
-        // ─────────────────────────────────────────────────────────────
-        // TRANSITION CH 0 -> CH 1 (0.05 to 1.00)
-        // ─────────────────────────────────────────────────────────────
+        // TRANSITION CH 0 (VIDEO) -> CH 1 (WELCOME)
         tl.to(ch0, {
           autoAlpha: 0,
           y: -35,
@@ -597,283 +569,7 @@ export default function ZAxisStage() {
           stagger: 0.04,
           ease: 'power2.out',
         }, 0.30);
-
-        // Micro-hold on Chapter 1: 1.00 to 1.08 (duration 0.08)
-
-        // ─────────────────────────────────────────────────────────────
-        // TRANSITION CH 1 -> CH 2 (1.08 to 2.08)
-        // ─────────────────────────────────────────────────────────────
-        tl.to('.ch1-stat-item', {
-          autoAlpha: 0,
-          y: 15,
-          duration: 0.45,
-          stagger: 0.03,
-          ease: 'power1.in',
-        }, 1.08)
-        .to(['.ch1-left-col', '.ch1-right-col'], {
-          autoAlpha: 0,
-          y: -25,
-          duration: 0.6,
-          ease: 'power1.inOut',
-        }, 1.15)
-        .to(['.ch1-leaf-left', '.ch1-leaf-right'], {
-          autoAlpha: 0,
-          duration: 0.45,
-          ease: 'power1.in',
-        }, 1.15)
-        .to(ch1, {
-          autoAlpha: 0,
-          duration: 0.45,
-        }, 1.45)
-        .to(stageBg, {
-          backgroundColor: '#201308',
-          duration: 0.95,
-          ease: 'power1.inOut',
-        }, 1.08)
-        .to(ch2, {
-          autoAlpha: 1,
-          duration: 0.75,
-          ease: 'power1.inOut',
-        }, 1.25)
-        .to('.ch2-content', {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-        }, 1.28);
-
-        // Micro-hold on Chapter 2 (Four Doors): 2.08 to 2.16 (duration 0.08)
-
-        // ─────────────────────────────────────────────────────────────
-        // TRANSITION CH 2 -> CH 3 (2.16 to 3.16)
-        // ─────────────────────────────────────────────────────────────
-        tl.to('.ch2-content', {
-          autoAlpha: 0,
-          y: -25,
-          scale: 0.98,
-          duration: 0.65,
-          ease: 'power1.inOut',
-        }, 2.16)
-        .to(ch2, {
-          autoAlpha: 0,
-          duration: 0.45,
-        }, 2.45)
-        .to(stageBg, {
-          backgroundColor: '#FAF4E6',
-          duration: 0.95,
-          ease: 'power1.inOut',
-        }, 2.16)
-        .to(ch3, {
-          autoAlpha: 1,
-          duration: 0.75,
-          ease: 'power1.inOut',
-        }, 2.30)
-        .to('.ch3-left-col', {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.75,
-          ease: 'power2.out',
-        }, 2.35)
-        .to('.ch3-card-item', {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.7,
-          stagger: 0.06,
-          ease: 'power2.out',
-        }, 2.40);
-
-        // Micro-hold on Chapter 3 (Three Pillars): 3.16 to 3.24 (duration 0.08)
-
-        // ─────────────────────────────────────────────────────────────
-        // TRANSITION CH 3 -> CH 4 (3.24 to 4.24)
-        // ─────────────────────────────────────────────────────────────
-        tl.to('.ch3-card-item', {
-          autoAlpha: 0,
-          y: -18,
-          scale: 0.98,
-          duration: 0.55,
-          stagger: 0.04,
-          ease: 'power1.in',
-        }, 3.24)
-        .to('.ch3-left-col', {
-          autoAlpha: 0,
-          y: -20,
-          duration: 0.6,
-          ease: 'power1.inOut',
-        }, 3.32)
-        .to(ch3, {
-          autoAlpha: 0,
-          duration: 0.45,
-        }, 3.55)
-        .to(stageBg, {
-          backgroundColor: '#2B173E',
-          duration: 0.95,
-          ease: 'power1.inOut',
-        }, 3.24)
-        .to(ch4, {
-          autoAlpha: 1,
-          duration: 0.75,
-          ease: 'power1.inOut',
-        }, 3.38)
-        .to(['.ch4-glow-left', '.ch4-glow-right'], {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 0.75,
-          ease: 'power1.out',
-        }, 3.38)
-        .to('.ch4-header', {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power2.out',
-        }, 3.45)
-        .to('.ch4-banner', {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.75,
-          ease: 'power2.out',
-        }, 3.50);
-
-        // Micro-hold on Chapter 4 (Audition Showcase): 4.24 to 4.32 (duration 0.08)
-
-        // ─────────────────────────────────────────────────────────────
-        // TRANSITION CH 4 -> CH 5 (4.32 to 5.32) - 3D Z-AXIS EMERGENCE
-        // ─────────────────────────────────────────────────────────────
-        tl.to(['.ch4-banner', '.ch4-header'], {
-          autoAlpha: 0,
-          y: -30,
-          scale: 0.96,
-          duration: 0.6,
-          stagger: 0.04,
-          ease: 'power1.in',
-        }, 4.32)
-        .to(['.ch4-glow-left', '.ch4-glow-right'], {
-          autoAlpha: 0,
-          duration: 0.5,
-        }, 4.32)
-        .to(ch4, {
-          autoAlpha: 0,
-          duration: 0.45,
-        }, 4.60)
-        .to(stageBg, {
-          backgroundColor: '#FAF4E6',
-          duration: 0.95,
-          ease: 'power1.inOut',
-        }, 4.32)
-        .to(ch5, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.85,
-          ease: 'power2.out',
-        }, 4.45)
-        .to('.ch5-badge', {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power2.out',
-        }, 4.50)
-        .to('.ch5-heading', {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.75,
-          ease: 'power2.out',
-        }, 4.55)
-        .to(['.ch5-leaf-left', '.ch5-leaf-right'], {
-          autoAlpha: 0.6,
-          x: 0,
-          duration: 0.75,
-          ease: 'power1.out',
-        }, 4.55)
-        .to('.ch5-body', {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power2.out',
-        }, 4.60)
-        .to('.ch5-buttons', {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.65,
-          ease: 'power2.out',
-        }, 4.65);
-
-        // Settle hold on Chapter 5 (Sanctuary Finale): 5.32 to 5.50 (duration 0.18)
-        // Chapter 5 remains fully visible and interactive on the Z-axis.
-        tl.to({}, { duration: 0.18 }, 5.32);
       });
-
-      // Footer Entrance Animation: seamlessly reveals with depth, stagger & elegance
-      if (footerEl) {
-        const footerCard = footerEl.querySelector('.footer-card');
-        const footerCols = footerEl.querySelectorAll('.footer-col');
-        const footerEventBox = footerEl.querySelector('.footer-event-box');
-        const footerBottom = footerEl.querySelector('.footer-bottom');
-
-        if (footerCard) {
-          gsap.from(footerCard, {
-            autoAlpha: 0,
-            y: 45,
-            scale: 0.98,
-            duration: 0.85,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: footerEl,
-              start: 'top 88%',
-              toggleActions: 'play reverse play reverse',
-            }
-          });
-        }
-
-        if (footerCols && footerCols.length > 0) {
-          gsap.from(footerCols, {
-            autoAlpha: 0,
-            y: 30,
-            duration: 0.75,
-            stagger: 0.09,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: footerEl,
-              start: 'top 82%',
-              toggleActions: 'play reverse play reverse',
-            }
-          });
-        }
-
-        if (footerEventBox) {
-          gsap.from(footerEventBox, {
-            autoAlpha: 0,
-            scale: 0.95,
-            y: 20,
-            duration: 0.8,
-            delay: 0.15,
-            ease: 'back.out(1.3)',
-            scrollTrigger: {
-              trigger: footerEl,
-              start: 'top 82%',
-              toggleActions: 'play reverse play reverse',
-            }
-          });
-        }
-
-        if (footerBottom) {
-          gsap.from(footerBottom, {
-            autoAlpha: 0,
-            y: 15,
-            duration: 0.65,
-            ease: 'power1.out',
-            scrollTrigger: {
-              trigger: footerEl,
-              start: 'top 75%',
-              toggleActions: 'play reverse play reverse',
-            }
-          });
-        }
-      }
     }, containerRef);
 
     return () => ctx.revert();
@@ -1031,36 +727,54 @@ export default function ZAxisStage() {
         </section>
 
         {/* Chapter 3: Pillars */}
-        <section className="relative w-full min-h-screen bg-[#FAF4E6] py-20 px-6 sm:px-12 lg:px-20 flex items-center justify-center">
-          <div className="max-w-[1200px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-5 space-y-4">
-              <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Chapter 03</span>
-              </div>
-              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="text-4xl sm:text-5xl font-bold uppercase leading-tight">
-                <span className="text-[#18181B]">EVERY </span>
-                <span className="text-[#F97316]">STORY</span>
+        <section className="relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-32 xl:py-36 px-6 sm:px-12 lg:px-20 flex items-center justify-center overflow-hidden">
+          <div className="max-w-[1280px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
+            
+            {/* Left Column: Heading & Description */}
+            <div className="lg:col-span-5 space-y-
+            6 text-left">
+              <h2 
+                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                className="font-serif text-4xl sm:text-5xl lg:text-[46px] xl:text-[52px] font-bold uppercase leading-[1.08] tracking-[12px]"
+              >
+                <span className="font-serif text-[#18181B]">EVERY </span>
+                <span className="font-serif text-[#F97316]">STORY</span>
                 <br />
-                <span className="text-[#18181B]">MATTERS.</span>
+                <span className="font-serif text-[#18181B]">MATTERS.</span>
               </h2>
-              <p className="text-sm sm:text-base text-[#6E6259] leading-relaxed max-w-md">
+
+              <p className="text-xs sm:text-[13px] lg:text-sm text-[#7A6B60] font-sans leading-relaxed max-w-sm">
                 Every story carries meaning, and every voice deserves to be heard. Experience an inspiring journey of real stories, human connection, and hope.
               </p>
             </div>
-            <div className="lg:col-span-7 grid grid-cols-3 gap-4 sm:gap-6">
+
+            {/* Right Column: 3 Stepped Pillar Cards */}
+            <div className="lg:col-span-7 grid grid-cols-3 gap-3.5 sm:gap-5 lg:gap-6 xl:gap-7 items-start">
               {pillars.map((p) => (
-                <div key={p.title} className="flex flex-col items-center text-center">
-                  <div className="w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-stone-200 shadow-md">
-                    <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                <div 
+                  key={p.title} 
+                  className={`flex flex-col items-center text-center ${p.offsetClass} transition-transform duration-300`}
+                >
+                  <div className="w-full aspect-[4/5] rounded-[18px] sm:rounded-[22px] lg:rounded-[24px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] bg-stone-200">
+                    <img 
+                      src={p.image} 
+                      alt={p.title} 
+                      className="w-full h-full object-cover block" 
+                    />
                   </div>
-                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="mt-3.5 text-lg font-bold text-[#18181B] uppercase">
+                  <h3 
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }} 
+                    className="mt-3.5 sm:mt-4 text-base sm:text-lg lg:text-xl font-bold tracking-wider text-[#18181B] uppercase font-serif"
+                  >
                     {p.title}
                   </h3>
-                  <p className="mt-0.5 text-xs text-[#7A6B60]">{p.subtitle}</p>
+                  <p className="mt-1 text-xs sm:text-[13px] text-[#7A6B60] font-sans leading-snug whitespace-nowrap">
+                    {p.subtitle}
+                  </p>
                 </div>
               ))}
             </div>
+
           </div>
         </section>
 
@@ -1251,243 +965,233 @@ export default function ZAxisStage() {
             </div>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 2: "WHERE WOULD YOU LIKE TO GO?" (Four Doors)
-              ═══════════════════════════════════════════════════════════════ */}
-          <div
-            ref={ch2Ref}
-            className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden select-none z-20 will-change-transform will-change-opacity"
-          >
-            <div className="ch2-content relative w-full h-full max-w-[1420px] pt-[74px] pb-6 px-4 flex items-center justify-center">
-              <div className="relative aspect-[1920/1188] max-h-full max-w-full w-full h-auto flex items-center justify-center">
-                <img 
-                  src={doorsSectionImg} 
-                  alt="Where would you like to go? Four open doors" 
-                  className="w-full h-full object-contain block select-none pointer-events-none" 
-                />
-
-                {/* ─── Luminous Orange Door Outlines (Hover Effect) ─── */}
-                <svg
-                  viewBox="0 0 1920 1188"
-                  className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
-                  preserveAspectRatio="xMidYMid meet"
-                >
-                  <defs>
-                    {/* Brand Orange Luminous Glow Filter */}
-                    <filter id="door-orange-glow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#F97316" floodOpacity="0.85" />
-                      <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#F97316" floodOpacity="0.45" />
-                    </filter>
-                  </defs>
-
-                  {doors.map((d) => {
-                    const isHovered = hoveredDoor === d.id;
-                    return d.type === 'rect' ? (
-                      <rect
-                        key={d.id}
-                        x={d.x}
-                        y={d.y}
-                        width={d.widthPx}
-                        height={d.heightPx}
-                        rx={d.rx}
-                        ry={d.rx}
-                        fill="transparent"
-                        stroke="#F97316"
-                        strokeWidth="3.5"
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                        filter={isHovered ? 'url(#door-orange-glow)' : undefined}
-                        className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
-                        style={{ pointerEvents: 'all' }}
-                        opacity={isHovered ? 1 : 0}
-                        onMouseEnter={() => setHoveredDoor(d.id)}
-                        onMouseLeave={() => setHoveredDoor(null)}
-                        onClick={() => navigate(d.path)}
-                      />
-                    ) : (
-                      <polygon
-                        key={d.id}
-                        points={d.points}
-                        fill="transparent"
-                        stroke="#F97316"
-                        strokeWidth="3.5"
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                        filter={isHovered ? 'url(#door-orange-glow)' : undefined}
-                        className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
-                        style={{ pointerEvents: 'all' }}
-                        opacity={isHovered ? 1 : 0}
-                        onMouseEnter={() => setHoveredDoor(d.id)}
-                        onMouseLeave={() => setHoveredDoor(null)}
-                        onClick={() => navigate(d.path)}
-                      />
-                    );
-                  })}
-                </svg>
-
-                {/* ─── Interactive Hitbox Links Over Each Door & Label ─── */}
-                {doors.map((d) => (
-                  <Link
-                    key={d.id}
-                    to={d.path}
-                    title={`${d.title} — ${d.subtitle}`}
-                    aria-label={`${d.title} — ${d.subtitle}`}
-                    onMouseEnter={() => setHoveredDoor(d.id)}
-                    onMouseLeave={() => setHoveredDoor(null)}
-                    style={{
-                      left: d.left,
-                      width: d.width,
-                      top: '18%',
-                      bottom: '8%',
-                    }}
-                    className="absolute z-20 cursor-pointer block group"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 3: "EVERY STORY MATTERS." (Three Pillars)
-              ═══════════════════════════════════════════════════════════════ */}
-          <div
-            ref={ch3Ref}
-            className="absolute inset-0 w-full h-full flex items-center justify-center px-6 sm:px-12 lg:px-20 z-20 will-change-transform will-change-opacity"
-          >
-            <div className="max-w-[1200px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              
-              {/* Left Column */}
-              <div className="ch3-left-col lg:col-span-5 space-y-4">
-                <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Chapter 03</span>
-                </div>
-
-                <h2 
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  className="text-4xl sm:text-5xl lg:text-[50px] font-bold tracking-tight uppercase leading-[1.08]"
-                >
-                  <span className="text-[#18181B]">EVERY </span>
-                  <span className="text-[#F97316]">STORY</span>
-                  <br />
-                  <span className="text-[#18181B]">MATTERS.</span>
-                </h2>
-
-                <p className="text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-md">
-                  Every story carries meaning, and every voice deserves to be heard. Experience an inspiring journey of real stories, human connection, and hope.
-                </p>
-              </div>
-
-              {/* Right Column: 3 Pillar Cards */}
-              <div className="lg:col-span-7 grid grid-cols-3 gap-4 sm:gap-6">
-                {pillars.map((p) => (
-                  <div 
-                    key={p.title} 
-                    className="ch3-card-item group flex flex-col items-center text-center cursor-default transition-transform duration-300 hover:scale-105"
-                  >
-                    <div className="w-full aspect-[4/5] rounded-[20px] overflow-hidden bg-stone-200 shadow-md border border-[#ecdac2] group-hover:shadow-2xl transition-all duration-500">
-                      <img
-                        src={p.image}
-                        alt={p.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      />
-                    </div>
-                    <h3 
-                      style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                      className="mt-3.5 text-lg sm:text-xl font-bold tracking-wider text-[#18181B] uppercase group-hover:text-[#F97316] transition-colors"
-                    >
-                      {p.title}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-[#7A6B60] font-sans">
-                      {p.subtitle}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 4: "WHAT'S COMING UP NEXT" (Audition Showdown)
-              ═══════════════════════════════════════════════════════════════ */}
-          <div
-            ref={ch4Ref}
-            className="absolute inset-0 w-full h-full flex flex-col justify-center items-center text-white pt-[74px] pb-4 px-4 select-none overflow-hidden z-20 will-change-transform will-change-opacity"
-          >
-            {/* Ambient Backlight matching Figma Frame 338 */}
-            <div className="ch4-glow-left absolute -top-12 -left-20 w-[650px] lg:w-[850px] h-[650px] bg-[#F97316]/25 rounded-full blur-[140px] pointer-events-none" />
-            <div className="ch4-glow-right absolute -bottom-12 -right-20 w-[600px] lg:w-[800px] h-[600px] bg-[#F97316]/20 rounded-full blur-[140px] pointer-events-none" />
-
-            <div className="w-full relative z-10 flex flex-col items-center justify-center">
-              <ShowdownSection onOpenModal={openFlyerModal} />
-            </div>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════════
-              CHAPTER 5: "YOU WERE EXPECTED." (Sanctuary Invitation - 3D Z-Axis Stage)
-              ═══════════════════════════════════════════════════════════════ */}
-          <div
-            ref={ch5Ref}
-            className="absolute inset-0 w-full h-full bg-[#FAF4E6] flex flex-col justify-center items-center px-6 sm:px-12 lg:px-20 z-20 overflow-hidden select-none will-change-transform will-change-opacity pointer-events-auto"
-          >
-            {/* Flourish leaves (centered with Expected section, kept well clear of the footer) */}
-            <img 
-              src={leftLeaf}  
-              alt="" 
-              className="ch5-leaf-left absolute left-2 sm:left-6 lg:left-12 top-[38%] -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
-            />
-            <img 
-              src={rightLeaf} 
-              alt="" 
-              className="ch5-leaf-right absolute right-2 sm:right-6 lg:right-12 top-[38%] -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
-            />
-
-            {/* Main Sanctuary Invitation Card */}
-            <div className="max-w-[760px] mx-auto text-center space-y-6 relative z-10 px-4 my-auto">
-              <div className="ch5-badge inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Chapter 05 • Welcome Home</span>
-              </div>
-
-              <h2
-                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                className="ch5-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
-              >
-                <span className="text-[#18181B]">YOU WERE </span>
-                <span className="text-[#F97316]">EXPECTED.</span>
-              </h2>
-
-              <div className="ch5-body space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
-                <p>
-                  Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
-                </p>
-                <p>
-                  Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.
-                </p>
-              </div>
-
-              <div className="ch5-buttons flex flex-wrap items-center justify-center gap-4 pt-2">
-                <FigmaButton to="/about" variant="primary">
-                  Explore Our Story
-                </FigmaButton>
-                <FigmaButton to="/movement" variant="outline">
-                  Join the Movement
-                </FigmaButton>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      {/* ─── NATURAL CONTINUATION: FULL-WIDTH OFFICIAL FOOTER ─── */}
-      <div 
-        ref={footerRef} 
-        className="relative w-full z-20 bg-[#FAF4E6] -mt-44 sm:-mt-52 lg:-mt-56"
+      {/* ═══════════════════════════════════════════════════════════════
+          CHAPTER 2: "WHERE WOULD YOU LIKE TO GO?" (Four Doors)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section 
+        id="chapter-02"
+        className="relative w-full min-h-screen bg-[#201308] flex items-center justify-center py-16 sm:py-24 px-4 overflow-hidden select-none"
       >
-        <Footer isHome={true} />
-      </div>
+        <div className="relative w-full max-w-[1420px] flex items-center justify-center">
+          <div className="relative aspect-[1920/1188] max-w-full w-full h-auto flex items-center justify-center">
+            <img 
+              src={doorsSectionImg} 
+              alt="Where would you like to go? Four open doors" 
+              className="w-full h-full object-contain block select-none pointer-events-none" 
+            />
+
+            {/* ─── Luminous Orange Door Outlines (Hover Effect) ─── */}
+            <svg
+              viewBox="0 0 1920 1188"
+              className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs>
+                {/* Brand Orange Luminous Glow Filter */}
+                <filter id="door-orange-glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#F97316" floodOpacity="0.85" />
+                  <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#F97316" floodOpacity="0.45" />
+                </filter>
+              </defs>
+
+              {doors.map((d) => {
+                const isHovered = hoveredDoor === d.id;
+                return d.type === 'rect' ? (
+                  <rect
+                    key={d.id}
+                    x={d.x}
+                    y={d.y}
+                    width={d.widthPx}
+                    height={d.heightPx}
+                    rx={d.rx}
+                    ry={d.rx}
+                    fill="transparent"
+                    stroke="#F97316"
+                    strokeWidth="3.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    filter={isHovered ? 'url(#door-orange-glow)' : undefined}
+                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
+                    style={{ pointerEvents: 'all' }}
+                    opacity={isHovered ? 1 : 0}
+                    onMouseEnter={() => setHoveredDoor(d.id)}
+                    onMouseLeave={() => setHoveredDoor(null)}
+                    onClick={() => navigate(d.path)}
+                  />
+                ) : (
+                  <polygon
+                    key={d.id}
+                    points={d.points}
+                    fill="transparent"
+                    stroke="#F97316"
+                    strokeWidth="3.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    filter={isHovered ? 'url(#door-orange-glow)' : undefined}
+                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
+                    style={{ pointerEvents: 'all' }}
+                    opacity={isHovered ? 1 : 0}
+                    onMouseEnter={() => setHoveredDoor(d.id)}
+                    onMouseLeave={() => setHoveredDoor(null)}
+                    onClick={() => navigate(d.path)}
+                  />
+                );
+              })}
+            </svg>
+
+            {/* ─── Interactive Hitbox Links Over Each Door & Label ─── */}
+            {doors.map((d) => (
+              <Link
+                key={d.id}
+                to={d.path}
+                title={`${d.title} — ${d.subtitle}`}
+                aria-label={`${d.title} — ${d.subtitle}`}
+                onMouseEnter={() => setHoveredDoor(d.id)}
+                onMouseLeave={() => setHoveredDoor(null)}
+                style={{
+                  left: d.left,
+                  width: d.width,
+                  top: '18%',
+                  bottom: '8%',
+                }}
+                className="absolute z-20 cursor-pointer block group"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          CHAPTER 3: "EVERY STORY MATTERS." (Three Pillars)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section 
+        id="chapter-03"
+        className="relative w-full bg-[#FAF4E6] flex items-center justify-center py-20 sm:py-28 lg:py-32 xl:py-36 px-6 sm:px-12 lg:px-20 overflow-hidden"
+      >
+        <div className="max-w-[1280px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
+          
+          {/* Left Column: Heading & Description */}
+          <div className="lg:col-span-5 space-y-4 text-left">
+            <h2 
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="font-serif text-4xl sm:text-5xl lg:text-[46px] xl:text-[52px] font-bold tracking-tight uppercase leading-[1.08]"
+            >
+              <span className="font-serif text-[#18181B]">EVERY </span>
+              <span className="font-serif text-[#F97316]">STORY</span>
+              <br />
+              <span className="font-serif text-[#18181B]">MATTERS.</span>
+            </h2>
+
+            <p className="text-xs sm:text-[13px] lg:text-sm text-[#7A6B60] font-sans leading-relaxed max-w-sm">
+              Every story carries meaning, and every voice deserves to be heard. Experience an inspiring journey of real stories, human connection, and hope.
+            </p>
+          </div>
+
+          {/* Right Column: 3 Stepped Pillar Cards */}
+          <div className="lg:col-span-7 grid grid-cols-3 gap-3.5 sm:gap-5 lg:gap-6 xl:gap-7 items-start">
+            {pillars.map((p) => (
+              <div 
+                key={p.title} 
+                className={`flex flex-col items-center text-center ${p.offsetClass} transition-transform duration-300`}
+              >
+                <div className="w-full aspect-[4/5] rounded-[18px] sm:rounded-[22px] lg:rounded-[24px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] bg-stone-200">
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    className="w-full h-full object-cover block"
+                  />
+                </div>
+                <h3 
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="mt-3.5 sm:mt-4 text-base sm:text-lg lg:text-xl font-bold tracking-wider text-[#18181B] uppercase font-serif"
+                >
+                  {p.title}
+                </h3>
+                <p className="mt-1 text-xs sm:text-[13px] text-[#7A6B60] font-sans leading-snug whitespace-nowrap">
+                  {p.subtitle}
+                </p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          CHAPTER 4: "WHAT'S COMING UP NEXT" (Audition Showdown)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section 
+        id="chapter-04"
+        className="relative w-full min-h-screen bg-[#2B173E] flex flex-col justify-center items-center text-white py-16 sm:py-24 px-4 sm:px-6 select-none overflow-hidden relative"
+      >
+        {/* Ambient Backlight matching Figma Frame 338 */}
+        <div className="absolute -top-12 -left-20 w-[650px] lg:w-[850px] h-[650px] bg-[#F97316]/25 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-12 -right-20 w-[600px] lg:w-[800px] h-[600px] bg-[#F97316]/20 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="w-full relative z-10 flex flex-col items-center justify-center">
+          <ShowdownSection onOpenModal={openFlyerModal} />
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          CHAPTER 5: "YOU WERE EXPECTED." (Sanctuary Invitation)
+          ═══════════════════════════════════════════════════════════════ */}
+      <section 
+        id="chapter-05"
+        className="relative w-full min-h-[75vh] flex flex-col justify-center items-center bg-[#FAF4E6] px-6 sm:px-12 lg:px-20 py-20 overflow-hidden select-none relative"
+      >
+        {/* Flourish leaves */}
+        <img 
+          src={leftLeaf} 
+          alt="" 
+          className="absolute left-2 sm:left-6 lg:left-12 top-1/2 -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
+        />
+        <img 
+          src={rightLeaf} 
+          alt="" 
+          className="absolute right-2 sm:right-6 lg:right-12 top-1/2 -translate-y-1/2 w-28 sm:w-40 lg:w-48 opacity-60 pointer-events-none select-none" 
+        />
+
+        {/* Main Sanctuary Invitation Card */}
+        <div className="max-w-[760px] mx-auto text-center space-y-6 relative z-10 px-4 my-auto">
+          <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Chapter 05 • Welcome Home</span>
+          </div>
+
+          <h2
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight uppercase"
+          >
+            <span className="text-[#18181B]">YOU WERE </span>
+            <span className="text-[#F97316]">EXPECTED.</span>
+          </h2>
+
+          <div className="space-y-2.5 text-sm sm:text-base text-[#6E6259] font-sans leading-relaxed max-w-xl mx-auto">
+            <p>
+              Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.
+            </p>
+            <p>
+              Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <FigmaButton to="/about" variant="primary">
+              Explore Our Story
+            </FigmaButton>
+            <FigmaButton to="/movement" variant="outline">
+              Join the Movement
+            </FigmaButton>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── OFFICIAL FULL-WIDTH FOOTER ─── */}
+      <Footer />
 
       {/* ─── SHOWDOWN FULL FLYER MODAL (Portaled to document.body) ─── */}
       {typeof document !== 'undefined' && createPortal(
