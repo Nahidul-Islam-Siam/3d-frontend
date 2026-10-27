@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { ExternalLink, ArrowRight, Calendar, Sparkles } from 'lucide-react';
+import {  ArrowRight, Calendar, Sparkles } from 'lucide-react';
 // import showdownPoster from '@/assets/welcome/audition_banner.png';
+import FigmaButton from '@/components/common/FigmaButton';
 
 export default function NextEventSection() {
   return (
@@ -49,15 +50,14 @@ export default function NextEventSection() {
             className="flex flex-wrap items-center gap-3 pt-1"
           >
             {/* Tickets Open Now Button */}
-            <a
+            <FigmaButton
               href="https://tickets.liveachievebelieve.org"
               target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-xs sm:text-sm font-serif font-bold tracking-wider uppercase shadow-[0_4px_20px_rgba(249,115,22,0.4)] transition-all hover:scale-105"
+              variant="primary"
+              size="md"
             >
-              <span>TICKETS OPEN NOW</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+              TICKETS OPEN NOW
+            </FigmaButton>
 
             {/* Audition Button */}
             <a
