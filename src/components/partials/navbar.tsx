@@ -53,7 +53,7 @@ const ministries = [
 ];
 
 export default function Navbar() {
-  const [scrollY, setScrollY] = useState(0);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isServeOpen, setIsServeOpen] = useState(false);
   const location = useLocation();
@@ -69,25 +69,27 @@ export default function Navbar() {
       return;
     }
 
+    // On home page, hidden initially until video time finishes
+    setIsRevealed(false);
+
     const handleReveal = () => setIsRevealed(true);
     const handleHide = () => setIsRevealed(false);
 
+    const handleScroll = () => {
+      const isPast = window.scrollY > 20;
+      setHasScrolled(prev => prev !== isPast ? isPast : prev);
+    };
+
     window.addEventListener('reveal-navbar', handleReveal);
     window.addEventListener('hide-navbar', handleHide);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('reveal-navbar', handleReveal);
       window.removeEventListener('hide-navbar', handleHide);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [isHomePage]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const navItems = [
     { label: "Welcome", to: "/" },
@@ -103,14 +105,14 @@ export default function Navbar() {
       <SideNav handleClose={toggleOpen} isOpen={isOpen} />
       
       <motion.nav 
-        initial={{ y: -60, opacity: 0 }}
+        initial={{ y: isHomePage ? -80 : 0, opacity: isHomePage ? 0 : 1 }}
         animate={{ 
-          y: isRevealed ? 0 : -60, 
+          y: isRevealed ? 0 : -80, 
           opacity: isRevealed ? 1 : 0 
         }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 h-[74px] z-50 bg-[#FAF4E6] border-b border-[#e9dcbe] transition-all duration-300 ${
-          scrollY > 20 ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 h-[74px] z-50 bg-[#FAF4E6] border-b border-[#e9dcbe] transition-shadow duration-300 ${
+          hasScrolled ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''
         } ${isRevealed ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
         <div className="w-full h-full px-6 sm:px-10 lg:px-16 xl:px-24 flex items-center justify-between">

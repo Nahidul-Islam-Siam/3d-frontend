@@ -5,6 +5,11 @@ import path from "path"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    allowedHosts: [
+      "khatash5173.ilmifygroup.com",
+    ],
+  },
   plugins: [
     react(),
     VitePWA({

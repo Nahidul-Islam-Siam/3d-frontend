@@ -1,6 +1,5 @@
 import Seo from '../components/Seo';
-import WelcomeExperience from '@/components/welcome/WelcomeExperience';
-import ExpectingYouSection from '@/components/welcome/ExpectingYouSection';
+import ZAxisStage from '@/components/welcome/ZAxisStage';
 
 export default function Home() {
   return (
@@ -9,8 +8,9 @@ export default function Home() {
         title="Live Achieve Believe — Welcome Home" 
         description="An invitation to experience a place where compassion becomes action, hope becomes visible, and every story matters." 
       />
-      <WelcomeExperience />
-      <ExpectingYouSection />
+
+      {/* Cinematic 3D Z-Axis Stage */}
+      <ZAxisStage />
     </>
   );
 }
