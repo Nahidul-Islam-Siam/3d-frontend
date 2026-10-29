@@ -24,9 +24,7 @@ export default function About() {
         <DocumentaryVideoSection />
 
         {/* ─── Section 4: What’s Coming Up Next (Showdown Section from Welcome) ─── */}
-        <div className="py-16">
-          <ShowdownSection />
-        </div>
+        <ShowdownSection />
 
         {/* ─── Section 5: Where Would You Like To Go? (Four Doors from Welcome) ─── */}
         <div className="py-16">
