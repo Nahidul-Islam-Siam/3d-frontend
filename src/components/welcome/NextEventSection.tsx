@@ -1,23 +1,20 @@
-import { motion } from 'framer-motion';
-import {  ArrowRight, Calendar, Sparkles } from 'lucide-react';
+import { motion } from "framer-motion";
+import { ArrowRight, Calendar, Sparkles } from "lucide-react";
 // import showdownPoster from '@/assets/welcome/audition_banner.png';
-import FigmaButton from '@/components/common/FigmaButton';
+import FigmaButton from "@/components/common/FigmaButton";
 
 export default function NextEventSection() {
   return (
     <section className="relative w-full bg-gradient-to-b from-[#2B173E] via-[#1B0C2A] to-[#140820] text-white py-20 lg:py-28 px-6 sm:px-10 lg:px-16 overflow-hidden select-none border-b border-purple-900/40">
-      
       {/* Ambient background glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-[#F97316]/12 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-1/2 right-10 w-96 h-96 bg-[#8b5cf6]/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-[1240px] mx-auto relative z-10 space-y-12 lg:space-y-16">
-        
         {/* Top Header Bar */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2 border-b border-white/10">
-          
           {/* Left Title & Description */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -29,7 +26,7 @@ export default function NextEventSection() {
               <span>Next Upcoming Event</span>
             </div>
 
-            <h2 
+            <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
               className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white"
             >
@@ -37,12 +34,13 @@ export default function NextEventSection() {
             </h2>
 
             <p className="text-sm sm:text-base text-stone-300 font-sans leading-relaxed">
-              Discover our next event—an inspiring experience filled with meaningful stories, connection, and hope.
+              Discover our next event—an inspiring experience filled with
+              meaningful stories, connection, and hope.
             </p>
           </motion.div>
 
           {/* Right Action Buttons */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -68,11 +66,10 @@ export default function NextEventSection() {
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </motion.div>
-
         </div>
 
         {/* Featured Showcase Poster */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
@@ -93,7 +90,8 @@ export default function NextEventSection() {
                 <span>November 14, 2026 • 7:00 PM EST</span>
               </div>
               <p className="text-white text-sm sm:text-base font-serif">
-                Join our global community for an evening of live retrospective stories & unscripted dialogues.
+                Join our global community for an evening of live retrospective
+                stories & unscripted dialogues.
               </p>
             </div>
 
@@ -108,7 +106,6 @@ export default function NextEventSection() {
             </a>
           </div>
         </motion.div>
-
       </div>
     </section>
   );

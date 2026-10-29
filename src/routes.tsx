@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Home from "./pages/home";
 import RootLayout from "./pages/Layout";
 import NotFound from "./pages/not-found";
-import About from "./pages/about";
+import About from "./pages/experience-story";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import PrivateRoute from "./pages/private-route";
@@ -26,6 +26,10 @@ export const router = createBrowserRouter([
       },
       {
         path: "/about",
+        element: <About />,
+      },
+      {
+        path: "/experience-the-story",
         element: <About />,
       },
       {
