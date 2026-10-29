@@ -53,7 +53,7 @@ export default function NotFound() {
                         <Button
                             onClick={() => window.history.back()}
                             variant="outline"
-                            className="w-full sm:w-auto"
+                            className="w-full sm:w-auto text-white"
                         >
                             <HiOutlineArrowLeft className="mr-2 h-5 w-5" />
                             Go Back
