@@ -8,7 +8,7 @@ export interface FigmaButtonProps {
   to?: string;
   href?: string;
   onClick?: (e: React.MouseEvent) => void;
-  variant?: 'primary' | 'outline' | 'dark' | 'white';
+  variant?: 'primary' | 'outline' | 'dark' | 'white' | 'outline-white' | 'dark-outline';
   size?: 'sm' | 'md' | 'lg';
   showArrow?: boolean;
   arrowIcon?: string;
@@ -59,7 +59,7 @@ export default function FigmaButton({
     textColor = "text-white";
     if (!activeArrowIcon) {
       activeArrowIcon = frame7Arrow;
-    }
+    }  
   } else if (variant === 'outline') {
     containerStyles = "border border-[#F97316] bg-transparent hover:bg-[#F97316]/5";
     textColor = "text-[#F97316]";
@@ -72,6 +72,10 @@ export default function FigmaButton({
     if (!activeArrowIcon) {
       activeArrowIcon = frame7Arrow;
     }
+  } else if (variant === 'outline-white' || variant === 'dark-outline') {
+    containerStyles = "border border-white/70 bg-black/20 hover:bg-white/10 hover:border-white shadow-sm backdrop-blur-[2px]";
+    textColor = "text-white";
+    // Keep activeArrowIcon undefined to render white currentColor SVG circular arrow
   } else {
     // white
     containerStyles = "bg-white hover:bg-stone-50 text-stone-900 border border-stone-200 shadow-sm";

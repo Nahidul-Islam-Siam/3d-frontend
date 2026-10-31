@@ -202,7 +202,7 @@ export default function FacesOfMovementSection({
       >
         {/* Moving Track - Top Aligned for Exact Horizon Match */}
         <div
-          className="flex items-start transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
+          className="flex items-start transition-transform duration-700 [transition-timing-function:cubic-bezier(0.25,1,0.5,1)] will-change-transform"
           style={{
             transform: `translateX(${trackOffset}px)`,
             gap: `${gap}px`,
