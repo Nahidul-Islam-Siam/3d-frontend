@@ -7,7 +7,8 @@ import {
   Award, 
   Mic, 
   Church, 
-  GraduationCap 
+  GraduationCap,
+  ChevronDown
 } from 'lucide-react';
 
 export interface ReasonSomeoneBelievesSectionProps {
@@ -59,7 +60,7 @@ export default function ReasonSomeoneBelievesSection({
 
           <h2
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] font-bold text-[#18181B] tracking-tight flex flex-col items-center gap-2.5 sm:gap-3.5 lg:gap-4 leading-none mb-4 sm:mb-6"
+            className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] font-bold text-[#18181B] tracking-tight flex flex-col items-center gap-2.5 sm:gap-3.5 lg:gap-4 leading-tight mb-4 sm:mb-6"
           >
             <span>Let's Be The Reason Someone</span>
             <span>Believes Tomorrow Is</span>
@@ -127,6 +128,14 @@ export default function ReasonSomeoneBelievesSection({
             })}
           </div>
 
+        </div>
+
+        {/* ─── Scroll To Continue Indicator (Exact Match to Reference Image) ─── */}
+        <div className="pt-10 sm:pt-14 pb-2 flex flex-col items-center justify-center gap-1.5 opacity-60 hover:opacity-90 transition-opacity pointer-events-none">
+          <span className="text-[10px] sm:text-[11px] font-sans tracking-[0.24em] uppercase text-[#EA580C] font-semibold">
+            SCROLL TO CONTINUE
+          </span>
+          <ChevronDown className="w-3.5 h-3.5 text-[#EA580C] animate-bounce" />
         </div>
 
       </div>
