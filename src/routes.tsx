@@ -4,6 +4,7 @@ import RootLayout from "./pages/Layout";
 import NotFound from "./pages/not-found";
 import About from "./pages/experience-story";
 import Movement from "./pages/movement";
+import WhoWeAre from "./pages/who-we-are";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import PrivateRoute from "./pages/private-route";
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
       {
         path: "/join-the-movement",
         element: <Movement />,
+      },
+      {
+        path: "/who-we-are",
+        element: <WhoWeAre />,
       },
       {
         path: "/login",
