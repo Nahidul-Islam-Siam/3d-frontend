@@ -1,28 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles,
-  ArrowRight,
-  ArrowDown,
-  X,
-  Maximize2,
-  Mail,
-  Phone,
-  Globe
+  ArrowDown
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // Assets
 import welcomeVideo from '@/assets/video/welcome.mp4';
-import doorsSectionImg from '@/assets/welcome/doors-section.png';
 import seenImg from '@/assets/welcome/seen.png';
 import heardImg from '@/assets/welcome/heard.png';
 import hopeImg from '@/assets/welcome/hope.png';
-import auditionBanner from '../../assets/welcome/audition_banner.png';
-import showdownPoster from '@/assets/welcome/showdown-poster.png';
 import leftLeaf from '@/assets/icons/Group.png';
 import rightLeaf from '@/assets/icons/Group-2.png';
 import mealsIcon from '@/assets/icons/utensils4.png';
@@ -32,6 +20,9 @@ import partnersIcon from '@/assets/icons/utensils.png';
 import FigmaButton from '@/components/common/FigmaButton';
 import Footer from '@/components/partials/footer';
 import SpotlightCanvas from './SpotlightCanvas';
+import FourDoorsSection from './FourDoorsSection';
+import ShowdownSection from './ShowdownSection';
+import WelcomeHomeSection from './WelcomeHomeSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,61 +31,6 @@ const stats = [
   { value: "1,200", label: "Mentor Matches", icon: mentorIcon },
   { value: "380", label: "Stories Told", icon: storiesIcon },
   { value: "64", label: "Community Partners", icon: partnersIcon },
-];
-
-const doors = [
-  { 
-    id: 'story', 
-    title: 'Experience the Story', 
-    subtitle: 'watch & feel it', 
-    path: '/about', 
-    tag: 'Documentary', 
-    left: '13%', 
-    width: '16%',
-    type: 'polygon' as const,
-    points: '256,430 550,258 550,760 256,932'
-  },
-  { 
-    id: 'serve', 
-    title: 'How We Serve', 
-    subtitle: 'step into our work', 
-    path: '/how-we-serve', 
-    tag: 'Pathways', 
-    left: '30.8%', 
-    width: '18%',
-    type: 'rect' as const,
-    x: 596,
-    y: 236,
-    widthPx: 338,
-    heightPx: 554,
-    rx: 10
-  },
-  { 
-    id: 'movement', 
-    title: 'Join the Movement', 
-    subtitle: 'be part of it', 
-    path: '/movement', 
-    tag: 'Community', 
-    left: '51.2%', 
-    width: '18%',
-    type: 'rect' as const,
-    x: 986,
-    y: 236,
-    widthPx: 338,
-    heightPx: 554,
-    rx: 10
-  },
-  { 
-    id: 'meet', 
-    title: 'Meet Us', 
-    subtitle: 'the people here', 
-    path: '/meet-us', 
-    tag: 'Stewards', 
-    left: '71%', 
-    width: '16%',
-    type: 'polygon' as const,
-    points: '1370,258 1664,430 1664,932 1370,760'
-  },
 ];
 
 const pillars = [
@@ -118,182 +54,7 @@ const pillars = [
   },
 ];
 
-interface ShowdownSectionProps {
-  isModal?: boolean;
-  onOpenModal?: () => void;
-}
-
-function ShowdownSection({ isModal = false, onOpenModal }: ShowdownSectionProps) {
-  return (
-    <div 
-      className={`mx-auto flex flex-col items-center ${
-        isModal 
-          ? 'w-full max-w-[840px] space-y-6 sm:space-y-8 px-2 sm:px-4 py-2' 
-          : 'w-full space-y-3 sm:space-y-4 px-4 sm:px-6'
-      }`}
-      style={!isModal ? { width: 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' } : undefined}
-    >
-      
-      {/* ─── 1. TOP HEADER: REAL TEXT & INTERACTIVE BUTTONS (EXACT FIGMA FRAME 338) ─── */}
-      <div className={`${isModal ? '' : 'ch4-header'} w-full flex flex-col sm:flex-row sm:items-end justify-between gap-3 shrink-0`}>
-        <div className="space-y-1 text-left">
-          <h2 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-white tracking-tight leading-tight"
-          >
-            What’s Coming Up Next
-          </h2>
-          <p className="text-xs sm:text-[13px] text-stone-300 font-sans leading-normal">
-            Discover our next event—an inspiring experience filled with meaningful stories, connection, and hope.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          <FigmaButton
-            href="https://tickets.liveachievebelieve.org"
-            target="_blank"
-            variant="primary"
-            size="sm"
-          >
-            TICKETS OPEN NOW
-          </FigmaButton>
-          <button
-            type="button"
-            onClick={onOpenModal}
-            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] sm:text-xs font-serif font-medium tracking-wider hover:scale-105 transition-all cursor-pointer"
-          >
-            <span>Audition</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* ─── 2. POSTER BANNER: EXACT FIGMA FRAME 338 ─── */}
-      <div 
-        onClick={onOpenModal}
-        className={`${isModal ? '' : 'ch4-banner'} relative w-full rounded-[18px] sm:rounded-[24px] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-white/15 bg-black shrink-0 ${onOpenModal ? 'cursor-pointer group' : ''}`}
-      >
-        <img
-          src={isModal ? showdownPoster : auditionBanner}
-          alt="Showdown Suicide Awareness Event - Where Are You Now? Letters to Etcetera"
-          className="w-full h-auto aspect-[1978/1620] object-cover block transition-transform duration-700 ease-out group-hover:scale-[1.015]"
-        />
-        {onOpenModal && (
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-            <div className="px-4 py-2 rounded-full bg-black/85 backdrop-blur-md border border-white/30 text-white text-xs font-serif tracking-wider uppercase flex items-center gap-2 shadow-2xl scale-95 group-hover:scale-100 transition-transform">
-              <Maximize2 className="w-3.5 h-3.5 text-[#F97316]" />
-              <span>Click for Full Details & Auditions</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ─── 4. BOTTOM 2-COLUMN INFORMATION CARD: REAL TEXT & BUTTONS (Rendered in modal) ─── */}
-      {isModal && (
-        <div 
-          id="modal-audition-card"
-          className="w-full rounded-[18px] sm:rounded-[22px] border border-purple-500/30 bg-gradient-to-br from-[#1C092E]/95 via-[#150624]/95 to-[#10031B]/98 p-5 sm:p-7 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-md mt-4"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            
-            {/* Left Column: Requirements */}
-            <div className="lg:col-span-7 space-y-3.5 text-left">
-              <h3 
-                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                className="text-lg sm:text-xl font-bold text-white tracking-wide uppercase leading-snug"
-              >
-                WE WOULD STILL LOVE TO SEE YOUR TALENT.
-              </h3>
-
-              <div className="space-y-1.5">
-                <p className="text-xs sm:text-sm font-semibold text-stone-200 font-sans">
-                  Please include:
-                </p>
-                <ul className="space-y-1.5 text-xs sm:text-[13px] text-stone-300 font-sans leading-relaxed list-disc list-inside">
-                  <li><strong className="text-white font-medium">All performers:</strong> A current headshot and a video of yourself performing a monologue.</li>
-                  <li><strong className="text-white font-medium">Singers:</strong> An additional, separate video singing a portion of a song that showcases your voice.</li>
-                  <li><strong className="text-white font-medium">Dancers:</strong> An additional, separate video demonstrating your dance ability.</li>
-                  <li><strong className="text-white font-medium">Singers and dancers:</strong> You may submit both additional videos.</li>
-                  <li>Include your name and contact information with your submission.</li>
-                </ul>
-              </div>
-
-              <p className="pt-2.5 border-t border-white/10 text-[11px] text-stone-400 font-sans italic leading-relaxed">
-                This production explores sensitive themes involving mental health and suicide awareness. Performers are not expected to share personal experiences.
-              </p>
-            </div>
-
-            {/* Right Column: Contact Details */}
-            <div className="lg:col-span-5 lg:border-l lg:border-white/10 lg:pl-6 space-y-3.5 text-left">
-              <div>
-                <h4 
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  className="text-base sm:text-lg font-bold text-white tracking-wide"
-                >
-                  Live Achieve Believe, Inc.
-                </h4>
-                <p className="text-xs text-stone-400 font-sans mt-0.5">
-                  People Matter. Every Story Matters.
-                </p>
-              </div>
-
-              <div className="space-y-2.5 pt-1">
-                {/* Audition Email */}
-                <a 
-                  href="mailto:auditions@thelab-inc.org"
-                  className="group flex items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-purple-300 group-hover:text-[#F97316] group-hover:border-orange-500/30 transition-colors shrink-0">
-                    <Mail className="w-3 h-3" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="block text-[10px] uppercase tracking-wider text-stone-400 font-sans">Audition Inquiries</span>
-                    <span className="block text-xs text-stone-200 group-hover:text-white transition-colors truncate">auditions@thelab-inc.org</span>
-                  </div>
-                </a>
-
-                {/* Phone */}
-                <a 
-                  href="tel:8132553592"
-                  className="group flex items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-purple-300 group-hover:text-[#F97316] group-hover:border-orange-500/30 transition-colors shrink-0">
-                    <Phone className="w-3 h-3" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="block text-[10px] uppercase tracking-wider text-stone-400 font-sans">Phone</span>
-                    <span className="block text-xs text-stone-200 group-hover:text-white transition-colors truncate">813-255-3592</span>
-                  </div>
-                </a>
-
-                {/* Website */}
-                <a 
-                  href="https://thelab-inc.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-2.5 p-1.5 -mx-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                >
-                  <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-purple-300 group-hover:text-[#F97316] group-hover:border-orange-500/30 transition-colors shrink-0">
-                    <Globe className="w-3 h-3" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="block text-[10px] uppercase tracking-wider text-stone-400 font-sans">Website</span>
-                    <span className="block text-xs text-stone-200 group-hover:text-white transition-colors truncate">thelab-inc.org</span>
-                  </div>
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
-}
-
 export default function ZAxisStage() {
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pinnedStageRef = useRef<HTMLDivElement | null>(null);
   const stageBgRef = useRef<HTMLDivElement | null>(null);
@@ -306,40 +67,10 @@ export default function ZAxisStage() {
   // Discrete application state
   const [isVideoFinished, setIsVideoFinished] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isFlyerModalOpen, setIsFlyerModalOpen] = useState<boolean>(false);
   const [isReducedMotion, setIsReducedMotion] = useState<boolean>(false);
-  const [hoveredDoor, setHoveredDoor] = useState<string | null>(null);
 
   const navbarRevealedRef = useRef<boolean>(false);
   const hasStartedPlaybackRef = useRef<boolean>(false);
-
-  const openFlyerModal = () => {
-    setIsFlyerModalOpen(true);
-  };
-
-  // Close flyer modal on Escape, coordinate body overflow & Lenis scroll lock
-  useEffect(() => {
-    const lenis = (window as unknown as { __lenis?: { stop: () => void; start: () => void } }).__lenis;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsFlyerModalOpen(false);
-      }
-    };
-
-    if (isFlyerModalOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      const prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      lenis?.stop();
-
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = prevOverflow;
-        lenis?.start();
-      };
-    }
-  }, [isFlyerModalOpen]);
 
   // Video playback management & preloader coordination
   const startVideoPlayback = () => {
@@ -646,91 +377,15 @@ export default function ZAxisStage() {
           </div>
         </section>
 
-        {/* Chapter 2: Doors */}
-        <section className="relative w-full bg-[#301F10] flex items-center justify-center overflow-hidden">
-          <div className="relative aspect-[1920/1188] w-full">
-            <img src={doorsSectionImg} alt="Four open doors" className="w-full h-full object-cover block select-none pointer-events-none" />
-
-            {/* Luminous Orange Door Outlines (Hover Effect) */}
-            <svg
-              viewBox="0 0 1920 1188"
-              className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                <filter id="rm-door-orange-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#F97316" floodOpacity="0.85" />
-                  <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#F97316" floodOpacity="0.45" />
-                </filter>
-              </defs>
-
-              {doors.map((d) => {
-                const isHovered = hoveredDoor === d.id;
-                return d.type === 'rect' ? (
-                  <rect
-                    key={d.id}
-                    x={d.x}
-                    y={d.y}
-                    width={d.widthPx}
-                    height={d.heightPx}
-                    rx={d.rx}
-                    ry={d.rx}
-                    fill="transparent"
-                    stroke="#F97316"
-                    strokeWidth="3.5"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    filter={isHovered ? 'url(#rm-door-orange-glow)' : undefined}
-                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
-                    style={{ pointerEvents: 'all' }}
-                    opacity={isHovered ? 1 : 0}
-                    onMouseEnter={() => setHoveredDoor(d.id)}
-                    onMouseLeave={() => setHoveredDoor(null)}
-                    onClick={() => navigate(d.path)}
-                  />
-                ) : (
-                  <polygon
-                    key={d.id}
-                    points={d.points}
-                    fill="transparent"
-                    stroke="#F97316"
-                    strokeWidth="3.5"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    filter={isHovered ? 'url(#rm-door-orange-glow)' : undefined}
-                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
-                    style={{ pointerEvents: 'all' }}
-                    opacity={isHovered ? 1 : 0}
-                    onMouseEnter={() => setHoveredDoor(d.id)}
-                    onMouseLeave={() => setHoveredDoor(null)}
-                    onClick={() => navigate(d.path)}
-                  />
-                );
-              })}
-            </svg>
-
-            {doors.map((d) => (
-              <Link
-                key={d.id}
-                to={d.path}
-                title={`${d.title} — ${d.subtitle}`}
-                aria-label={`${d.title} — ${d.subtitle}`}
-                onMouseEnter={() => setHoveredDoor(d.id)}
-                onMouseLeave={() => setHoveredDoor(null)}
-                style={{ left: d.left, width: d.width, top: '18%', bottom: '8%' }}
-                className="absolute z-20 cursor-pointer block group"
-              />
-            ))}
-          </div>
-        </section>
+        {/* Chapter 2: Doors (Modular) */}
+        <FourDoorsSection id="rm-chapter-02" />
 
         {/* Chapter 3: Pillars */}
         <section className="relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-32 xl:py-36 px-6 sm:px-12 lg:px-20 flex items-center justify-center overflow-hidden">
           <div className="max-w-[1280px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
             
             {/* Left Column: Heading & Description */}
-            <div className="lg:col-span-5 space-y-
-            6 text-left">
+            <div className="lg:col-span-5 space-y-6 text-left">
               <h2 
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                 className="font-serif text-4xl sm:text-5xl lg:text-[46px] xl:text-[52px] font-bold uppercase leading-[1.08] tracking-[12px]"
@@ -776,32 +431,11 @@ export default function ZAxisStage() {
           </div>
         </section>
 
-        {/* Chapter 4: Audition Showdown */}
-        <section className="relative w-full min-h-screen bg-[#2B173E] py-20 px-4 flex items-center justify-center">
-          <ShowdownSection onOpenModal={openFlyerModal} />
-        </section>
+        {/* Chapter 4: Showdown (Modular) */}
+        <ShowdownSection />
 
-        {/* Chapter 5: Sanctuary Invitation */}
-        <section className="relative w-full bg-[#FAF4E6] py-24 px-6 flex items-center justify-center">
-          <div className="max-w-[760px] mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-1.5 text-xs font-serif text-[#F97316] uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Chapter 05 • Welcome Home</span>
-            </div>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif" }} className="text-4xl sm:text-5xl font-bold uppercase">
-              <span className="text-[#18181B]">YOU WERE </span>
-              <span className="text-[#F97316]">EXPECTED.</span>
-            </h2>
-            <div className="space-y-2.5 text-sm sm:text-base text-[#6E6259] max-w-xl mx-auto">
-              <p>Thank you for stepping inside. The table is prepared, the light is on, and you are welcome here.</p>
-              <p>Take your next step with us today. Whether reading stories or standing in our kitchen line, your presence completes our family.</p>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <FigmaButton to="/about" variant="primary">Explore Our Story</FigmaButton>
-              <FigmaButton to="/movement" variant="outline">Join the Movement</FigmaButton>
-            </div>
-          </div>
-        </section>
+        {/* Chapter 5: Welcome Home (Modular) */}
+        <WelcomeHomeSection id="rm-chapter-05" />
 
         {/* Footer */}
         <Footer />
@@ -814,7 +448,7 @@ export default function ZAxisStage() {
   // ═════════════════════════════════════════════════════════════════
   return (
     <div className="relative w-full select-none bg-[#FAF4E6]">
-      {/* ─── PINNED CONTAINER (Holds Chapters 0 to 5 in a unified cinematic 3D Z-axis stage) ─── */}
+      {/* ─── PINNED CONTAINER (Holds Chapters 0 to 1 in cinematic 3D stage) ─── */}
       <div 
         ref={containerRef} 
         className="relative w-full"
@@ -899,8 +533,8 @@ export default function ZAxisStage() {
                     <span>Chapter 01</span>
                   </div>
                   <h2 
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-4xl sm:text-5xl lg:text-[52px] font-playfair font-bold text-[#F97316] tracking-tight leading-[1.06] uppercase"
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }} 
+                    className="text-4xl sm:text-5xl lg:text-[54px] font-bold text-[#F97316] leading-[1.08] uppercase"
                   >
                     WE’VE BEEN<br />EXPECTING YOU.
                   </h2>
@@ -914,24 +548,15 @@ export default function ZAxisStage() {
                 {/* Right Column */}
                 <div className="ch1-right-col lg:col-span-7 flex flex-col items-start lg:items-end text-left lg:text-right space-y-4">
                   <p 
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-lg sm:text-xl lg:text-[22px] font-playfair leading-[1.4] max-w-xl text-left lg:text-right"
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }} 
+                    className="text-lg sm:text-xl lg:text-[22px] leading-relaxed max-w-xl"
                   >
                     <span className="font-bold text-[#18181B]">This isn’t simply a website.</span>{" "}
-                    <span className="text-[#7A6B60]">
-                      It’s an invitation to experience a place where compassion becomes action, hope becomes visible, and{" "}
-                    </span>
+                    <span className="text-[#7A6B60]">It’s an invitation to experience a place where compassion becomes action, hope becomes visible, and </span>
                     <span className="font-bold text-[#18181B]">Every story matters.</span>
                   </p>
-
-                  <p 
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-lg sm:text-xl font-playfair font-semibold text-[#F97316]"
-                  >
-                    Including yours.
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                  
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
                     <FigmaButton to="/how-we-serve" variant="primary">
                       Find Your Pathway
                     </FigmaButton>
@@ -944,10 +569,10 @@ export default function ZAxisStage() {
               </div>
 
               {/* 4 Stat Badges */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-orange-200/80">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-orange-200">
                 {stats.map((s) => (
-                  <div key={s.label} className="ch1-stat-item flex items-center gap-3.5 group">
-                    <img src={s.icon} alt="" className="w-11 h-11 object-contain flex-shrink-0 group-hover:scale-105 transition-transform" />
+                  <div key={s.label} className="ch1-stat-item flex items-center gap-3.5">
+                    <img src={s.icon} alt="" className="w-11 h-11 object-contain" />
                     <div>
                       <div className="text-2xl sm:text-3xl font-serif font-bold text-[#231F20] leading-none">
                         {s.value}
@@ -967,97 +592,9 @@ export default function ZAxisStage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════
-          CHAPTER 2: "WHERE WOULD YOU LIKE TO GO?" (Four Doors)
+          CHAPTER 2: "WHERE WOULD YOU LIKE TO GO?" (Modular Four Doors)
           ═══════════════════════════════════════════════════════════════ */}
-      <section 
-        id="chapter-02"
-        className="relative w-full bg-[#301F10] flex items-center justify-center overflow-hidden select-none"
-      >
-        <div className="relative w-full aspect-[1920/1188] flex items-center justify-center">
-          <img 
-            src={doorsSectionImg} 
-            alt="Where would you like to go? Four open doors" 
-            className="w-full h-full object-cover block select-none pointer-events-none" 
-          />
-            {/* ─── Luminous Orange Door Outlines (Hover Effect) ─── */}
-            <svg
-              viewBox="0 0 1920 1188"
-              className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                {/* Brand Orange Luminous Glow Filter */}
-                <filter id="door-orange-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#F97316" floodOpacity="0.85" />
-                  <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#F97316" floodOpacity="0.45" />
-                </filter>
-              </defs>
-
-              {doors.map((d) => {
-                const isHovered = hoveredDoor === d.id;
-                return d.type === 'rect' ? (
-                  <rect
-                    key={d.id}
-                    x={d.x}
-                    y={d.y}
-                    width={d.widthPx}
-                    height={d.heightPx}
-                    rx={d.rx}
-                    ry={d.rx}
-                    fill="transparent"
-                    stroke="#F97316"
-                    strokeWidth="3.5"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    filter={isHovered ? 'url(#door-orange-glow)' : undefined}
-                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
-                    style={{ pointerEvents: 'all' }}
-                    opacity={isHovered ? 1 : 0}
-                    onMouseEnter={() => setHoveredDoor(d.id)}
-                    onMouseLeave={() => setHoveredDoor(null)}
-                    onClick={() => navigate(d.path)}
-                  />
-                ) : (
-                  <polygon
-                    key={d.id}
-                    points={d.points}
-                    fill="transparent"
-                    stroke="#F97316"
-                    strokeWidth="3.5"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    filter={isHovered ? 'url(#door-orange-glow)' : undefined}
-                    className="transition-all duration-300 ease-out cursor-pointer pointer-events-auto"
-                    style={{ pointerEvents: 'all' }}
-                    opacity={isHovered ? 1 : 0}
-                    onMouseEnter={() => setHoveredDoor(d.id)}
-                    onMouseLeave={() => setHoveredDoor(null)}
-                    onClick={() => navigate(d.path)}
-                  />
-                );
-              })}
-            </svg>
-
-            {/* ─── Interactive Hitbox Links Over Each Door & Label ─── */}
-            {doors.map((d) => (
-              <Link
-                key={d.id}
-                to={d.path}
-                title={`${d.title} — ${d.subtitle}`}
-                aria-label={`${d.title} — ${d.subtitle}`}
-                onMouseEnter={() => setHoveredDoor(d.id)}
-                onMouseLeave={() => setHoveredDoor(null)}
-                style={{
-                  left: d.left,
-                  width: d.width,
-                  top: '18%',
-                  bottom: '8%',
-                }}
-                className="absolute z-20 cursor-pointer block group"
-              />
-            ))}
-          </div>
-      </section>
+      <FourDoorsSection id="chapter-02" />
 
       {/* ═══════════════════════════════════════════════════════════════
           CHAPTER 3: "EVERY STORY MATTERS." (Three Pillars)
@@ -1093,14 +630,14 @@ export default function ZAxisStage() {
                 className={`flex flex-col items-center text-center ${p.offsetClass} transition-transform duration-300`}
               >
                 <div className="w-full aspect-[4/5] rounded-[18px] sm:rounded-[22px] lg:rounded-[24px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] bg-stone-200">
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    className="w-full h-full object-cover block"
+                  <img 
+                    src={p.image} 
+                    alt={p.title} 
+                    className="w-full h-full object-cover block" 
                   />
                 </div>
                 <h3 
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }} 
                   className="mt-3.5 sm:mt-4 text-base sm:text-lg lg:text-xl font-bold tracking-wider text-[#18181B] uppercase font-serif"
                 >
                   {p.title}
@@ -1116,23 +653,12 @@ export default function ZAxisStage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          CHAPTER 4: "WHAT'S COMING UP NEXT" (Audition Showdown)
+          CHAPTER 4: "WHAT'S COMING UP NEXT" (Modular Showdown Section)
           ═══════════════════════════════════════════════════════════════ */}
-      <section 
-        id="chapter-04"
-        className="relative w-full min-h-screen bg-[#2B173E] flex flex-col justify-center items-center text-white py-16 sm:py-24 px-4 sm:px-6 select-none overflow-hidden relative"
-      >
-        {/* Ambient Backlight matching Figma Frame 338 */}
-        <div className="absolute -top-12 -left-20 w-[650px] lg:w-[850px] h-[650px] bg-[#F97316]/25 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute -bottom-12 -right-20 w-[600px] lg:w-[800px] h-[600px] bg-[#F97316]/20 rounded-full blur-[140px] pointer-events-none" />
-
-        <div className="w-full relative z-10 flex flex-col items-center justify-center">
-          <ShowdownSection onOpenModal={openFlyerModal} />
-        </div>
-      </section>
+      <ShowdownSection id="chapter-04" />
 
       {/* ═══════════════════════════════════════════════════════════════
-          CHAPTER 5: "YOU WERE EXPECTED." (Sanctuary Invitation)
+          CHAPTER 5: "YOU WERE EXPECTED." (Modular Sanctuary Invitation)
           ═══════════════════════════════════════════════════════════════ */}
       <section 
         id="chapter-05"
@@ -1187,57 +713,6 @@ export default function ZAxisStage() {
 
       {/* ─── OFFICIAL FULL-WIDTH FOOTER ─── */}
       <Footer />
-
-      {/* ─── SHOWDOWN FULL FLYER MODAL (Portaled to document.body) ─── */}
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {isFlyerModalOpen && (
-            <div 
-              className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 md:p-6"
-              onWheel={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
-            >
-              {/* Dark blur backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                onClick={() => setIsFlyerModalOpen(false)}
-                className="fixed inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
-              />
-
-              {/* Modal Dialog Container */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.94, y: 15 }}
-                transition={{ type: 'spring', damping: 28, stiffness: 340 }}
-                className="relative z-10 flex flex-col w-full max-w-[880px] h-[92vh] bg-[#14061F] border border-orange-500/30 rounded-[20px] sm:rounded-[24px] shadow-[0_25px_80px_rgba(0,0,0,0.95)] overflow-hidden"
-              >
-                {/* Floating Close Button */}
-                <button
-                  onClick={() => setIsFlyerModalOpen(false)}
-                  aria-label="Close modal"
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 p-2 rounded-full bg-black/60 hover:bg-black/90 text-stone-300 hover:text-white border border-white/20 transition-all cursor-pointer backdrop-blur-md shadow-lg"
-                >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-
-                {/* Modal Content */}
-                <div 
-                  data-lenis-prevent
-                  className="flex-1 min-h-0 bg-gradient-to-b from-[#14061F] via-[#0E0316] to-[#0A0210] overflow-y-auto overscroll-contain custom-modal-scrollbar p-4 sm:p-8"
-                >
-                  <ShowdownSection isModal={true} />
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-
     </div>
   );
 }
