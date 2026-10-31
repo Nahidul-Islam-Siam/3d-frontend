@@ -1,6 +1,5 @@
 import Seo from "@/components/Seo";
 import StoryHeroBanner from "@/components/experience-story/StoryHeroBanner";
-import MovementStorySection from "@/components/experience-story/MovementStorySection";
 import DocumentaryVideoSection from "@/components/experience-story/DocumentaryVideoSection";
 import ShowdownSection from "@/components/welcome/ShowdownSection";
 import FourDoorsSection from "@/components/welcome/FourDoorsSection";
@@ -14,11 +13,8 @@ export default function About() {
       />
 
       <div className="w-full bg-[#FAF4E6]">
-        {/* ─── Section 1: Hero Video Banner ─── */}
+        {/* ─── Section 1 & 2: Pinned Theatrical Stage (Hero Video transitions into Living Room Scene in the exact same position) ─── */}
         <StoryHeroBanner />
-
-        {/* ─── Section 2: Every Movement Begins With A Story ─── */}
-        <MovementStorySection />
 
         {/* ─── Section 3: Documentary Video (Experience Story 2) ─── */}
         <DocumentaryVideoSection />

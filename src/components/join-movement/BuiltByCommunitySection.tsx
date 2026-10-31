@@ -55,7 +55,7 @@ export default function BuiltByCommunitySection({
         {/* Main Heading: Exact Dual Color Matching Reference Image with Generous Line Spacing */}
         <h2
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-          className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] tracking-tight flex flex-col items-center gap-2.5 sm:gap-3.5 lg:gap-4 leading-none"
+          className="text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px] font-bold tracking-tight flex flex-col items-center gap-2.5 sm:gap-3.5 lg:gap-4 leading-tight"
         >
           <span className="text-[#1F1E1C]">Live Achieve Believe Was</span>
           <span className="text-[#1F1E1C]">Never Meant To Be Built By</span>

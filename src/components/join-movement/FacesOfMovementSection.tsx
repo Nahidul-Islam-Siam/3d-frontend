@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import faceFamily from '@/assets/join-movement/faces/face_family_living_room.png';
+import logoIcon from '@/assets/logo/logo-icon.png';
+import faceChild from '@/assets/join-movement/faces/face_child_running.png';
 import faceSculptor from '@/assets/join-movement/faces/face_sculptor.png';
 import faceFlowers from '@/assets/join-movement/faces/face_flowers.png';
+import faceFamily from '@/assets/join-movement/faces/face_family_living_room.png';
 import faceStudent from '@/assets/join-movement/faces/face_student.png';
 import faceHandshake from '@/assets/join-movement/faces/face_handshake.png';
 import faceCommunity from '@/assets/join-movement/faces/face_community_hub.png';
-import faceChild from '@/assets/join-movement/faces/face_child_running.png';
 
 export interface FacesOfMovementSectionProps {
   id?: string;
@@ -21,13 +22,14 @@ interface FaceStory {
   role: string;
 }
 
+// Exactly ordered to match reference image 3: [Child, Sculptor, Flowers, Family (Center), Student, Handshake, Community]
 const stories: FaceStory[] = [
   {
-    id: 'story-family',
-    image: faceFamily,
-    title: 'I came to help . I found family.',
-    quote: '“ I thought I was dropping off extra canned goods before work. Three years later, the teenagers who sit around my prep table have become my own children in spirit. ”',
-    role: 'Community Living Circle',
+    id: 'story-child',
+    image: faceChild,
+    title: 'Unbroken laughter . A brighter horizon.',
+    quote: '“ For the first time in two years, my daughter runs across the grass without fear. Seeing her smile freely again is the greatest gift this community has given our family. ”',
+    role: 'Family Respite Retreat',
   },
   {
     id: 'story-sculptor',
@@ -42,6 +44,13 @@ const stories: FaceStory[] = [
     title: 'A single blossom . A lifelong bond.',
     quote: '“ Mrs. Gable had not received visitors in months. When I dropped off flowers on her stoop, she looked up with tears and said: ‘Someone remembered me.’ That was the turning point. ”',
     role: 'Neighbor Stoop Outreach',
+  },
+  {
+    id: 'story-family',
+    image: faceFamily,
+    title: 'I came to help . I found family.',
+    quote: '“ I thought I was dropping off extra canned goods before work. Three years later, the teenagers who sit around my prep table have become my own children in spirit. ”',
+    role: 'Community Living Circle',
   },
   {
     id: 'story-student',
@@ -64,13 +73,6 @@ const stories: FaceStory[] = [
     quote: '“ The kitchen is where barriers melt away. When we sit together over a home-cooked meal, there are no strangers — only neighbors who haven’t heard each other’s names yet. ”',
     role: 'Harvest Kitchen Coordinator',
   },
-  {
-    id: 'story-child',
-    image: faceChild,
-    title: 'Unbroken laughter . A brighter horizon.',
-    quote: '“ For the first time in two years, my daughter runs across the grass without fear. Seeing her smile freely again is the greatest gift this community has given our family. ”',
-    role: 'Family Respite Retreat',
-  },
 ];
 
 // Tripled array for seamless infinite looping in both directions
@@ -80,8 +82,8 @@ export default function FacesOfMovementSection({
   id = 'faces-of-movement', 
   className = '' 
 }: FacesOfMovementSectionProps) {
-  // Start in the middle set of stories (index 7 corresponds to first story in second set)
-  const [activeIndex, setActiveIndex] = useState<number>(stories.length);
+  // Start centered on story-family in the middle set (index 10)
+  const [activeIndex, setActiveIndex] = useState<number>(stories.length + 3);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [dimensions, setDimensions] = useState({
@@ -198,9 +200,9 @@ export default function FacesOfMovementSection({
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Moving Track */}
+        {/* Moving Track - Top Aligned for Exact Horizon Match */}
         <div
-          className="flex items-center transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
+          className="flex items-start transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
           style={{
             transform: `translateX(${trackOffset}px)`,
             gap: `${gap}px`,
@@ -225,8 +227,12 @@ export default function FacesOfMovementSection({
                       className="w-full h-full object-cover select-none pointer-events-none"
                     />
                     {/* Elegant Live Achieve Believe Monogram Badge */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/20 flex items-center gap-1.5 shadow-sm">
-                      <span className="text-[11px] font-serif italic text-white/90 tracking-wider">LAB</span>
+                    <div className="absolute top-3 left-3 pointer-events-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                      <img
+                        src={logoIcon}
+                        alt="Live Achieve Believe"
+                        className="w-7 h-7 sm:w-8 sm:h-8 object-contain brightness-0 invert opacity-90 drop-shadow-md"
+                      />
                     </div>
                   </div>
 
