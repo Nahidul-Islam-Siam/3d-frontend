@@ -84,14 +84,14 @@ export default function ShowdownSection({
           >
             TICKETS OPEN NOW
           </FigmaButton>
-          <button
-            type="button"
+          <FigmaButton
             onClick={openModal}
-            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-[11px] sm:text-xs font-serif font-medium tracking-wider hover:scale-105 transition-all cursor-pointer"
+            variant="outline-white"
+            size="sm"
+            className="!border-white/30 !text-white !bg-white/10 hover:!bg-white/20"
           >
-            <span>Audition</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+            Audition
+          </FigmaButton>
         </div>
       </div>
 
@@ -123,7 +123,8 @@ export default function ShowdownSection({
           className={`relative w-full min-h-screen bg-gradient-to-b from-[#2B173E] via-[#1B0C2A] to-[#140820] flex items-center justify-center py-20 px-4 sm:px-6 overflow-hidden select-none ${className}`}
         >
           {/* Ambient background glows */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-[#F97316]/12 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute -top-12 -left-12 w-[650px] h-[550px] bg-[#F97316]/22 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-[#F97316]/10 rounded-full blur-[140px] pointer-events-none" />
           <div className="absolute top-1/2 right-10 w-96 h-96 bg-[#8b5cf6]/15 rounded-full blur-3xl pointer-events-none" />
           
           {content}

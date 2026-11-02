@@ -6,6 +6,7 @@ import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCo
 import PurePhotographySection from '@/components/how-we-serve/PurePhotographySection';
 import StoriesFromTheTableSection from '@/components/how-we-serve/StoriesFromTheTableSection';
 import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWaitingSection';
+import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function HowWeServePage() {
   return (
@@ -36,6 +37,9 @@ export default function HowWeServePage() {
 
         {/* ─── Section 7: There Is Always Another Seat Waiting (Action Cards) ─── */}
         <AnotherSeatWaitingSection />
+
+        {/* ─── Section 8: What's Coming Up Next (Showdown Event & Auditions) ─── */}
+        <ShowdownSection id="what-coming-up-next" />
       </div>
     </>
   );
