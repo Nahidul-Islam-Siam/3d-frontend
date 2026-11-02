@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import meetUsBg from '@/assets/Meet Us.png';
+import meetUsBg from '@/assets/meet-us/hero-orbit-bg.png';
 
 export interface MeetUsBannerProps {
   className?: string;
@@ -16,7 +16,7 @@ export default function MeetUsBanner({
       return;
     }
 
-    const nextSection = document.getElementById('meet-us-content');
+    const nextSection = document.getElementById('people-behind-the-mission') || document.getElementById('meet-us-content');
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: 'smooth' });
     } else {

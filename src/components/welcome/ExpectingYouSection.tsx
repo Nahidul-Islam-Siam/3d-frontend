@@ -16,7 +16,7 @@ const stats = [
   {
     value: "1,200",
     label: "Mentor Matches",
-    icon: mentorIcon,
+    icon: mentorIcon,  
   },
   {
     value: "380",
