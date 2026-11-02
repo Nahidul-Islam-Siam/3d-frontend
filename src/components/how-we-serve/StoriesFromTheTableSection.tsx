@@ -89,8 +89,12 @@ export default function StoriesFromTheTableSection({
           className="text-center max-w-2xl mx-auto"
         >
           <h2
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-3xl sm:text-4xl lg:text-[48px] font-semibold text-[#0B0B0A] leading-tight tracking-tight"
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              color: '#272624',
+              lineHeight: 'normal',
+            }}
+            className="text-3xl sm:text-4xl lg:text-[48px] font-semibold tracking-tight"
           >
             Stories From the Table
           </h2>

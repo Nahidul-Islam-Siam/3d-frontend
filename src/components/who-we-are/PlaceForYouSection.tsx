@@ -20,8 +20,12 @@ export default function PlaceForYouSection() {
           >
             {/* Title */}
             <h2
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-[48px] font-semibold text-[#0B0B0A] leading-normal"
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                color: '#272624',
+                lineHeight: 'normal',
+              }}
+              className="text-3xl sm:text-4xl lg:text-[48px] font-semibold tracking-tight"
             >
               There&apos;s a Place for<br />
               You Here.
