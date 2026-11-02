@@ -25,7 +25,7 @@ export default function AnotherSeatWaitingSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] pt-20 sm:pt-28 lg:pt-36 pb-20 sm:pb-28 lg:pb-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] pt-14 sm:pt-20 lg:pt-36 pb-14 sm:pb-20 lg:pb-36 px-4 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
     >
       {/* ─── Wave / Artistic Background (another-seat-waiting-bg.png) ─── */}
       <div
@@ -44,7 +44,7 @@ export default function AnotherSeatWaitingSection({
         src={rightLeaf}
         alt=""
         aria-hidden="true"
-        className="absolute top-[320px] sm:top-[300px] lg:top-[270px] -right-4 sm:right-0 w-36 sm:w-48 lg:w-56 opacity-85 pointer-events-none select-none z-10"
+        className="hidden sm:block absolute top-[320px] sm:top-[300px] lg:top-[270px] -right-4 sm:right-0 w-36 sm:w-48 lg:w-56 opacity-85 pointer-events-none select-none z-10"
       />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto">
@@ -103,11 +103,11 @@ export default function AnotherSeatWaitingSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full mt-8 sm:mt-10 lg:mt-14"
+            className="w-full mt-0 md:mt-10 lg:mt-14"
           >
             <Link
               to="/movement#volunteer"
-              className="group flex flex-col justify-between bg-white rounded-[22px] p-7 sm:p-8 min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+              className="group flex flex-col justify-between bg-white rounded-[22px] p-6 sm:p-8 min-h-[290px] sm:min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
             >
               <div>
                 {/* Icon 1: Volunteer / Two Figures with Star */}
@@ -167,7 +167,7 @@ export default function AnotherSeatWaitingSection({
           >
             <Link
               to="/contact#donate"
-              className="group flex flex-col justify-between bg-white rounded-[22px] p-7 sm:p-8 min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+              className="group flex flex-col justify-between bg-white rounded-[22px] p-6 sm:p-8 min-h-[290px] sm:min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
             >
               <div>
                 {/* Icon 2: Sponsor / Meal Feast Table */}
@@ -223,11 +223,11 @@ export default function AnotherSeatWaitingSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full mt-8 sm:mt-10 lg:mt-14"
+            className="w-full mt-0 md:mt-10 lg:mt-14"
           >
             <Link
               to="/contact#partner"
-              className="group flex flex-col justify-between bg-white rounded-[22px] p-7 sm:p-8 min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+              className="group flex flex-col justify-between bg-white rounded-[22px] p-6 sm:p-8 min-h-[290px] sm:min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
             >
               <div>
                 {/* Icon 3: Partnership / Handshake */}
@@ -275,7 +275,7 @@ export default function AnotherSeatWaitingSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-5xl mx-auto rounded-[32px] sm:rounded-[40px] px-6 sm:px-12 lg:px-16 pt-14 sm:pt-16 pb-14 sm:pb-16 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
+          className="relative w-full max-w-5xl mx-auto rounded-[32px] sm:rounded-[40px] px-4 sm:px-10 lg:px-16 pt-10 sm:pt-14 lg:pt-16 pb-10 sm:pb-14 lg:pb-16 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
           style={{
             background:
               'linear-gradient(180deg, #FD7646 0%, #FA7545 40%, #F57242 70%, #EA6635 100%)',
@@ -295,7 +295,7 @@ export default function AnotherSeatWaitingSection({
             {/* Title */}
             <h3
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-[42px] font-semibold text-white text-center leading-[1.2] tracking-tight mb-4 sm:mb-5 max-w-2xl"
+              className="text-2xl sm:text-3xl lg:text-[42px] font-semibold text-white text-center leading-[1.2] tracking-tight mb-4 sm:mb-5 max-w-2xl"
             >
               No Single Organization Heals
               <br />
@@ -329,7 +329,7 @@ export default function AnotherSeatWaitingSection({
             </div>
 
             {/* Navigation Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 w-full sm:w-auto">
               <FigmaButton
                 to="/#doors"
                 variant="outline-white"

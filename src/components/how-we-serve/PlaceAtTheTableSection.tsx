@@ -12,7 +12,7 @@ export default function PlaceAtTheTableSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] py-14 sm:py-20 lg:py-28 px-4 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
     >
       <div className="w-full max-w-4xl mx-auto text-center flex flex-col items-center">
         
@@ -23,7 +23,7 @@ export default function PlaceAtTheTableSection({
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
           style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] font-bold text-[#F97316] uppercase tracking-[0.02em] leading-tight"
+          className="text-2xl sm:text-3xl md:text-5xl lg:text-[48px] font-bold text-[#F97316] uppercase tracking-[0.02em] leading-tight"
         >
           A PLACE AT THE TABLE
         </motion.h2>

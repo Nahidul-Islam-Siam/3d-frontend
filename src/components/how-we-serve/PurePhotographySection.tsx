@@ -49,7 +49,7 @@ export default function PurePhotographySection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] py-14 sm:py-20 lg:py-28 px-4 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
     >
       {/* ─── Decorative Leaf Flourish - Top Left (Group.png) ─── */}
       <motion.img
@@ -110,7 +110,7 @@ export default function PurePhotographySection({
               >
                 {/* Photo Card Container */}
                 <div
-                  className={`relative w-full h-[320px] sm:h-[380px] lg:h-[460px] rounded-[22px] sm:rounded-[28px] overflow-hidden bg-[#ECE0D0] transition-all duration-700 ease-out ${
+                  className={`relative w-full h-[260px] sm:h-[340px] lg:h-[460px] rounded-[22px] sm:rounded-[28px] overflow-hidden bg-[#ECE0D0] transition-all duration-700 ease-out ${
                     isActive
                       ? 'shadow-[0_20px_50px_rgba(44,36,29,0.16)] ring-1 ring-[#F97316]/30'
                       : 'shadow-[0_10px_28px_rgba(44,36,29,0.06)] opacity-90 hover:opacity-100'
