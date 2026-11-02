@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export interface APlaceForThemSectionProps {
   id?: string;
-  className?: string;
+  className?: string;   
 }
 
 const tableCards = [
@@ -11,35 +11,35 @@ const tableCards = [
     title: 'Seeing People.',
     image: '/who/table-seeing-people.png',
     alt: 'Close-up of eyes seeing each individual with dignity and compassion',
-    offsetClass: 'lg:translate-y-8',
+    offsetClass: 'mt-10 sm:mt-14 lg:mt-16',
   },
   {
     id: 'listening',
     title: 'Listening.',
     image: '/who/table-listening.png',
     alt: 'Attentive, compassionate listening in personal conversation',
-    offsetClass: 'lg:-translate-y-3',
+    offsetClass: 'mt-1 sm:mt-2 lg:mt-4',
   },
   {
     id: 'building-relationships',
     title: 'Building relationships.',
     image: '/who/table-building-relationships.png',
     alt: 'Volunteers and community members sharing a warm meal together at the table',
-    offsetClass: 'lg:translate-y-10',
+    offsetClass: 'mt-10 sm:mt-14 lg:mt-16',
   },
   {
     id: 'offering-hope',
     title: 'Offering hope.',
     image: '/who/table-offering-hope.png',
     alt: 'Warm, welcoming smile offering sincere hope and human connection',
-    offsetClass: 'lg:-translate-y-6',
+    offsetClass: 'mt-0',
   },
   {
     id: 'one-conversation',
     title: 'One conversation at a time.',
     image: '/who/table-one-conversation.png',
     alt: 'Holding hands across the table in deep empathy, love, and care',
-    offsetClass: 'lg:translate-y-8',
+    offsetClass: 'mt-10 sm:mt-14 lg:mt-16',
   },
 ];
 
@@ -78,8 +78,12 @@ export default function APlaceForThemSection({
             className="lg:col-span-7"
           >
             <h2
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-[44px] xl:text-[46px] font-semibold text-[#0B0B0A] leading-[1.18] tracking-tight max-w-xl"
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                color: '#272624',
+                lineHeight: 'normal',
+              }}
+              className="text-3xl sm:text-4xl lg:text-[48px] font-semibold tracking-tight max-w-xl"
             >
               No one should have to wonder if there is a place for them.
             </h2>
@@ -114,12 +118,12 @@ export default function APlaceForThemSection({
 
         </div>
 
-        {/* ─── Bottom Row: 5 Organic Staggered Narrative Photo Cards ─── */}
-        <div className="mt-16 sm:mt-20 lg:mt-28 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 sm:gap-6 lg:gap-5 xl:gap-6 items-start">
+        {/* ─── Bottom Row: 5 Organic Staggered Narrative Photo Cards (Up/Down Alternating) ─── */}
+        <div className="mt-12 sm:mt-16 lg:mt-20 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 sm:gap-6 lg:gap-5 xl:gap-6 items-start">
           {tableCards.map((card, idx) => (
             <motion.div
               key={card.id}
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{
@@ -127,24 +131,26 @@ export default function APlaceForThemSection({
                 delay: idx * 0.1,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className={`group flex flex-col ${card.offsetClass} transition-transform duration-300`}
+              className={`w-full ${card.offsetClass}`}
             >
-              {/* Card Photo Container */}
-              <div className="relative w-full aspect-[250/200] rounded-[18px] sm:rounded-[22px] overflow-hidden bg-[#ECE0D0] shadow-[0_10px_28px_rgba(44,36,29,0.08)]">
-                <img
-                  src={card.image}
-                  alt={card.alt}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
-              </div>
+              <div className="group flex flex-col transition-transform duration-300 hover:-translate-y-1">
+                {/* Card Photo Container */}
+                <div className="relative w-full aspect-square rounded-[18px] sm:rounded-[22px] overflow-hidden bg-[#ECE0D0] shadow-[0_10px_28px_rgba(44,36,29,0.08)]">
+                  <img
+                    src={card.image}
+                    alt={card.alt}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                </div>
 
-              {/* Caption Underneath */}
-              <p
-                style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
-                className="mt-3 sm:mt-3.5 text-xs sm:text-[13px] lg:text-[13.5px] font-normal text-[#594B3C] text-left leading-snug tracking-normal"
-              >
-                {card.title}
-              </p>
+                {/* Caption Underneath */}
+                <p
+                  style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
+                  className="mt-3 sm:mt-3.5 text-xs sm:text-[13px] lg:text-[13.5px] font-normal text-[#594B3C] text-left leading-snug tracking-normal"
+                >
+                  {card.title}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>

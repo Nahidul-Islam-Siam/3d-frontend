@@ -74,8 +74,12 @@ export default function PurePhotographySection({
           className="max-w-3xl"
         >
           <h2
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-3xl sm:text-4xl lg:text-[48px] font-semibold text-[#272624] leading-normal tracking-tight"
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              color: '#272624',
+              lineHeight: 'normal',
+            }}
+            className="text-3xl sm:text-4xl lg:text-[48px] font-semibold tracking-tight"
           >
             Pure photography, quiet moments, zero staged gloss.
           </h2>

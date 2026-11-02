@@ -1,12 +1,22 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Handshake } from 'lucide-react';
+import { HeartHandshake } from 'lucide-react';
+import FigmaButton from '@/components/common/FigmaButton';
 import rightLeaf from '@/assets/icons/Group-2.png';
 
 export interface AnotherSeatWaitingSectionProps {
   id?: string;
   className?: string;
 }
+
+const partnerPills = [
+  'Churches',
+  'Nonprofits',
+  'Local Bakeries & Farms',
+  'Community Volunteers',
+  'Civic Leaders',
+];
 
 export default function AnotherSeatWaitingSection({
   id = 'another-seat-waiting',
@@ -15,11 +25,11 @@ export default function AnotherSeatWaitingSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] pt-20 sm:pt-28 lg:pt-36 pb-20 sm:pb-28 lg:pb-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
     >
       {/* ─── Wave / Artistic Background (another-seat-waiting-bg.png) ─── */}
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none select-none z-0"
+        className="absolute inset-0 w-full h-[850px] pointer-events-none select-none z-0"
         aria-hidden="true"
       >
         <img
@@ -29,12 +39,12 @@ export default function AnotherSeatWaitingSection({
         />
       </div>
 
-      {/* ─── Bottom-Right Decorative Leaf Flourish (Group-2.png) ─── */}
+      {/* ─── Mid-Right Decorative Leaf Flourish (Group-2.png) ─── */}
       <img
         src={rightLeaf}
         alt=""
         aria-hidden="true"
-        className="absolute -bottom-8 -right-4 sm:-bottom-10 sm:right-0 w-36 sm:w-48 lg:w-60 opacity-80 pointer-events-none select-none z-10"
+        className="absolute top-[320px] sm:top-[300px] lg:top-[270px] -right-4 sm:right-0 w-36 sm:w-48 lg:w-56 opacity-85 pointer-events-none select-none z-10"
       />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto">
@@ -49,8 +59,12 @@ export default function AnotherSeatWaitingSection({
             className="lg:col-span-7"
           >
             <h2
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-[46px] font-semibold text-[#0B0B0A] leading-[1.16] tracking-tight max-w-xl"
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                color: '#272624',
+                lineHeight: 'normal',
+              }}
+              className="text-3xl sm:text-4xl lg:text-[48px] font-semibold tracking-tight max-w-xl"
             >
               There Is Always Another
               <br />
@@ -67,8 +81,12 @@ export default function AnotherSeatWaitingSection({
             className="lg:col-span-5 flex flex-col items-start lg:items-end justify-center pt-2"
           >
             <p
-              style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
-              className="text-[13px] sm:text-[14px] text-[#746343] font-normal leading-relaxed max-w-md lg:text-right"
+              style={{
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                color: '#746343',
+                lineHeight: '26px',
+              }}
+              className="text-[15px] sm:text-[17px] lg:text-[18px] font-normal max-w-md text-left lg:text-right"
             >
               Whether you would like to prepare meals, serve alongside our volunteers, donate
               food, or partner with us in expanding our outreach, there is a place for you at the
@@ -78,14 +96,14 @@ export default function AnotherSeatWaitingSection({
         </div>
 
         {/* ─── 3 White Action Cards (Staggered Layout + Rich Hover Interaction) ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start">
-          {/* ─── Card 1: Volunteer at the Table ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start mb-24 sm:mb-28 lg:mb-36 max-w-5xl mx-auto">
+          {/* ─── Card 1: Volunteer at the Table (Down) ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:translate-y-8"
+            className="w-full mt-8 sm:mt-10 lg:mt-14"
           >
             <Link
               to="/movement#volunteer"
@@ -139,13 +157,13 @@ export default function AnotherSeatWaitingSection({
             </Link>
           </motion.div>
 
-          {/* ─── Card 2: Sponsor a Community Meal (Elevated) ─── */}
+          {/* ─── Card 2: Sponsor a Community Meal (Up / Elevated) ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:-translate-y-2"
+            className="w-full mt-0"
           >
             <Link
               to="/contact#donate"
@@ -199,13 +217,13 @@ export default function AnotherSeatWaitingSection({
             </Link>
           </motion.div>
 
-          {/* ─── Card 3: Partner With Us (Lowered) ─── */}
+          {/* ─── Card 3: Partner With Us (Down) ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:translate-y-12"
+            className="w-full mt-8 sm:mt-10 lg:mt-14"
           >
             <Link
               to="/contact#partner"
@@ -214,7 +232,7 @@ export default function AnotherSeatWaitingSection({
               <div>
                 {/* Icon 3: Partnership / Handshake */}
                 <div className="w-10 h-10 mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                  <Handshake
+                  <HeartHandshake
                     className="w-10 h-10 text-[#F97316]"
                     strokeWidth={1.8}
                   />
@@ -250,8 +268,89 @@ export default function AnotherSeatWaitingSection({
             </Link>
           </motion.div>
         </div>
+
+        {/* ─── Bottom CTA Banner: No Single Organization Heals A City Alone ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 36 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-5xl mx-auto rounded-[32px] sm:rounded-[40px] px-6 sm:px-12 lg:px-16 pt-14 sm:pt-16 pb-14 sm:pb-16 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
+          style={{
+            background:
+              'linear-gradient(180deg, #FD7646 0%, #FA7545 40%, #F57242 70%, #EA6635 100%)',
+          }}
+        >
+          {/* Subtle diffused radiant white glow at bottom-center matching Figma */}
+          <div
+            className="absolute inset-0 pointer-events-none select-none"
+            style={{
+              background:
+                'radial-gradient(ellipse 70% 55% at 50% 85%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 70%)',
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 flex flex-col items-center text-center">
+            {/* Title */}
+            <h3
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="text-3xl sm:text-4xl lg:text-[42px] font-semibold text-white text-center leading-[1.2] tracking-tight mb-4 sm:mb-5 max-w-2xl"
+            >
+              No Single Organization Heals
+              <br />
+              A City Alone
+            </h3>
+
+            {/* Subtitle */}
+            <p
+              style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
+              className="text-xs sm:text-[14px] text-white/95 font-normal text-center leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10"
+            >
+              We believe lasting change happens when churches, nonprofits, businesses,
+              volunteers, and community partners come together with one shared purpose: loving
+              people well.
+            </p>
+
+            {/* Partner Pills Row with '+' separators */}
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-3xl mx-auto mb-10 sm:mb-12">
+              {partnerPills.map((pill, idx) => (
+                <React.Fragment key={pill}>
+                  <span className="px-3.5 sm:px-4 py-1.5 rounded-full border border-white/60 text-white text-[11.5px] sm:text-[12.5px] font-medium tracking-wide bg-white/10 backdrop-blur-sm shadow-sm select-none hover:bg-white/20 transition-colors">
+                    {pill}
+                  </span>
+                  {idx < partnerPills.length - 1 && (
+                    <span className="text-white/70 text-xs sm:text-sm font-light select-none">
+                      +
+                    </span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Navigation Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+              <FigmaButton
+                to="/#doors"
+                variant="outline-white"
+                size="md"
+                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+              >
+                Return To Hallway Of Hope
+              </FigmaButton>
+
+              <FigmaButton
+                to="/movement"
+                variant="outline-white"
+                size="md"
+                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+              >
+                Next Door
+              </FigmaButton>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
 }
-

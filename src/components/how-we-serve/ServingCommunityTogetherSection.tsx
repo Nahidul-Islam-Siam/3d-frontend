@@ -76,8 +76,12 @@ export default function ServingCommunityTogetherSection({
           className="text-center max-w-3xl mx-auto space-y-3.5"
         >
           <h2
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-3xl sm:text-4xl lg:text-[48px] font-semibold text-[#272624] text-center leading-normal tracking-tight"
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              color: '#272624',
+              lineHeight: 'normal',
+            }}
+            className="text-3xl sm:text-4xl lg:text-[48px] font-semibold text-center tracking-tight"
           >
             Serving Our Community Together
           </h2>
