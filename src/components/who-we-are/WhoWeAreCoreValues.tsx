@@ -14,7 +14,7 @@ const coreValues: CoreValueItem[] = [
     title: 'Think Higher',
     description:
       'See beyond circumstances and limitations. Recognize possibilities where others see obstacles.',
-    image: '/who/think-higher.png',
+    image: '/who/value-think-higher.png',
     alt: 'Person standing on mountain ridge looking out over the horizon at sunrise',
   },
   {
@@ -22,7 +22,7 @@ const coreValues: CoreValueItem[] = [
     title: 'Feel Deeper',
     description:
       "Look beyond appearances. Listen without judgment and recognize every person's dignity, struggles, and hopes.",
-    image: '/who/feel-deeper.png',
+    image: '/who/value-feel-deeper.png',
     alt: 'Two women sharing a heartfelt, compassionate conversation',
   },
   {
@@ -30,7 +30,7 @@ const coreValues: CoreValueItem[] = [
     title: 'Act with Purpose',
     description:
       'Turn compassion into action through service, encouragement, meaningful support, and human connection.',
-    image: '/who/act-with-purpose.png',
+    image: '/who/value-act-purpose.png',
     alt: 'Community volunteers serving fresh food and essentials to families',
   },
 ];
@@ -41,13 +41,13 @@ export default function WhoWeAreCoreValues() {
       id="core-values"
       className="relative w-full bg-[#FAF4E6] py-16 sm:py-24 md:py-28 lg:py-36 overflow-hidden select-none"
     >
-      {/* ─── Wave Container Background Layer (our-core-values.png) ─── */}
+      {/* ─── Wave Container Background Layer (values-wave-bg.png) ─── */}
       <div 
         className="absolute inset-0 w-full h-full pointer-events-none select-none z-0"
         aria-hidden="true"
       >
         <img
-          src="/who/our-core-values.png"
+          src="/who/values-wave-bg.png"
           alt=""
           className="w-full h-full object-fill object-center"
         />

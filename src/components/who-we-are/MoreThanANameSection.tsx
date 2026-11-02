@@ -7,13 +7,13 @@ export default function MoreThanANameSection() {
       id="more-than-a-name"
       className="relative w-full min-h-[660px] lg:min-h-[760px] bg-[#432A19] py-20 sm:py-28 lg:py-32 px-6 sm:px-10 lg:px-16 overflow-hidden select-none flex items-center"
     >
-      {/* ─── Background Textured Layer (Frame 360.png) ─── */}
+      {/* ─── Background Textured Layer (more-than-name-bg.png) ─── */}
       <div 
         className="absolute inset-0 w-full h-full pointer-events-none select-none z-0"
         aria-hidden="true"
       >
         <img
-          src="/who/frame-360.png"
+          src="/who/more-than-name-bg.png"
           alt=""
           className="w-full h-full object-cover object-center"
         />

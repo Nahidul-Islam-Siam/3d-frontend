@@ -1,61 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { CiMenuFries } from "react-icons/ci";
-import { 
-  ChevronDown, 
-  Utensils, 
-  GraduationCap, 
-  BookHeart, 
-  Home as HomeIcon, 
-  Users 
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import SideNav from "./side-nav";
 import logoWithText from "@/assets/logo/logo-with-text.png";
 import btnArrow from "@/assets/icons/btn-arrow.png";
 
-const ministries = [
-  {
-    title: "A Place at the Table",
-    subtitle: "Community Meals & Dignity",
-    to: "/how-we-serve#table",
-    icon: Utensils,
-    tag: "Meals"
-  },
-  {
-    title: "Strong Foundations",
-    subtitle: "Youth Development & LEADS",
-    to: "/how-we-serve#youth",
-    icon: GraduationCap,
-    tag: "Next Gen"
-  },
-  {
-    title: "Stories That Save Lives",
-    subtitle: "Suicide Awareness Showdown",
-    to: "/how-we-serve#stories",
-    icon: BookHeart,
-    tag: "Mental Health"
-  },
-  {
-    title: "Welcome Home",
-    subtitle: "Veteran Housing & Restoration",
-    to: "/how-we-serve#veterans",
-    icon: HomeIcon,
-    tag: "Veterans"
-  },
-  {
-    title: "Serve Beside Us",
-    subtitle: "Volunteer Family Opportunities",
-    to: "/how-we-serve#volunteer",
-    icon: Users,
-    tag: "Community"
-  }
-];
-
 export default function Navbar() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isServeOpen, setIsServeOpen] = useState(false);
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
@@ -64,13 +17,8 @@ export default function Navbar() {
   const toggleOpen = () => setIsOpen(!isOpen);
 
   useEffect(() => {
-    if (!isHomePage) {
-      setIsRevealed(true);
-      return;
-    }
-
-    // On home page, hidden initially until video time finishes
-    setIsRevealed(false);
+    // Initial reveal state
+    setIsRevealed(!isHomePage);
 
     const handleReveal = () => setIsRevealed(true);
     const handleHide = () => setIsRevealed(false);
@@ -95,7 +43,7 @@ export default function Navbar() {
     { label: "Welcome", to: "/" },
     { label: "Experience the Story", to: "/about" },
     { label: "Who We Are", to: "/who-we-are" },
-    { label: "How We Serve", to: "/how-we-serve", hasDropdown: true },
+    { label: "How We Serve", to: "/how-we-serve" },
     { label: "Join the Movement", to: "/movement" },
     { label: "Meet Us", to: "/meet-us" },
   ];
@@ -132,74 +80,6 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center justify-center gap-7 xl:gap-9 whitespace-nowrap text-[16px] leading-[24px] font-normal text-[#746343]">
             {navItems.map((item) => {
               const isActive = location.pathname === item.to;
-
-              if (item.hasDropdown) {
-                return (
-                  <div 
-                    key={item.label}
-                    className="relative py-2 whitespace-nowrap"
-                    onMouseEnter={() => setIsServeOpen(true)}
-                    onMouseLeave={() => setIsServeOpen(false)}
-                  >
-                    <button 
-                      className={`flex items-center gap-1.5 transition-colors hover:text-[#ea580c] font-normal text-[16px] leading-[24px] whitespace-nowrap ${
-                        location.pathname.startsWith('/how-we-serve') ? 'text-[#ea580c] font-medium' : 'text-[#746343]'
-                      }`}
-                      onClick={() => setIsServeOpen(!isServeOpen)}
-                    >
-                      <span className="whitespace-nowrap">{item.label}</span>
-                      <ChevronDown className={`w-3.5 h-3.5 text-[#746343] transition-transform duration-200 ${
-                        isServeOpen ? 'rotate-180 text-[#ea580c]' : ''
-                      }`} />
-                    </button>
-
-                    <AnimatePresence>
-                      {isServeOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                          transition={{ duration: 0.18 }}
-                          className="absolute top-full -left-6 w-[360px] p-2.5 rounded-2xl bg-[#FAF4E6] border border-orange-200/90 shadow-xl grid gap-1 text-left"
-                        >
-                          <div className="px-3 py-1.5 border-b border-orange-100 text-[10px] font-mono tracking-wider text-[#ea580c] font-bold uppercase">
-                            How We Serve Ministries
-                          </div>
-
-                          {ministries.map((m) => {
-                            const Icon = m.icon;
-                            return (
-                              <Link
-                                key={m.title}
-                                to={m.to}
-                                onClick={() => setIsServeOpen(false)}
-                                className="group/item flex items-start gap-3 p-2 rounded-xl hover:bg-orange-100/40 transition-colors"
-                              >
-                                <div className="w-7 h-7 rounded-lg bg-orange-100/70 text-[#ea580c] flex items-center justify-center mt-0.5">
-                                  <Icon className="w-3.5 h-3.5" />
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-stone-900 group-hover/item:text-[#ea580c]">
-                                      {m.title}
-                                    </span>
-                                    <span className="text-[9px] font-mono text-stone-500 bg-white px-1.5 py-0.2 rounded border border-orange-100">
-                                      {m.tag}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] text-stone-500">
-                                    {m.subtitle}
-                                  </p>
-                                </div>
-                              </Link>
-                            );
-                          })}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              }
 
               return (
                 <Link 
