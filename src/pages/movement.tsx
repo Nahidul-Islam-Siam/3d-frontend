@@ -1,5 +1,6 @@
 import Seo from '@/components/Seo';
 import MovementHeroBanner from '@/components/join-movement/MovementHeroBanner';
+import MovementSecondVideo from '@/components/join-movement/MovementSecondVideo';
 import MovementTitleSection from '@/components/join-movement/MovementTitleSection';
 import SomeoneNoticesSection from '@/components/join-movement/SomeoneNoticesSection';
 import BuiltByCommunitySection from '@/components/join-movement/BuiltByCommunitySection';
@@ -19,8 +20,11 @@ export default function MovementPage() {
       />
 
       <div className="w-full bg-[#FAF4E6]">
-        {/* ─── Section 1 & 2: Pinned Cinematic Video Stage (Banner Video into Second Video Open Animation) ─── */}
+        {/* ─── Section 1: Hero Cinema Video (WhatsApp Video 2026-10-31 at 11.04.42 AM) ─── */}
         <MovementHeroBanner />
+
+        {/* ─── Section 2: Second Cinema Video (join-the-movement-2.mp4) ─── */}
+        <MovementSecondVideo />
 
         {/* ─── Section 3: "JOIN THE MOVEMENT" Title & Flourish Leaves ─── */}
         <MovementTitleSection />

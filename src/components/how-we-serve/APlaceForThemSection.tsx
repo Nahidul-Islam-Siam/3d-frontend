@@ -11,21 +11,21 @@ const tableCards = [
     title: 'Seeing People.',
     image: '/who/table-seeing-people.png',
     alt: 'Close-up of eyes seeing each individual with dignity and compassion',
-    offsetClass: 'mt-10 sm:mt-14 lg:mt-16',
+    offsetClass: 'mt-3 sm:mt-8 lg:mt-16',
   },
   {
     id: 'listening',
     title: 'Listening.',
     image: '/who/table-listening.png',
     alt: 'Attentive, compassionate listening in personal conversation',
-    offsetClass: 'mt-1 sm:mt-2 lg:mt-4',
+    offsetClass: 'mt-0 sm:mt-1 lg:mt-4',
   },
   {
     id: 'building-relationships',
     title: 'Building relationships.',
     image: '/who/table-building-relationships.png',
     alt: 'Volunteers and community members sharing a warm meal together at the table',
-    offsetClass: 'mt-10 sm:mt-14 lg:mt-16',
+    offsetClass: 'mt-3 sm:mt-8 lg:mt-16',
   },
   {
     id: 'offering-hope',
@@ -39,7 +39,7 @@ const tableCards = [
     title: 'One conversation at a time.',
     image: '/who/table-one-conversation.png',
     alt: 'Holding hands across the table in deep empathy, love, and care',
-    offsetClass: 'mt-10 sm:mt-14 lg:mt-16',
+    offsetClass: 'mt-3 sm:mt-8 lg:mt-16',
   },
 ];
 
@@ -50,7 +50,7 @@ export default function APlaceForThemSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] py-14 sm:py-20 lg:py-28 px-4 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
     >
       {/* ─── Undulating Wave Container Background Layer (values-wave-bg.png) ─── */}
       <div 
@@ -119,7 +119,7 @@ export default function APlaceForThemSection({
         </div>
 
         {/* ─── Bottom Row: 5 Organic Staggered Narrative Photo Cards (Up/Down Alternating) ─── */}
-        <div className="mt-12 sm:mt-16 lg:mt-20 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 sm:gap-6 lg:gap-5 xl:gap-6 items-start">
+        <div className="mt-12 sm:mt-16 lg:mt-20 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-6 lg:gap-5 xl:gap-6 items-start">
           {tableCards.map((card, idx) => (
             <motion.div
               key={card.id}
@@ -131,7 +131,7 @@ export default function APlaceForThemSection({
                 delay: idx * 0.1,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className={`w-full ${card.offsetClass}`}
+              className={`w-full ${card.offsetClass} ${idx === 4 ? 'col-span-2 sm:col-span-1 max-w-[220px] sm:max-w-none mx-auto sm:mx-0' : ''}`}
             >
               <div className="group flex flex-col transition-transform duration-300 hover:-translate-y-1">
                 {/* Card Photo Container */}

@@ -76,7 +76,7 @@ export default function StoriesFromTheTableSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-6 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] py-14 sm:py-20 lg:py-28 px-4 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
     >
       <div className="w-full max-w-7xl mx-auto">
         
@@ -114,10 +114,10 @@ export default function StoriesFromTheTableSection({
                   delay: idx * 0.12,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="flex-[0_0_88%] sm:flex-[0_0_58%] lg:flex-[0_0_38%] min-w-0"
+                className="flex-[0_0_90%] sm:flex-[0_0_58%] lg:flex-[0_0_38%] min-w-0"
               >
                 {/* Testimonial Card (Matches Figma 1:1) */}
-                <div className="h-full bg-white rounded-[22px] sm:rounded-[26px] p-6 sm:p-8 md:p-9 border border-[#EFE5D2] shadow-[0_10px_32px_rgba(44,36,29,0.04)] hover:shadow-[0_16px_44px_rgba(44,36,29,0.08)] transition-all duration-300 flex flex-col justify-between">
+                <div className="h-full bg-white rounded-[22px] sm:rounded-[26px] p-5 sm:p-7 md:p-9 border border-[#EFE5D2] shadow-[0_10px_32px_rgba(44,36,29,0.04)] hover:shadow-[0_16px_44px_rgba(44,36,29,0.08)] transition-all duration-300 flex flex-col justify-between">
                   
                   {/* Top Quote Icon & Testimonial Paragraph */}
                   <div>

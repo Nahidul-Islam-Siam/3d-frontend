@@ -75,7 +75,7 @@ export default function ShowdownSection({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 w-full sm:w-auto">
           <FigmaButton
             href="https://tickets.liveachievebelieve.org"
             target="_blank"
@@ -120,7 +120,7 @@ export default function ShowdownSection({
       {isStandaloneSection ? (
         <section 
           id={id}
-          className={`relative w-full min-h-screen bg-gradient-to-b from-[#2B173E] via-[#1B0C2A] to-[#140820] flex items-center justify-center py-20 px-4 sm:px-6 overflow-hidden select-none ${className}`}
+          className={`relative w-full min-h-screen bg-gradient-to-b from-[#2B173E] via-[#1B0C2A] to-[#140820] flex items-center justify-center py-14 sm:py-20 px-4 sm:px-6 overflow-hidden select-none ${className}`}
         >
           {/* Ambient background glows */}
           <div className="absolute -top-12 -left-12 w-[650px] h-[550px] bg-[#F97316]/22 rounded-full blur-[140px] pointer-events-none" />
