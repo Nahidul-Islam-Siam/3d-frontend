@@ -13,33 +13,64 @@ export default function MovementTitleSection({
   return (
     <section 
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-16 sm:py-20 lg:py-28 px-4 sm:px-6 overflow-hidden select-none flex items-center justify-center ${className}`}
+      className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-4 sm:px-6 overflow-hidden select-none flex items-center justify-center min-h-[520px] lg:min-h-[680px] ${className}`}
     >
-      {/* Decorative Left Flourish Leaf (Exact Figma: 195.05px x 258.35px at Left Edge) */}
+      {/* Decorative Left Flourish Leaf (Exact Figma: bottom-left offset) */}
       <img 
         src={leftLeaf} 
         alt="" 
-        className="absolute left-0 bottom-0 w-[135px] h-[178px] sm:w-[165px] sm:h-[218px] lg:w-[195.05px] lg:h-[258.35px] opacity-95 pointer-events-none select-none object-contain origin-bottom-left" 
+        className="absolute left-0 sm:left-2 lg:left-3 bottom-6 sm:bottom-10 lg:bottom-12 w-[140px] sm:w-[180px] lg:w-[218px] h-auto opacity-95 pointer-events-none select-none object-contain" 
       />
 
-      {/* Decorative Right Flourish Leaf (Exact Figma: 195.05px x 258.35px at Right Edge) */}
+      {/* Decorative Right Flourish Leaf (Exact Figma: bottom-right offset) */}
       <img 
         src={rightLeaf} 
         alt="" 
-        className="absolute right-0 bottom-0 w-[135px] h-[178px] sm:w-[165px] sm:h-[218px] lg:w-[195.05px] lg:h-[258.35px] opacity-95 pointer-events-none select-none object-contain origin-bottom-right" 
+        className="absolute right-0 sm:right-2 lg:right-3 bottom-6 sm:bottom-10 lg:bottom-12 w-[120px] sm:w-[155px] lg:w-[177px] h-auto opacity-95 pointer-events-none select-none object-contain" 
       />
 
       {/* Main Centered Content */}
-      <div className="max-w-[820px] mx-auto text-center relative z-10 px-4">
+      <div className="max-w-[840px] mx-auto text-center relative z-10 px-4">
         <h2
-          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-          className="text-4xl sm:text-5xl lg:text-[60px] xl:text-[68px] font-bold tracking-[0.08em] sm:tracking-[0.11em] uppercase flex flex-col gap-2 sm:gap-3 lg:gap-3.5 leading-none"
+          style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+          }}
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] font-black leading-tight sm:leading-tight lg:leading-[100px] tracking-normal uppercase flex flex-col items-center justify-center"
         >
-          <span className="block text-[#1F1E1C]">JOIN THE</span>
-          <span className="block text-[#F97316]">MOVEMENT</span>
+          <span 
+            style={{
+              color: '#272624',
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: 'inherit',
+              lineHeight: 'inherit',
+              fontWeight: 900,
+            }}
+            className="block text-[#272624]"
+          >
+            JOIN THE
+          </span>
+          <span 
+            style={{
+              color: '#F97316',
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: 'inherit',
+              lineHeight: 'inherit',
+              fontWeight: 900,
+            }}
+            className="block text-[#F97316]"
+          >
+            MOVEMENT
+          </span>
         </h2>
 
-        <p className="mt-4 sm:mt-5 lg:mt-6 text-xs sm:text-sm lg:text-[15px] text-[#6E6259] font-sans max-w-lg mx-auto leading-relaxed">
+        <p 
+          style={{
+            color: '#746343',
+            fontFamily: "Helvetica, Arial, -apple-system, sans-serif",
+            fontWeight: 400,
+          }}
+          className="mt-6 sm:mt-8 lg:mt-10 text-base sm:text-xl lg:text-[24px] leading-snug sm:leading-snug lg:leading-[26px] text-[#746343] text-center max-w-[550px] mx-auto font-normal font-sans"
+        >
           Together, we become the reason someone believes<br className="hidden sm:inline" /> tomorrow is worth seeing.
         </p>
       </div>

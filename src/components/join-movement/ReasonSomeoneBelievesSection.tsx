@@ -7,8 +7,7 @@ import {
   Award, 
   Mic, 
   Church, 
-  GraduationCap,
-  ChevronDown
+  GraduationCap
 } from 'lucide-react';
 
 export interface ReasonSomeoneBelievesSectionProps {
@@ -50,11 +49,11 @@ export default function ReasonSomeoneBelievesSection({
       id={id}
       className={`relative w-full bg-[#FAF4E6] py-20 sm:py-28 lg:py-36 px-4 sm:px-8 lg:px-12 flex flex-col items-center justify-center overflow-hidden select-none ${className}`}
     >
-      <div className="max-w-[1100px] w-full mx-auto text-center relative z-10 px-2 sm:px-4">
+      <div className="max-w-[1160px] w-full mx-auto text-center relative z-10 px-2 sm:px-4">
         
         {/* ─── Top Header: TOGETHER... & Title with Generous Vertical Line Spacing ─── */}
         <div className="max-w-3xl mx-auto text-center">
-          <span className="text-[#EA580C] text-xs sm:text-[13px] font-sans tracking-[0.24em] uppercase font-semibold block mb-3 sm:mb-4">
+          <span className="text-[#F97316] text-xs sm:text-[13px] font-sans tracking-[0.24em] uppercase font-semibold block mb-3 sm:mb-4">
             TOGETHER...
           </span>
 
@@ -75,7 +74,7 @@ export default function ReasonSomeoneBelievesSection({
         </div>
 
         {/* ─── 3 Balanced Staggered Rows of Apricot Action Pills (Exact Figma Match) ─── */}
-        <div className="space-y-3 sm:space-y-3.5 max-w-4xl mx-auto pt-8 sm:pt-10">
+        <div className="space-y-3 sm:space-y-3.5 max-w-[1140px] w-full mx-auto pt-8 sm:pt-10">
           
           {/* Row 1: 3 Pills */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 lg:gap-3.5">
@@ -85,10 +84,38 @@ export default function ReasonSomeoneBelievesSection({
                 <button
                   key={pill.label}
                   type="button"
-                  className="inline-flex items-center gap-2 px-4 sm:px-5 lg:px-5.5 py-2 sm:py-2.5 rounded-full bg-[#FCE3CE]/90 hover:bg-[#FCD8BE] border border-[#F7CCAB]/60 text-xs sm:text-[13px] font-sans font-medium text-[#EA580C] shadow-[0_2px_10px_rgba(234,88,12,0.05)] hover:shadow-[0_4px_16px_rgba(234,88,12,0.12)] hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                  style={{
+                    display: 'flex',
+                    padding: '16px 24px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    borderRadius: '47px',
+                    background: 'rgba(249, 115, 22, 0.15)',
+                    boxShadow: '0px 4px 20px 0px rgba(249, 115, 22, 0.22)',
+                    color: '#F97316',
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontSize: '16px',
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: '24px',
+                  }}
+                  className="flex items-center justify-center gap-[10px] px-6 py-4 rounded-[47px] bg-[rgba(249,115,22,0.15)] hover:bg-[rgba(249,115,22,0.25)] text-[#F97316] font-playfair font-bold text-[16px] leading-[24px] hover:scale-[1.02] hover:shadow-[0px_6px_28px_rgba(249,115,22,0.32)] transition-all duration-300 group cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#EA580C] stroke-[1.8] group-hover:scale-110 transition-transform" />
-                  <span>{pill.label}</span>
+                  <Icon className="w-5 h-5 text-[#F97316] stroke-[2] shrink-0 group-hover:scale-110 transition-transform" />
+                  <span
+                    style={{
+                      color: '#F97316',
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontSize: '16px',
+                      fontStyle: 'normal',
+                      fontWeight: 700,
+                      lineHeight: '24px',
+                    }}
+                    className="font-playfair font-bold text-[16px] leading-[24px] text-[#F97316]"
+                  >
+                    {pill.label}
+                  </span>
                 </button>
               );
             })}
@@ -102,10 +129,38 @@ export default function ReasonSomeoneBelievesSection({
                 <button
                   key={pill.label}
                   type="button"
-                  className="inline-flex items-center gap-2 px-4 sm:px-5 lg:px-5.5 py-2 sm:py-2.5 rounded-full bg-[#FCE3CE]/90 hover:bg-[#FCD8BE] border border-[#F7CCAB]/60 text-xs sm:text-[13px] font-sans font-medium text-[#EA580C] shadow-[0_2px_10px_rgba(234,88,12,0.05)] hover:shadow-[0_4px_16px_rgba(234,88,12,0.12)] hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                  style={{
+                    display: 'flex',
+                    padding: '16px 24px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    borderRadius: '47px',
+                    background: 'rgba(249, 115, 22, 0.15)',
+                    boxShadow: '0px 4px 20px 0px rgba(249, 115, 22, 0.22)',
+                    color: '#F97316',
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontSize: '16px',
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: '24px',
+                  }}
+                  className="flex items-center justify-center gap-[10px] px-6 py-4 rounded-[47px] bg-[rgba(249,115,22,0.15)] hover:bg-[rgba(249,115,22,0.25)] text-[#F97316] font-playfair font-bold text-[16px] leading-[24px] hover:scale-[1.02] hover:shadow-[0px_6px_28px_rgba(249,115,22,0.32)] transition-all duration-300 group cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#EA580C] stroke-[1.8] group-hover:scale-110 transition-transform" />
-                  <span>{pill.label}</span>
+                  <Icon className="w-5 h-5 text-[#F97316] stroke-[2] shrink-0 group-hover:scale-110 transition-transform" />
+                  <span
+                    style={{
+                      color: '#F97316',
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontSize: '16px',
+                      fontStyle: 'normal',
+                      fontWeight: 700,
+                      lineHeight: '24px',
+                    }}
+                    className="font-playfair font-bold text-[16px] leading-[24px] text-[#F97316]"
+                  >
+                    {pill.label}
+                  </span>
                 </button>
               );
             })}
@@ -119,24 +174,46 @@ export default function ReasonSomeoneBelievesSection({
                 <button
                   key={pill.label}
                   type="button"
-                  className="inline-flex items-center gap-2 px-4 sm:px-5 lg:px-5.5 py-2 sm:py-2.5 rounded-full bg-[#FCE3CE]/90 hover:bg-[#FCD8BE] border border-[#F7CCAB]/60 text-xs sm:text-[13px] font-sans font-medium text-[#EA580C] shadow-[0_2px_10px_rgba(234,88,12,0.05)] hover:shadow-[0_4px_16px_rgba(234,88,12,0.12)] hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                  style={{
+                    display: 'flex',
+                    padding: '16px 24px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    borderRadius: '47px',
+                    background: 'rgba(249, 115, 22, 0.15)',
+                    boxShadow: '0px 4px 20px 0px rgba(249, 115, 22, 0.22)',
+                    color: '#F97316',
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontSize: '16px',
+                    fontStyle: 'normal',
+                    fontWeight: 700,
+                    lineHeight: '24px',
+                  }}
+                  className="flex items-center justify-center gap-[10px] px-6 py-4 rounded-[47px] bg-[rgba(249,115,22,0.15)] hover:bg-[rgba(249,115,22,0.25)] text-[#F97316] font-playfair font-bold text-[16px] leading-[24px] hover:scale-[1.02] hover:shadow-[0px_6px_28px_rgba(249,115,22,0.32)] transition-all duration-300 group cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#EA580C] stroke-[1.8] group-hover:scale-110 transition-transform" />
-                  <span>{pill.label}</span>
+                  <Icon className="w-5 h-5 text-[#F97316] stroke-[2] shrink-0 group-hover:scale-110 transition-transform" />
+                  <span
+                    style={{
+                      color: '#F97316',
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontSize: '16px',
+                      fontStyle: 'normal',
+                      fontWeight: 700,
+                      lineHeight: '24px',
+                    }}
+                    className="font-playfair font-bold text-[16px] leading-[24px] text-[#F97316]"
+                  >
+                    {pill.label}
+                  </span>
                 </button>
-              );
+              );  
             })}
           </div>
 
         </div>
 
-        {/* ─── Scroll To Continue Indicator (Exact Match to Reference Image) ─── */}
-        <div className="pt-10 sm:pt-14 pb-2 flex flex-col items-center justify-center gap-1.5 opacity-60 hover:opacity-90 transition-opacity pointer-events-none">
-          <span className="text-[10px] sm:text-[11px] font-sans tracking-[0.24em] uppercase text-[#EA580C] font-semibold">
-            SCROLL TO CONTINUE
-          </span>
-          <ChevronDown className="w-3.5 h-3.5 text-[#EA580C] animate-bounce" />
-        </div>
+
 
       </div>
     </section>

@@ -47,7 +47,7 @@ export default function StoriesFromTheTableSection({
   className = '',
 }: StoriesFromTheTableSectionProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: false,
+    loop: false,            
     align: 'start',
     containScroll: 'trimSnaps',
     dragFree: false,
