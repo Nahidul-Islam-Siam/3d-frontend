@@ -36,7 +36,7 @@ export default function SmoothScroll() {
     const handleResize = () => {
       lenis.resize();
       ScrollTrigger.refresh();
-    };
+    };    
     window.addEventListener('resize', handleResize);
 
     return () => {

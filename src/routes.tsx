@@ -6,6 +6,7 @@ import About from "./pages/experience-story";
 import Movement from "./pages/movement";
 import WhoWeAre from "./pages/who-we-are";
 import HowWeServe from "./pages/how-we-serve";
+import MeetUs from "./pages/meet-us";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import PrivateRoute from "./pages/private-route";
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: "/how-we-serve",
         element: <HowWeServe />,
+      },
+      {
+        path: "/meet-us",
+        element: <MeetUs />,
       },
       {
         path: "/login",

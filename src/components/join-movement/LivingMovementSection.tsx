@@ -272,20 +272,31 @@ export default function LivingMovementSection({
             className="w-full h-full overflow-visible pointer-events-auto"
           >
             <defs>
-              {/* Radial gradient reproducing the exact peach/orange glowing halo */}
-              <radialGradient id="livingHaloGradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#F97316" stopOpacity="0.65" />
-                <stop offset="35%" stopColor="#FB923C" stopOpacity="0.45" />
-                <stop offset="70%" stopColor="#FDBA74" stopOpacity="0.18" />
-                <stop offset="100%" stopColor="#FDBA74" stopOpacity="0" />
+              {/* ─── Exact Radial Gradient from Figma Node 882:5106 ─── */}
+              <radialGradient
+                id="paint0_radial_882_5106"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(29.6348 28.2488) scale(29.6348 28.2488)"
+              >
+                <stop stopColor="#FFB298" stopOpacity="0.84" />
+                <stop offset="1" stopColor="#FF4E0B" stopOpacity="0.25" />
               </radialGradient>
 
-              {/* Hover highlight halo gradient */}
-              <radialGradient id="activeHaloGradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#EA580C" stopOpacity="0.85" />
-                <stop offset="40%" stopColor="#F97316" stopOpacity="0.60" />
-                <stop offset="75%" stopColor="#FDBA74" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#FDBA74" stopOpacity="0" />
+              {/* Hover highlight halo gradient with heightened bloom */}
+              <radialGradient
+                id="activeHaloGradient"
+                cx="0"
+                cy="0"
+                r="1"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="translate(29.6348 28.2488) scale(29.6348 28.2488)"
+              >
+                <stop stopColor="#FFC8B5" stopOpacity="0.95" />
+                <stop offset="0.65" stopColor="#F97316" stopOpacity="0.55" />
+                <stop offset="1" stopColor="#FF4E0B" stopOpacity="0.30" />
               </radialGradient>
             </defs>
 
@@ -315,9 +326,9 @@ export default function LivingMovementSection({
                       y1={nodeA.y}
                       x2={nodeB.x}
                       y2={nodeB.y}
-                      stroke={isEdgeActive ? '#EA580C' : '#9E8B7A'}
-                      strokeWidth={isEdgeActive ? 1.8 : 1.2}
-                      strokeDasharray="4 4"
+                      stroke={isEdgeActive ? '#F97316' : '#746343'}
+                      strokeWidth={isEdgeActive ? 1.6 : 1}
+                      strokeDasharray="2 3.8"
                       className="transition-colors duration-300"
                       initial={{ pathLength: 0, opacity: 0 }}
                       animate={{ pathLength: 1, opacity: 0.9 }}
@@ -326,9 +337,10 @@ export default function LivingMovementSection({
                   );
                 })}
 
-                {/* ─── Glowing Halos & Center Dots ("Trees" Nodes) ─── */}
+                {/* ─── Glowing Halos & Center Dots (Figma 1:1 SVGs) ─── */}
                 {activeNetwork.nodes.map((node, nodeIdx) => {
                   const isHovered = hoveredNode?.id === node.id;
+                  const scaleRatio = node.radius / 24;
 
                   return (
                     <g 
@@ -336,16 +348,15 @@ export default function LivingMovementSection({
                       className="cursor-pointer group"
                       onMouseEnter={() => setHoveredNode(node)}
                       onMouseLeave={() => setHoveredNode(null)}
+                      transform={`translate(${node.x}, ${node.y})`}
                     >
-                      {/* Outer Glowing Translucent Halo */}
-                      <motion.circle
-                        cx={node.x}
-                        cy={node.y}
-                        r={node.radius}
-                        fill={isHovered ? 'url(#activeHaloGradient)' : 'url(#livingHaloGradient)'}
-                        initial={{ scale: 0.6, opacity: 0 }}
+                      {/* Outer Glowing Translucent Halo from Figma SVG (48x48 centered at 0, 0) */}
+                      <motion.g
+                        initial={{ scale: 0.6 * scaleRatio, opacity: 0 }}
                         animate={{ 
-                          scale: [1, 1.06, 1],
+                          scale: isHovered 
+                            ? [scaleRatio * 1.15, scaleRatio * 1.22, scaleRatio * 1.15]
+                            : [scaleRatio, scaleRatio * 1.08, scaleRatio],
                           opacity: 1 
                         }}
                         transition={{
@@ -356,34 +367,46 @@ export default function LivingMovementSection({
                           },
                           opacity: { duration: 0.35, delay: nodeIdx * 0.04 }
                         }}
-                      />
+                      >
+                        <path
+                          d="M0 24C0 37.246 10.754 48 24 48C37.246 48 48 37.246 48 24C48 10.754 37.246 0 24 0C10.754 0 0 10.754 0 24V24"
+                          transform="translate(-24, -24)"
+                          fill={isHovered ? 'url(#activeHaloGradient)' : 'url(#paint0_radial_882_5106)'}
+                        />
+                      </motion.g>
 
-                      {/* Solid Center Dot */}
-                      <motion.circle
-                        cx={node.x}
-                        cy={node.y}
-                        r={isHovered ? 5.5 : 4}
-                        fill="#EA580C"
+                      {/* Solid Center Dot from Figma SVG (10x10 centered at 0, 0 with #F97316) */}
+                      <motion.g
                         initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                        animate={{ scale: isHovered ? 1.3 : 1 }}
                         transition={{ type: 'spring', stiffness: 220, damping: 15 }}
-                      />
+                      >
+                        <path
+                          d="M0 5C0 7.75957 2.24042 10 5 10C7.75957 10 10 7.75957 10 5C10 2.24042 7.75957 0 5 0C2.24042 0 0 2.24042 0 5V5"
+                          transform="translate(-5, -5)"
+                          fill="#F97316"
+                        />
+                      </motion.g>
 
-                      {/* Optional Interactive Name Label on Hover */}
+                      {/* Interactive Name Tooltip on Hover */}
                       {isHovered && (
-                        <g>
+                        <motion.g
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.18 }}
+                        >
                           <rect
-                            x={node.x - 70}
-                            y={node.y - node.radius - 28}
-                            width={140}
+                            x={-75}
+                            y={-node.radius - 30}
+                            width={150}
                             height={24}
                             rx={12}
                             fill="#1F1E1C"
                             opacity={0.92}
                           />
                           <text
-                            x={node.x}
-                            y={node.y - node.radius - 12}
+                            x={0}
+                            y={-node.radius - 14}
                             textAnchor="middle"
                             fill="#FFFFFF"
                             fontSize="11"
@@ -393,7 +416,7 @@ export default function LivingMovementSection({
                           >
                             {node.label}
                           </text>
-                        </g>
+                        </motion.g>
                       )}
                     </g>
                   );
@@ -417,13 +440,13 @@ export default function LivingMovementSection({
                   onClick={() => setActiveCategory(cat.name)}
                   className={`flex items-center gap-2 px-3.5 sm:px-4.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-[13px] font-sans transition-all duration-300 cursor-pointer border ${
                     isActive
-                      ? 'border-[#EA580C] text-[#EA580C] bg-[#FFF6EE] font-semibold shadow-sm scale-[1.02]'
+                      ? 'border-[#F97316] text-[#F97316] bg-[#FFF6EE] font-semibold shadow-sm scale-[1.02]'
                       : 'border-[#C9BFB0] text-[#3F3730] hover:border-[#9C8C7A] hover:bg-[#F0E5D3]/50 font-medium'
                   }`}
                 >
                   <Icon 
                     className={`w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.8] ${
-                      isActive ? 'text-[#EA580C]' : 'text-[#3F3730]'
+                      isActive ? 'text-[#F97316]' : 'text-[#3F3730]'
                     }`} 
                   />
                   <span>{cat.name}</span>
