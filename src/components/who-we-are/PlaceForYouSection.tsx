@@ -50,7 +50,7 @@ export default function PlaceForYouSection() {
             </div>
           </motion.div>
 
-          {/* ─── Right Column: Photo with Notch Cutout (Subtract copy.png) ─── */}
+          {/* ─── Right Column: Photo with Notch Cutout (place-for-you.png) ─── */}
           <motion.div
             initial={{ opacity: 0, x: 22 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -60,7 +60,7 @@ export default function PlaceForYouSection() {
           >
             <div className="relative w-full max-w-[560px] lg:max-w-[620px]">
               <img
-                src="/who/subtract-copy.png"
+                src="/who/place-for-you.png"
                 alt="Community volunteers sharing fresh food with families"
                 className="w-full h-auto object-contain block drop-shadow-[0_12px_32px_rgba(40,30,20,0.06)]"
               />

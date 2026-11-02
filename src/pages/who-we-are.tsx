@@ -6,6 +6,8 @@ import LookingBeyondSection from '@/components/who-we-are/LookingBeyondSection';
 import MoreThanANameSection from '@/components/who-we-are/MoreThanANameSection';
 import PlaceForYouSection from '@/components/who-we-are/PlaceForYouSection';
 import WhoWeAreVideoSection from '@/components/who-we-are/WhoWeAreVideoSection';
+import PeopleMatterEveryDaySection from '@/components/who-we-are/PeopleMatterEveryDaySection';
+import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function WhoWeArePage() {
   return (
@@ -36,6 +38,12 @@ export default function WhoWeArePage() {
 
         {/* ─── Section 7: Cinematic 3D Video Experience ─── */}
         <WhoWeAreVideoSection />
+
+        {/* ─── Section 8: People Matter. Every Day. Without Exception. ─── */}
+        <PeopleMatterEveryDaySection />
+
+        {/* ─── Section 9: What's Coming Up Next (Showdown Section) ─── */}
+        <ShowdownSection id="what-coming-up-next" />
       </div>
     </>
   );

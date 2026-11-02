@@ -17,7 +17,7 @@ export default function WhoWeAreStorySection() {
             <div className="relative w-full max-w-[640px]">
               {/* Photo with Cutout Corner */}
               <img
-                src="/who/Subtract.png"
+                src="/who/story-community.png"
                 alt="Community volunteers serving food"
                 className="w-full h-auto object-contain block drop-shadow-[0_12px_32px_rgba(40,30,20,0.06)]"
               />

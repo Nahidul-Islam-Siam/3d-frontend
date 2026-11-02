@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import FigmaButton from '@/components/common/FigmaButton';
 
-const whoBannerBg = '/who/Who%20we%20Are.png';
+const whoBannerBg = '/who/hero-banner.png';
 
 export interface WhoWeAreBannerProps {
   className?: string;
@@ -19,7 +19,7 @@ export default function WhoWeAreBanner({
       id="who-we-are-banner"
       className={`relative w-full min-h-screen flex items-center justify-center bg-[#131211] overflow-hidden select-none ${className}`}
     >
-      {/* ─── Background Art Layer (Artwork from /who/Who we Are.png) ─── */}
+      {/* ─── Background Art Layer (Artwork from /who/hero-banner.png) ─── */}
       <div 
         className="absolute inset-0 w-full h-full bg-cover bg-center lg:bg-center bg-no-repeat pointer-events-none"
         style={{ backgroundImage: `url("${whoBannerBg}")` }}

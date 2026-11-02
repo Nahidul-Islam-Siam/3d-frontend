@@ -59,7 +59,7 @@ export default function ShowdownSection({
   const content = (
     <div 
       className="w-full space-y-4 sm:space-y-6 px-4 sm:px-6 mx-auto flex flex-col items-center"
-      style={{ width: 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' }}
+      style={{ width: isStandaloneSection ? 'min(1240px, 94vw)' : 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' }}
     >
       {/* ─── 1. TOP HEADER: FIGMA BUTTON & AUDITION TRIGGER ─── */}
       <div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-3 shrink-0">
