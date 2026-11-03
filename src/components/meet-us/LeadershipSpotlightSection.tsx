@@ -1,226 +1,347 @@
-import { useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useRef, useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import starryBg from '@/assets/meet-us/starry-cosmic-bg.png';
 import sarahPhoto from '@/assets/meet-us/sarah-mitchell.png';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export interface LeadershipSpotlightSectionProps {
+  id?: string;
   className?: string;
   onScrollClick?: () => void;
 }
 
 export default function LeadershipSpotlightSection({
+  id = 'leadership-spotlight',
   className = '',
   onScrollClick,
 }: LeadershipSpotlightSectionProps) {
-  const containerRef = useRef<HTMLElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pinnedStageRef = useRef<HTMLDivElement | null>(null);
+  const bgImgRef = useRef<HTMLImageElement | null>(null);
+  const bgGlowRef = useRef<HTMLDivElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const glareRef = useRef<HTMLDivElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const subtitleRef = useRef<HTMLParagraphElement | null>(null);
+  const scrollBtnRef = useRef<HTMLDivElement | null>(null);
 
-  // Mouse coordinate motion values (-0.5 to 0.5 relative to card center)
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  // ─── 1. GSAP SCROLLTRIGGER PINNED SCRUB (Edolus / SomeoneNotices 1:1 Motion) ───
+  useEffect(() => {
+    const container = containerRef.current;
+    const stage = pinnedStageRef.current;
+    const bgImg = bgImgRef.current;
+    const bgGlow = bgGlowRef.current;
+    const card = cardRef.current;
+    const title = titleRef.current;
+    const subtitle = subtitleRef.current;
+    const scrollBtn = scrollBtnRef.current;
 
-  // Smooth cinematic spring physics
-  const springConfig = { stiffness: 140, damping: 18, mass: 0.6 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
+    if (!container || !stage || !card) return;
 
-  // 3D card tilt transforms
-  const rotateX = useTransform(smoothY, [-0.5, 0.5], ['9deg', '-9deg']);
-  const rotateY = useTransform(smoothX, [-0.5, 0.5], ['-9deg', '9deg']);
+    const ctx = gsap.context(() => {
+      // Resting states before scroll enters
+      gsap.set(card, {
+        scale: 0.85,
+        rotateZ: -4.5,
+        autoAlpha: 0.35,
+        transformPerspective: 1200,
+      });
 
-  // Parallax shifts for cosmic background
-  const bgTranslateX = useTransform(smoothX, [-0.5, 0.5], ['-10px', '10px']);
-  const bgTranslateY = useTransform(smoothY, [-0.5, 0.5], ['-8px', '8px']);
+      if (bgImg) {
+        gsap.set(bgImg, { scale: 1.02, y: 0 });
+      }
+      if (bgGlow) {
+        gsap.set(bgGlow, { autoAlpha: 0.3, scale: 0.95 });
+      }
+      if (title) {
+        gsap.set(title, { x: -45, autoAlpha: 0 });
+      }
+      if (subtitle) {
+        gsap.set(subtitle, { x: -35, autoAlpha: 0 });
+      }
+      if (scrollBtn) {
+        gsap.set(scrollBtn, { y: 16, autoAlpha: 0 });
+      }
 
-  // Dynamic light sheen across the card surface
-  const glareX = useTransform(smoothX, [-0.5, 0.5], ['0%', '100%']);
-  const glareY = useTransform(smoothY, [-0.5, 0.5], ['0%', '100%']);
+      // Master Pinned Scroll Scrub Timeline
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: container,
+          start: 'top 74px',
+          end: '+=1050',
+          pin: stage,
+          scrub: 0.5,
+          anticipatePin: 1,
+        },
+      });
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
-    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(xPct);
-    mouseY.set(yPct);
-  };
+      // ── Stage 1 (0 to 0.45): Card scales forward, Title reveals, Glow blooms ──
+      if (title) {
+        tl.to(title, { x: 0, autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, 0.05);
+      }
+      if (subtitle) {
+        tl.to(subtitle, { x: 0, autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, 0.12);
+      }
+      if (bgGlow) {
+        tl.to(bgGlow, { autoAlpha: 0.85, scale: 1.05, duration: 0.65, ease: 'power1.inOut' }, 0.05);
+      }
+      if (bgImg) {
+        tl.to(bgImg, { scale: 1.06, y: -15, duration: 0.8, ease: 'power1.out' }, 0.05);
+      }
 
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-    setIsHovered(false);
-  };
+      tl.to(
+        card,
+        {
+          scale: 1.02,
+          rotateZ: -2,
+          autoAlpha: 1,
+          duration: 0.45,
+          ease: 'power2.out',
+        },
+        0.08
+      );
 
-  const handleScrollDown = () => {
+      // ── Stage 2 (0.45 to 0.75): Card settles into cinematic tilt, Scroll button reveals ──
+      tl.to(
+        card,
+        {
+          scale: 1.0,
+          rotateZ: -2.5,
+          duration: 0.3,
+          ease: 'power1.inOut',
+        },
+        0.48
+      );
+
+      if (scrollBtn) {
+        tl.to(scrollBtn, { y: 0, autoAlpha: 1, duration: 0.25, ease: 'power2.out' }, 0.52);
+      }
+
+      // ── Stage 3 (0.75 to 1.0): Hold Phase for Reading & Smooth Unpin ──
+      tl.to({}, { duration: 0.28 });
+    }, container);
+
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 120);
+
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
+  }, []);
+
+  // ─── 2. INTERACTIVE 3D MOUSE TILT (Hover Glare & Inertia Physics) ───
+  useEffect(() => {
+    const card = cardRef.current;
+    const glare = glareRef.current;
+    const stage = pinnedStageRef.current;
+    if (!card || !stage) return;
+
+    const setRotateX = gsap.quickTo(card, 'rotateX', { duration: 0.5, ease: 'power2.out' });
+    const setRotateY = gsap.quickTo(card, 'rotateY', { duration: 0.5, ease: 'power2.out' });
+
+    let isHovering = false;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = card.getBoundingClientRect();
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+
+      const deltaX = (e.clientX - cardCenterX) / (window.innerWidth / 2);
+      const deltaY = (e.clientY - cardCenterY) / (window.innerHeight / 2);
+
+      const tiltY = Math.max(-12, Math.min(12, deltaX * 12));
+      const tiltX = Math.max(-10, Math.min(10, -deltaY * 10));
+
+      setRotateX(tiltX);
+      setRotateY(tiltY);
+
+      if (isHovering && glare) {
+        const glareX = ((e.clientX - rect.left) / rect.width) * 100;
+        const glareY = ((e.clientY - rect.top) / rect.height) * 100;
+        glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.25) 0%, rgba(249,115,22,0.18) 40%, transparent 75%)`;
+      }
+    };
+
+    const onMouseEnterCard = () => {
+      isHovering = true;
+      if (glare) gsap.to(glare, { opacity: 1, duration: 0.35 });
+      gsap.to(card, {
+        boxShadow: '0 35px 85px rgba(249, 115, 22, 0.32), 0 25px 60px rgba(0,0,0,0.95)',
+        duration: 0.35,
+        ease: 'power2.out',
+      });
+    };
+
+    const onMouseLeaveCard = () => {
+      isHovering = false;
+      if (glare) gsap.to(glare, { opacity: 0, duration: 0.45 });
+      gsap.to(card, {
+        rotateX: 0,
+        rotateY: 0,
+        boxShadow: '0 25px 70px rgba(0,0,0,0.9)',
+        duration: 0.9,
+        ease: 'elastic.out(1, 0.45)',
+      });
+    };
+
+    stage.addEventListener('mousemove', onMouseMove, { passive: true });
+    card.addEventListener('mouseenter', onMouseEnterCard);
+    card.addEventListener('mouseleave', onMouseLeaveCard);
+
+    return () => {
+      stage.removeEventListener('mousemove', onMouseMove);
+      card.removeEventListener('mouseenter', onMouseEnterCard);
+      card.removeEventListener('mouseleave', onMouseLeaveCard);
+    };
+  }, []);
+
+  // ─── Smooth scroll down past the pinned section ───
+  const handleScroll = () => {
     if (onScrollClick) {
       onScrollClick();
       return;
     }
 
-    const nextSection = document.getElementById('meet-us-team-grid') || document.getElementById('meet-us-next');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' });
+    const next = document.getElementById('meet-us-next') || document.getElementById('meet-us-team');
+    if (next) {
+      next.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+      window.scrollBy({ top: window.innerHeight * 1.25, behavior: 'smooth' });
     }
   };
 
   return (
-    <section
+    <div
       ref={containerRef}
-      id="leadership-spotlight"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      className={`relative w-full min-h-[calc(100vh-74px)] lg:h-[calc(100vh-74px)] lg:max-h-[920px] bg-[#020409] overflow-hidden flex flex-col justify-between select-none ${className}`}
+      id={id}
+      className={`relative w-full bg-[#020409] ${className}`}
     >
-      {/* ─── Cosmic Starry Sky with Horizon Amber Glow (Parallax Layer) ─── */}
-      <motion.img
-        src={starryBg}
-        alt="Cosmic starry background"
-        style={{
-          x: bgTranslateX,
-          y: bgTranslateY,
-          scale: 1.04,
-        }}
-        className="absolute inset-0 w-full h-full object-cover object-bottom pointer-events-none select-none transition-transform duration-700 ease-out"
-        aria-hidden="true"
-      />
-
-      {/* ─── Ambient Glow Enhancer ─── */}
+      {/* ─── Pinned Stage Viewport (100vh - navbar) ─── */}
       <div
-        className="absolute inset-0 bg-gradient-to-t from-orange-950/20 via-transparent to-black/30 pointer-events-none"
-        aria-hidden="true"
-      />
+        ref={pinnedStageRef}
+        className="relative w-full h-[calc(100vh-74px)] bg-[#020409] text-white overflow-hidden flex flex-col justify-between py-8 sm:py-12 lg:py-16 px-6 sm:px-12 lg:px-16 xl:px-20 select-none"
+      >
+        {/* ─── Cosmic Starry Sky Photo Layer ─── */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none select-none z-0 overflow-hidden">
+          <img
+            ref={bgImgRef}
+            src={starryBg}
+            alt="Cosmic starry background"
+            className="w-full h-full object-cover object-bottom pointer-events-none select-none"
+          />
+        </div>
 
-      {/* ─── Top Spacer for Balance ─── */}
-      <div className="w-full h-8 sm:h-12 pointer-events-none" aria-hidden="true" />
+        {/* ─── Ambient Horizon Amber Glow at Bottom ─── */}
+        <div
+          ref={bgGlowRef}
+          className="absolute bottom-0 inset-x-0 h-48 sm:h-72 lg:h-96 pointer-events-none z-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 90% 65% at 50% 100%, rgba(234, 88, 12, 0.42) 0%, rgba(74, 29, 11, 0.24) 50%, transparent 80%)',
+          }}
+          aria-hidden="true"
+        />
 
-      {/* ─── Main Content Row (1416px Figma Container) ─── */}
-      <div className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 my-auto py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-center">
-          
-          {/* Left Column: Leader Name & Executive Title */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex flex-col items-start text-left lg:pl-4 xl:pl-8"
-          >
-            {/* Leader Name */}
-            <h3
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-bold leading-tight tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]"
-            >
-              Sarah Mitchell
-            </h3>
+        {/* ─── Top Spacer for Flex Balance ─── */}
+        <div className="w-full h-2 sm:h-6 pointer-events-none" aria-hidden="true" />
 
-            {/* Leadership Role / Title */}
-            <p className="mt-2.5 sm:mt-3 text-[#A89880] text-sm sm:text-base lg:text-[17px] font-sans font-normal tracking-wide drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
-              Chief Operating Officer
-            </p>
+        {/* ─── Main Content Row (Perspective 3D Stage) ─── */}
+        <div
+          className="max-w-[1416px] w-full mx-auto relative z-10 my-auto py-4 sm:py-6 lg:py-8"
+          style={{ perspective: 1200 }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left Column: Sarah Mitchell & Title */}
+            <div className="lg:col-span-5 text-left lg:pl-6 xl:pl-10">
+              <h3
+                ref={titleRef}
+                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-bold leading-tight tracking-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.8)]"
+              >
+                Sarah Mitchell
+              </h3>
 
-            {/* Interactive Leadership Mission Tag */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 0.9 : 0.65 }}
-              transition={{ duration: 0.4 }}
-              className="mt-6 sm:mt-8 text-xs sm:text-sm text-stone-300 font-sans leading-relaxed max-w-sm hidden sm:block"
-            >
-              Guiding daily operations and community pathways to make sure every story finds dignity and a seat at the table.
-            </motion.p>
-          </motion.div>
+              <p
+                ref={subtitleRef}
+                className="mt-2.5 sm:mt-3 text-[#A89880] text-sm sm:text-base lg:text-[17px] font-sans font-normal tracking-wide drop-shadow-[0_1px_6px_rgba(0,0,0,0.7)]"
+              >
+                Chief Operating Officer
+              </p>
+            </div>
 
-          {/* Right Column: Interactive 3D Tilt Portrait Card */}
-          <div className="lg:col-span-7 flex justify-center lg:justify-end">
-            <motion.div
-              ref={cardRef}
-              initial={{ opacity: 0, scale: 0.94 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                perspective: 1200,
-              }}
-              className="relative group cursor-pointer"
-            >
-              <motion.div
+            {/* Center/Right Column: 3D Inertia-Tilted Showcase Card */}
+            <div className="lg:col-span-7 flex justify-center lg:justify-end">
+              <div
+                ref={cardRef}
                 style={{
-                  rotateX,
-                  rotateY,
                   transformStyle: 'preserve-3d',
                 }}
-                className="relative rounded-[28px] sm:rounded-[32px] overflow-hidden max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[540px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_-5px_rgba(249,115,22,0.18)] border border-white/10 group-hover:border-white/25 transition-colors duration-500"
+                className="relative rounded-[28px] sm:rounded-[32px] overflow-hidden max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[540px] shadow-[0_25px_70px_rgba(0,0,0,0.9)] border border-white/15 bg-stone-900 cursor-pointer shrink-0 transition-shadow duration-300 group"
               >
                 {/* Portrait Photo */}
                 <img
                   src={sarahPhoto}
                   alt="Sarah Mitchell — Chief Operating Officer"
-                  className="w-full h-auto object-cover select-none pointer-events-none group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+                  className="w-full h-auto object-cover select-none pointer-events-none transition-transform duration-700 ease-out group-hover:scale-105"
                 />
 
-                {/* Interactive Dynamic Sheen Glare */}
-                <motion.div
-                  style={{
-                    background: useTransform(
-                      [glareX, glareY],
-                      ([gx, gy]) =>
-                        `radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 65%)`
-                    ),
-                  }}
-                  className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                />
-
-                {/* Subtle Edge Vignette */}
+                {/* Dynamic Specular Light Glare Overlay */}
                 <div
-                  className="absolute inset-0 rounded-[28px] sm:rounded-[32px] ring-1 ring-inset ring-white/15 pointer-events-none"
+                  ref={glareRef}
+                  className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 z-10"
+                />
+
+                {/* Subtle Cinematic Edge Ring */}
+                <div
+                  className="absolute inset-0 rounded-[28px] sm:rounded-[32px] ring-1 ring-inset ring-white/15 pointer-events-none z-10"
                   aria-hidden="true"
                 />
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
+
           </div>
-
         </div>
-      </div>
 
-      {/* ─── Bottom-Right CTA: SCROLL TO ENTER STORY ─── */}
-      <div className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-8 sm:pb-10 lg:pb-12 flex justify-end items-end">
-        <motion.button
-          type="button"
-          onClick={handleScrollDown}
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="group flex items-center gap-2.5 text-white/80 hover:text-white transition-colors duration-300 cursor-pointer select-none outline-none focus-visible:ring-1 focus-visible:ring-white rounded-full p-1"
+        {/* ─── Bottom-Right CTA: SCROLL TO ENTER STORY ─── */}
+        <div
+          ref={scrollBtnRef}
+          className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-2 sm:pb-4 flex justify-end items-end"
         >
-          {/* Circular Down Arrow Icon Badge */}
-          <span className="w-5 h-5 rounded-full border border-white/60 group-hover:border-white flex items-center justify-center transition-all duration-300">
-            <svg
-              className="w-2.5 h-2.5 text-white/80 group-hover:text-white transition-transform duration-300 group-hover:translate-y-0.5"
-              viewBox="0 0 10 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="5" y1="2" x2="5" y2="8" />
-              <polyline points="2.5 5.5 5 8 7.5 5.5" />
-            </svg>
-          </span>
-
-          <span
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-[10px] sm:text-[11px] tracking-[0.22em] font-medium uppercase text-white/80 group-hover:text-white transition-colors duration-300"
+          <div
+            onClick={handleScroll}
+            className="group flex items-center gap-2.5 text-white/80 hover:text-white transition-colors duration-300 cursor-pointer select-none rounded-full p-1"
           >
-            SCROLL TO ENTER STORY
-          </span>
-        </motion.button>
+            {/* Circular Down Arrow Icon Badge matching Figma */}
+            <span className="w-5 h-5 rounded-full border border-white/60 group-hover:border-[#F97316] flex items-center justify-center transition-all duration-300 bg-white/5 backdrop-blur-sm group-hover:scale-110">
+              <svg
+                className="w-2.5 h-2.5 text-white/80 group-hover:text-[#F97316] transition-transform duration-300 group-hover:translate-y-0.5"
+                viewBox="0 0 10 10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="5" y1="2" x2="5" y2="8" />
+                <polyline points="2.5 5.5 5 8 7.5 5.5" />
+              </svg>
+            </span>
+
+            <span
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="text-[10px] sm:text-[11px] tracking-[0.22em] font-medium uppercase text-white/85 group-hover:text-white transition-colors duration-300"
+            >
+              SCROLL TO ENTER STORY
+            </span>
+          </div>
+        </div>
+
       </div>
-    </section>
+    </div>
   );
 }
-
