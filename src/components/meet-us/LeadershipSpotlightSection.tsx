@@ -206,7 +206,7 @@ export default function LeadershipSpotlightSection({
       return;
     }
 
-    const next = document.getElementById('meet-us-next') || document.getElementById('meet-us-team');
+    const next = document.getElementById('moments-why-we-serve') || document.getElementById('meet-us-next') || document.getElementById('meet-us-team');
     if (next) {
       next.scrollIntoView({ behavior: 'smooth' });
     } else {
