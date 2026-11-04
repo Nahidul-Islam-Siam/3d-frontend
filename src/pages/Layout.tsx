@@ -8,6 +8,7 @@ import SmoothScroll from "../components/common/SmoothScroll";
 export default function RootLayout() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isHeroPage = isHomePage || location.pathname === '/meet-us';
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
@@ -38,9 +39,9 @@ export default function RootLayout() {
       {isHomePage && <Preloader />}
 
       {/* Global Fixed Navbar */}
-      <Navbar />
+      <Navbar />   
 
-      <main className={`flex-grow w-full ${isHomePage ? 'pt-0' : 'pt-[74px]'} transition-all duration-700`}>
+      <main className={`flex-grow w-full ${isHeroPage ? 'pt-0' : 'pt-[74px]'} transition-all duration-700`}>
         <Outlet />
       </main>
 
