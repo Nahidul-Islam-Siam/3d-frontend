@@ -9,7 +9,6 @@ import HowWeServe from "./pages/how-we-serve";
 import MeetUs from "./pages/meet-us";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
-import PrivateRoute from "./pages/private-route";
 import Dashboard from "./pages/dashboard";
 import Pricing from "./pages/pricing";
 import Features from "./pages/features";
@@ -19,6 +18,25 @@ import Docs from "./pages/docs";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
+  // ─── Dedicated Ant Design Admin Dashboard (Matches lab-admin-flow.base44.app) ───
+  {
+    path: "/admin/*",
+    element: <Dashboard />,
+  },
+  {
+    path: "/admin",
+    element: <Dashboard />,
+  },
+  {
+    path: "/dashboard/*",
+    element: <Dashboard />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+  },
+
+  // ─── Client Cinematic Website Layout ───
   {
     path: "",
     element: <RootLayout />,
@@ -87,16 +105,6 @@ export const router = createBrowserRouter([
       {
         path: "*",
         element: <NotFound />,
-      },
-      {
-        path: "",
-        element: <PrivateRoute />,
-        children: [
-          {
-            path: "/dashboard",
-            element: <Dashboard />,
-          },
-        ],
       },
     ],
   },

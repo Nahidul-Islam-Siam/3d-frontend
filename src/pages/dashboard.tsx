@@ -1,10 +1,5 @@
-import Seo from '../components/Seo';
+import AdminDashboard from './admin/AdminDashboard';
 
-export default function Dashboard() {
-  return (
-    <>
-      <Seo title="Dashboard | React Template" description="View your dashboard on the React TSX Tailwind template." />
-      <div>dashboard</div>
-    </>
-  )
+export default function DashboardPage() {
+  return <AdminDashboard />;
 }

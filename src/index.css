@@ -141,3 +141,95 @@ body::-webkit-scrollbar,
 .custom-modal-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(249, 115, 22, 0.9);
 }
+
+
+/* ─── Modern SaaS Admin Table (Exact Image 4 Reference) ─── */
+.admin-saas-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 25px -4px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-saas-card button,
+.admin-saas-card input,
+.admin-saas-card select {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.admin-saas-table .ant-table {
+  background: #ffffff !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.admin-saas-table .ant-table-thead > tr > th {
+  background: #ffffff !important;
+  color: #64748B !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid #F1F5F9 !important;
+  padding: 14px 18px !important;
+}
+
+.admin-saas-table .ant-table-thead > tr > th::before {
+  display: none !important;
+}
+
+.admin-saas-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #F1F5F9 !important;
+  padding: 16px 18px !important;
+  vertical-align: middle !important;
+}
+
+.admin-saas-table .ant-table-tbody > tr:hover > td {
+  background: #FFFDF9 !important;
+}
+
+/* Custom Saas Pagination bar */
+.admin-saas-table .ant-pagination {
+  margin: 18px 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.admin-saas-table .ant-pagination-total-text {
+  margin-right: auto !important;
+  color: #64748B !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+.admin-saas-table .ant-pagination-item {
+  border-radius: 8px !important;
+  border: 1px solid #E2E8F0 !important;
+  font-weight: 600 !important;
+  font-size: 12.5px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  line-height: 30px !important;
+}
+
+.admin-saas-table .ant-pagination-item-active {
+  background: #F97316 !important;
+  border-color: #F97316 !important;
+}
+
+.admin-saas-table .ant-pagination-item-active a {
+  color: #ffffff !important;
+}
+
+.admin-saas-table .ant-pagination-prev .ant-pagination-item-link,
+.admin-saas-table .ant-pagination-next .ant-pagination-item-link {
+  border-radius: 8px !important;
+  border: 1px solid #E2E8F0 !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
