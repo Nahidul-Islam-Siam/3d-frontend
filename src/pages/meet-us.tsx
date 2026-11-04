@@ -18,9 +18,6 @@ export default function MeetUsPage() {
         {/* ─── Section 1: Meet Us Cinematic Banner ─── */}
         <MeetUsBanner />
 
-        {/* ─── Cream Spacer / Transition Band (Figma Frame 150px) ─── */}
-        <div className="w-full h-24 sm:h-32 lg:h-40 bg-[#FAF4E6]" aria-hidden="true" />
-
         {/* ─── Section 2: The People Behind the Mission ─── */}
         <PeopleBehindMissionSection />
 
