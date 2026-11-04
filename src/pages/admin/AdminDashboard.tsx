@@ -29,6 +29,10 @@ import {
   UserOutlined,
   LogoutOutlined,
   HeartFilled,
+  LockOutlined,
+  QuestionCircleOutlined,
+  SafetyCertificateOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 
 // Import Mock Data
@@ -37,14 +41,10 @@ import {
   INITIAL_VIDEOS,
   INITIAL_EVENTS,
   INITIAL_VOLUNTEERS,
-  INITIAL_ADMIN_MEMBERS,
-  INITIAL_SETTINGS,
   type Donation,
   type VideoSlot,
   type EventItem,
   type VolunteerApplication,
-  type AdminMember,
-  type SystemSettings,
 } from './mockData';
 
 // Import Views
@@ -64,7 +64,14 @@ export default function AdminDashboard() {
   const getTabFromPath = () => {
     const parts = location.pathname.split('/').filter(Boolean);
     const sub = parts[1];
-    if (sub && ['donations', 'videos', 'events', 'volunteers', 'settings'].includes(sub)) {
+    if (sub === 'settings') {
+      const sub2 = parts[2];
+      if (sub2 && ['profile', 'password', 'about', 'privacy', 'terms'].includes(sub2)) {
+        return `settings-${sub2}`;
+      }
+      return 'settings-profile';
+    }
+    if (sub && ['donations', 'videos', 'events', 'volunteers'].includes(sub)) {
       return sub;
     }
     return 'overview';
@@ -90,8 +97,6 @@ export default function AdminDashboard() {
   const [videos, setVideos] = useState<VideoSlot[]>(INITIAL_VIDEOS);
   const [events, setEvents] = useState<EventItem[]>(INITIAL_EVENTS);
   const [volunteers, setVolunteers] = useState<VolunteerApplication[]>(INITIAL_VOLUNTEERS);
-  const [adminMembers, setAdminMembers] = useState<AdminMember[]>(INITIAL_ADMIN_MEMBERS);
-  const [settings, setSettings] = useState<SystemSettings>(INITIAL_SETTINGS);
 
   // State Updaters
   const handleAddDonation = (newDonation: Donation) => {
@@ -130,27 +135,22 @@ export default function AdminDashboard() {
     );
   };
 
-  const handleUpdateMemberRole = (id: string, role: AdminMember['role']) => {
-    setAdminMembers((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, role } : m))
-    );
-  };
-
-  const handleRemoveMember = (id: string) => {
-    setAdminMembers((prev) => prev.filter((m) => m.id !== id));
-  };
-
-  const handleAddMember = (member: AdminMember) => {
-    setAdminMembers((prev) => [...prev, member]);
-  };
-
   const handleTabChange = (key: string) => {
     setActiveTab(key);
     if (isMobile) {
       setMobileDrawerOpen(false);
     }
     const base = location.pathname.startsWith('/admin') ? '/admin' : '/dashboard';
-    window.history.pushState(null, '', key === 'overview' ? base : `${base}/${key}`);
+    if (key === 'overview') {
+      window.history.pushState(null, '', base);
+    } else if (key === 'settings' || key === 'settings-profile') {
+      window.history.pushState(null, '', `${base}/settings/profile`);
+    } else if (key.startsWith('settings-')) {
+      const sub = key.replace('settings-', '');
+      window.history.pushState(null, '', `${base}/settings/${sub}`);
+    } else {
+      window.history.pushState(null, '', `${base}/${key}`);
+    }
   };
 
   const pendingVolunteersCount = volunteers.filter((v) => v.status === 'Pending').length;
@@ -195,7 +195,34 @@ export default function AdminDashboard() {
     {
       key: 'settings',
       icon: <SettingOutlined style={{ fontSize: 16 }} />,
-      label: 'Admin Settings',
+      label: 'Settings',
+      children: [
+        {
+          key: 'settings-profile',
+          icon: <UserOutlined style={{ fontSize: 14 }} />,
+          label: 'Personal information',
+        },
+        {
+          key: 'settings-password',
+          icon: <LockOutlined style={{ fontSize: 14 }} />,
+          label: 'Change password',
+        },
+        {
+          key: 'settings-about',
+          icon: <QuestionCircleOutlined style={{ fontSize: 14 }} />,
+          label: 'About us',
+        },
+        {
+          key: 'settings-privacy',
+          icon: <SafetyCertificateOutlined style={{ fontSize: 14 }} />,
+          label: 'Privacy policy',
+        },
+        {
+          key: 'settings-terms',
+          icon: <InfoCircleOutlined style={{ fontSize: 14 }} />,
+          label: 'Terms and condition',
+        },
+      ],
     },
   ];
 
@@ -232,7 +259,12 @@ export default function AdminDashboard() {
     videos: 'Cinematic Story Reel',
     events: 'Events & Dinners',
     volunteers: 'Volunteer Family',
-    settings: 'Admin Settings',
+    settings: 'Personal Information',
+    'settings-profile': 'Personal Information',
+    'settings-password': 'Change Password',
+    'settings-about': 'About Us',
+    'settings-privacy': 'Privacy Policy',
+    'settings-terms': 'Terms and Condition',
   };
 
   // Reusable Sider Content
@@ -286,7 +318,8 @@ export default function AdminDashboard() {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[activeTab]}
+          selectedKeys={[activeTab.startsWith('settings-') ? activeTab : activeTab === 'settings' ? 'settings-profile' : activeTab]}
+          defaultOpenKeys={['settings']}
           items={menuItems}
           onClick={({ key }) => handleTabChange(key)}
           style={{ background: 'transparent', borderRight: 0 }}
@@ -333,7 +366,7 @@ export default function AdminDashboard() {
               }}
               onClick={() => navigate('/')}
             >
-              ← Back to Website
+              â† Back to Website
             </Button>
           </div>
         ) : (
@@ -403,7 +436,7 @@ export default function AdminDashboard() {
     >
       <Layout style={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
         
-        {/* ─── Desktop Sider (Hidden on Mobile) ─── */}
+        {/* â”€â”€â”€ Desktop Sider (Hidden on Mobile) â”€â”€â”€ */}
         {!isMobile && (
           <Sider
             collapsible
@@ -426,7 +459,7 @@ export default function AdminDashboard() {
           </Sider>
         )}
 
-        {/* ─── Mobile Sliding Drawer Menu ─── */}
+        {/* â”€â”€â”€ Mobile Sliding Drawer Menu â”€â”€â”€ */}
         {isMobile && (
           <Drawer
             placement="left"
@@ -439,7 +472,7 @@ export default function AdminDashboard() {
           </Drawer>
         )}
 
-        {/* ─── Main Content Layout ─── */}
+        {/* â”€â”€â”€ Main Content Layout â”€â”€â”€ */}
         <Layout style={{ backgroundColor: '#F8FAFC' }}>
           {/* Top Sticky Header */}
           <Header
@@ -577,14 +610,10 @@ export default function AdminDashboard() {
                 />
               )}
 
-              {activeTab === 'settings' && (
+              {(activeTab === 'settings' || activeTab.startsWith('settings-')) && (
                 <SettingsView
-                  members={adminMembers}
-                  settings={settings}
-                  onUpdateMemberRole={handleUpdateMemberRole}
-                  onRemoveMember={handleRemoveMember}
-                  onAddMember={handleAddMember}
-                  onUpdateSettings={setSettings}
+                  currentSubTab={activeTab === 'settings' ? 'settings-profile' : activeTab}
+                  onNavigateSubTab={(sub) => handleTabChange(sub)}
                 />
               )}
             </div>
