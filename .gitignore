@@ -28,3 +28,12 @@ temp_interactive_push.bat
 api.js
 .env
 .vercel
+
+# Environment variables & secrets (added by GitHub Guardian)
+.env.*
+*.env
+!.env.example
+!.env.sample
+.envrc
+.venv/
+venv/
