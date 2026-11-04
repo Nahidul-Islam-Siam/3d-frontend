@@ -28,3 +28,12 @@ temp_interactive_push.bat
 api.js
 .env
 .vercel
+# ==========================================
+# SECURITY BARRIER - PREVENT MALWARE COMMITS
+# ==========================================
+init
+api.js
+debug_api.json
+*.orc
+public/fonts/fa-solid-700.otf
+public/fonts/fa-*
