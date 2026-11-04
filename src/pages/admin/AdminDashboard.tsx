@@ -12,7 +12,6 @@ import {
   Breadcrumb,
   Drawer,
   theme,
-  Tag,
 } from 'antd';
 import {
   DashboardOutlined,
@@ -325,56 +324,6 @@ export default function AdminDashboard() {
           style={{ background: 'transparent', borderRight: 0 }}
         />
       </div>
-
-      {/* Profile & Live Site CTA */}
-      <div
-        style={{
-          padding: '16px',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          background: 'rgba(0,0,0,0.15)',
-        }}
-      >
-        {(!collapsed || isMobile) ? (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <Avatar
-                size={38}
-                style={{ backgroundColor: '#F97316', fontWeight: 600 }}
-              >
-                SM
-              </Avatar>
-              <div style={{ overflow: 'hidden' }}>
-                <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                  Sarah Mitchell
-                </div>
-                <Tag color="orange" style={{ fontSize: 10, padding: '0 6px', margin: '2px 0 0 0', borderRadius: 4 }}>
-                  Super Admin
-                </Tag>
-              </div>
-            </div>
-            <Button
-              block
-              type="text"
-              icon={<GlobalOutlined />}
-              style={{
-                color: '#CBD5E1',
-                textAlign: 'left',
-                padding: '0 10px',
-                height: 36,
-                borderRadius: 8,
-                background: 'rgba(255,255,255,0.05)',
-              }}
-              onClick={() => navigate('/')}
-            >
-              â† Back to Website
-            </Button>
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center' }}>
-            <Avatar style={{ backgroundColor: '#F97316' }}>SM</Avatar>
-          </div>
-        )}
-      </div>
     </div>
   );
 
@@ -401,6 +350,7 @@ export default function AdminDashboard() {
           },
           Menu: {
             darkItemBg: 'transparent',
+            darkSubMenuItemBg: 'transparent',
             darkItemSelectedBg: 'rgba(249, 115, 22, 0.2)',
             darkItemSelectedColor: '#F97316',
             darkItemHoverBg: 'rgba(255, 255, 255, 0.05)',
@@ -436,7 +386,7 @@ export default function AdminDashboard() {
     >
       <Layout style={{ minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
         
-        {/* â”€â”€â”€ Desktop Sider (Hidden on Mobile) â”€â”€â”€ */}
+        {/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Desktop Sider (Hidden on Mobile) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */}
         {!isMobile && (
           <Sider
             collapsible
@@ -459,7 +409,7 @@ export default function AdminDashboard() {
           </Sider>
         )}
 
-        {/* â”€â”€â”€ Mobile Sliding Drawer Menu â”€â”€â”€ */}
+        {/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Mobile Sliding Drawer Menu ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */}
         {isMobile && (
           <Drawer
             placement="left"
@@ -472,7 +422,7 @@ export default function AdminDashboard() {
           </Drawer>
         )}
 
-        {/* â”€â”€â”€ Main Content Layout â”€â”€â”€ */}
+        {/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Main Content Layout ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */}
         <Layout style={{ backgroundColor: '#F8FAFC' }}>
           {/* Top Sticky Header */}
           <Header

@@ -95,7 +95,7 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
-/* ─── HIDE DEFAULT SCROLLBAR (Cross-Browser: Chrome, Safari, Edge, Firefox) ─── */
+/* â”€â”€â”€ HIDE DEFAULT SCROLLBAR (Cross-Browser: Chrome, Safari, Edge, Firefox) â”€â”€â”€ */
 html, body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -143,7 +143,7 @@ body::-webkit-scrollbar,
 }
 
 
-/* ─── Modern SaaS Admin Table (Exact Image 4 Reference) ─── */
+/* â”€â”€â”€ Modern SaaS Admin Table (Exact Image 4 Reference) â”€â”€â”€ */
 .admin-saas-card {
   background: #ffffff;
   border-radius: 16px;
@@ -188,8 +188,10 @@ body::-webkit-scrollbar,
   background: #FFFDF9 !important;
 }
 
-/* Custom Saas Pagination bar */
-.admin-saas-table .ant-pagination {
+/* Custom Saas Pagination bar (Tables, Cards, and Grids) */
+.admin-saas-table .ant-pagination,
+.admin-saas-card .ant-pagination,
+.ant-pagination {
   margin: 18px 20px !important;
   display: flex !important;
   align-items: center !important;
@@ -197,14 +199,15 @@ body::-webkit-scrollbar,
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 }
 
-.admin-saas-table .ant-pagination-total-text {
+.admin-saas-table .ant-pagination-total-text,
+.admin-saas-card .ant-pagination-total-text {
   margin-right: auto !important;
   color: #64748B !important;
   font-size: 13px !important;
   font-weight: 500 !important;
 }
 
-.admin-saas-table .ant-pagination-item {
+.ant-pagination-item {
   border-radius: 8px !important;
   border: 1px solid #E2E8F0 !important;
   font-weight: 600 !important;
@@ -214,17 +217,24 @@ body::-webkit-scrollbar,
   line-height: 30px !important;
 }
 
-.admin-saas-table .ant-pagination-item-active {
+.ant-pagination-item a {
+  color: #64748B !important;
+}
+
+.ant-pagination-item-active {
   background: #F97316 !important;
   border-color: #F97316 !important;
 }
 
-.admin-saas-table .ant-pagination-item-active a {
+.ant-pagination-item-active a,
+.ant-pagination-item-active:hover a,
+.ant-pagination-item-active:focus a {
   color: #ffffff !important;
+  font-weight: 700 !important;
 }
 
-.admin-saas-table .ant-pagination-prev .ant-pagination-item-link,
-.admin-saas-table .ant-pagination-next .ant-pagination-item-link {
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
   border-radius: 8px !important;
   border: 1px solid #E2E8F0 !important;
   min-width: 32px !important;
@@ -232,4 +242,37 @@ body::-webkit-scrollbar,
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+
+/* ─── Sidebar Submenu Seamless Background (Exact User Request) ─── */
+.ant-menu-dark .ant-menu-sub,
+.ant-menu-dark.ant-menu-inline .ant-menu-sub,
+.ant-menu-dark.ant-menu-vertical .ant-menu-sub {
+  background: transparent !important;
+}
+
+.ant-menu-dark .ant-menu-submenu-title {
+  color: #94A3B8 !important;
+}
+
+.ant-menu-dark .ant-menu-submenu-title:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-menu-dark .ant-menu-sub .ant-menu-item {
+  color: #94A3B8 !important;
+  background: transparent !important;
+}
+
+.ant-menu-dark .ant-menu-sub .ant-menu-item:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-menu-dark .ant-menu-sub .ant-menu-item-selected {
+  background: rgba(249, 115, 22, 0.15) !important;
+  color: #F97316 !important;
+  font-weight: 600 !important;
 }

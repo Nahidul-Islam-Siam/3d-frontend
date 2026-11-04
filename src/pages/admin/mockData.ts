@@ -54,7 +54,7 @@ export interface AdminMember {
   id: string;
   name: string;
   email: string;
-  role: 'Super admin' | 'Finance — donations only' | 'Editor — videos and events' | 'Moderator — volunteers';
+  role: 'Super admin' | 'Finance â€” donations only' | 'Editor â€” videos and events' | 'Moderator â€” volunteers';
   status: 'Active' | 'Invited';
   last_active: string;
 }
@@ -300,6 +300,77 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     sort_order: 6,
     updated_at: '2026-10-20',
   },
+  {
+    id: 'vid-7',
+    slot_label: 'LEADS Youth Stories',
+    page_location: '/who-we-are#youth',
+    title: 'Rising Scholars: From Tutoring to College Gates',
+    description: 'Mini-documentary following three first-generation students in the LEADS initiative.',
+    duration: '1:40',
+    status: 'Live',
+    video_url: 'src/assets/video/welcome.mp4',
+    sort_order: 7,
+    updated_at: '2026-10-18',
+  },
+  {
+    id: 'vid-8',
+    slot_label: 'Holiday Community Feast',
+    page_location: '/events/holiday-feast',
+    title: 'Gathering at the Table: Thanksgiving Harvest',
+    description: 'Highlight reel of 1,200 warm plates served by community volunteers.',
+    duration: '2:30',
+    status: 'Live',
+    video_url: 'src/assets/join-movement/join-the-movement-3.mp4',
+    sort_order: 8,
+    updated_at: '2026-10-15',
+  },
+  {
+    id: 'vid-9',
+    slot_label: 'Veterans Bridge Feature',
+    page_location: '/how-we-serve#veterans',
+    title: 'Honor in Transition: Rehousing Tampa Veterans',
+    description: 'Field report detailing emergency home setups and fellowship groups.',
+    duration: '2:15',
+    status: 'Draft',
+    video_url: 'src/assets/experienc-story/experience-story.mp4',
+    sort_order: 9,
+    updated_at: '2026-10-10',
+  },
+  {
+    id: 'vid-10',
+    slot_label: 'Volunteer Family Voices',
+    page_location: '/join-the-movement#volunteers',
+    title: 'Why I Serve: Stories Behind the Apron',
+    description: 'Interviews with long-time kitchen prep and distribution volunteers.',
+    duration: '1:15',
+    status: 'Live',
+    video_url: 'src/assets/join-movement/join-the-movement-2.mp4',
+    sort_order: 10,
+    updated_at: '2026-10-05',
+  },
+  {
+    id: 'vid-11',
+    slot_label: 'Annual Impact Milestone',
+    page_location: '/about#impact',
+    title: '8 Years, 80,000 Lives Touched',
+    description: 'Year-in-review cinema piece presented at the donor banquet.',
+    duration: '3:00',
+    status: 'Draft',
+    video_url: 'src/assets/video/welcome.mp4',
+    sort_order: 11,
+    updated_at: '2026-09-30',
+  },
+  {
+    id: 'vid-12',
+    slot_label: 'Frontline Pantry Expansion',
+    page_location: '/who-we-are#facilities',
+    title: 'New Cold Storage: Expanding Fresh Produce Access',
+    description: 'Behind the scenes walkthrough of our newly renovated pantry walk-in.',
+    duration: '1:20',
+    status: 'Empty',
+    sort_order: 12,
+    updated_at: '2026-09-22',
+  },
 ];
 
 export const INITIAL_EVENTS: EventItem[] = [
@@ -435,7 +506,7 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
     id: 'adm-2',
     name: 'Marcus Vance',
     email: 'marcus.v@liveachievebelieve.org',
-    role: 'Finance — donations only',
+    role: 'Finance â€” donations only',
     status: 'Active',
     last_active: '2 hours ago',
   },
@@ -443,7 +514,7 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
     id: 'adm-3',
     name: 'David Kim',
     email: 'david.k@liveachievebelieve.org',
-    role: 'Editor — videos and events',
+    role: 'Editor â€” videos and events',
     status: 'Active',
     last_active: 'Yesterday',
   },
@@ -451,7 +522,7 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
     id: 'adm-4',
     name: 'Elena Rostova',
     email: 'elena.r@liveachievebelieve.org',
-    role: 'Moderator — volunteers',
+    role: 'Moderator â€” volunteers',
     status: 'Active',
     last_active: '3 days ago',
   },

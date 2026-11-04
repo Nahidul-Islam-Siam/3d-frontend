@@ -14,6 +14,7 @@ import {
   message,
   Space,
   Popconfirm,
+  Pagination,
 } from 'antd';
 import {
   VideoCameraOutlined,
@@ -35,7 +36,7 @@ interface VideosViewProps {
   onAddSlot: (newSlot: VideoSlot) => void;
   onDeleteSlot: (id: string) => void;
 }
-
+   
 export default function VideosView({
   videos,
   onUpdateVideo,
@@ -43,6 +44,9 @@ export default function VideosView({
   onDeleteSlot,
 }: VideosViewProps) {
   const [statusFilter, setStatusFilter] = useState<'All' | 'Live' | 'Draft' | 'Empty'>('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(6);
+
   const [selectedVideo, setSelectedVideo] = useState<VideoSlot | null>(null);
   const [isReplaceModalOpen, setIsReplaceModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -55,6 +59,14 @@ export default function VideosView({
     if (statusFilter === 'All') return true;
     return v.status === statusFilter;
   });
+
+  const totalVideos = filteredVideos.length;
+  const paginatedVideos = filteredVideos.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handleStatusFilterChange = (val: 'All' | 'Live' | 'Draft' | 'Empty') => {
+    setStatusFilter(val);
+    setCurrentPage(1);
+  };
 
   const handleTogglePublish = (slot: VideoSlot) => {
     const nextStatus = slot.status === 'Live' ? 'Draft' : 'Live';
@@ -101,7 +113,7 @@ export default function VideosView({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* ─── Header ─── */}
+      {/* â”€â”€â”€ Header â”€â”€â”€ */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <Title level={3} style={{ margin: 0, fontWeight: 600 }}>
@@ -120,7 +132,7 @@ export default function VideosView({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <Radio.Group
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => handleStatusFilterChange(e.target.value)}
           buttonStyle="solid"
         >
           <Radio.Button value="All">All ({videos.length})</Radio.Button>
@@ -138,7 +150,7 @@ export default function VideosView({
 
       {/* ─── Video Slot Cards Grid ─── */}
       <Row gutter={[16, 16]}>
-        {filteredVideos.map((slot) => (
+        {paginatedVideos.map((slot) => (
           <Col xs={24} md={12} xl={8} key={slot.id}>
             <Card
               bordered={false}
@@ -287,7 +299,66 @@ export default function VideosView({
         ))}
       </Row>
 
-      {/* ─── Modal: Replace / Upload Video ─── */}
+      {/* ─── Pagination Footer ─── */}
+      <div
+        className="admin-saas-card"
+        style={{
+          padding: '16px 24px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: 14,
+          border: '1px solid #F1F5F9',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        }}
+      >
+        <div style={{ color: '#64748B', fontSize: 13, fontWeight: 500 }}>
+          Showing{' '}
+          <strong style={{ color: '#0F172A' }}>
+            {totalVideos === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{' '}
+            {Math.min(currentPage * pageSize, totalVideos)}
+          </strong>{' '}
+          of <strong style={{ color: '#0F172A' }}>{totalVideos}</strong> video slots
+        </div>
+
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={totalVideos}
+          showSizeChanger
+          pageSizeOptions={['6', '12', '24']}
+          onChange={(page, size) => {
+            setCurrentPage(page);
+            setPageSize(size);
+          }}
+          itemRender={(page, type, originalElement) => {
+            if (type === 'page') {
+              const isActive = page === currentPage;
+              return (
+                <span
+                  style={{
+                    color: isActive ? '#ffffff' : '#475569',
+                    fontWeight: isActive ? 700 : 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  {page}
+                </span>
+              );
+            }
+            return originalElement;
+          }}
+        />
+      </div>
+
+      {/* â”€â”€â”€ Modal: Replace / Upload Video â”€â”€â”€ */}
       <Modal
         title={`Replace Film for ${selectedVideo?.slot_label}`}
         open={isReplaceModalOpen}
@@ -319,7 +390,7 @@ export default function VideosView({
         </Form>
       </Modal>
 
-      {/* ─── Modal: Preview Video ─── */}
+      {/* â”€â”€â”€ Modal: Preview Video â”€â”€â”€ */}
       <Modal
         title={selectedVideo?.title}
         open={isPreviewModalOpen}
@@ -349,7 +420,7 @@ export default function VideosView({
         )}
       </Modal>
 
-      {/* ─── Modal: Add Video Slot ─── */}
+      {/* â”€â”€â”€ Modal: Add Video Slot â”€â”€â”€ */}
       <Modal
         title="Add New Video Slot"
         open={isAddModalOpen}
