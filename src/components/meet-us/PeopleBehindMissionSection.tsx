@@ -1,5 +1,10 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import aerialForestBg from '@/assets/meet-us/misty-forest-bg.png';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import MistyForestCanvas from './MistyForestCanvas';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export interface PeopleBehindMissionSectionProps {
   className?: string;
@@ -10,80 +15,143 @@ export default function PeopleBehindMissionSection({
   className = '',
   onScrollClick,
 }: PeopleBehindMissionSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
   const handleScrollDown = () => {
     if (onScrollClick) {
       onScrollClick();
       return;
     }
 
-    const nextSection = document.getElementById('people-leading-the-way') || document.getElementById('meet-us-team');
+    const nextSection =
+      document.getElementById('people-leading-the-way') ||
+      document.getElementById('meet-us-team');
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+      window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
     }
   };
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: '+=120%',
+        pin: true,
+        scrub: 1.2,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          setScrollProgress(self.progress);
+        },
+      },
+    });
+
+    // Stage 1 -> Stage 2: Headline floats up and dissolves (0% -> 45%)
+    tl.to(
+      '#mission-headline',
+      {
+        opacity: 0,
+        y: -80,
+        ease: 'power2.inOut',
+        duration: 0.45,
+      },
+      0
+    );
+
+    tl.to(
+      '#mission-subtitle',
+      {
+        opacity: 0,
+        y: -50,
+        ease: 'power2.inOut',
+        duration: 0.4,
+      },
+      0.05
+    );
+
+    // Bottom-right CTA fades out early
+    tl.to(
+      '#mission-scroll-cta',
+      {
+        opacity: 0,
+        y: 25,
+        ease: 'power2.inOut',
+        duration: 0.3,
+      },
+      0
+    );
+
+    return () => {
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="people-behind-the-mission"
-      className={`relative w-full h-[calc(100vh-74px)] min-h-[640px] max-h-[920px] bg-[#0e1616] overflow-hidden flex flex-col justify-between select-none ${className}`}
+      className={`relative w-full h-screen min-h-[640px] max-h-[960px] bg-[#0c1414] overflow-hidden flex flex-col justify-between select-none ${className}`}
     >
-      {/* ─── Background Dramatic Aerial Forest with Mist/Clouds ─── */}
-      <img
-        src={aerialForestBg}
-        alt="Aerial forest terrain with rolling misty clouds"
-        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
-        aria-hidden="true"
-      />
+      {/* ─── Realtime WebGL Volumetric Drifting Mist & 3D Forest Canvas ─── */}
+      <MistyForestCanvas scrollProgress={scrollProgress} />
 
-      {/* ─── Subtle Vignette / Contrast Layer for Center Text Clarity ─── */}
+      {/* ─── Atmospheric Vignette Layer for Text Clarity ─── */}
       <div
-        className="absolute inset-0 bg-black/25 pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/30 pointer-events-none"
         aria-hidden="true"
       />
 
-      {/* ─── Top Spacer for Flex Balance ─── */}
-      <div className="w-full h-12 pointer-events-none" aria-hidden="true" />
+      {/* ─── Top Spacer for Optical Balance ─── */}
+      <div className="w-full h-16 pointer-events-none" aria-hidden="true" />
 
       {/* ─── Centered Main Headline & Narrative ─── */}
       <div className="relative z-10 w-full max-w-4xl mx-auto px-6 sm:px-10 flex flex-col items-center justify-center text-center">
         {/* Main Heading: THE PEOPLE BEHIND THE MISSION */}
-        <motion.h2
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-          className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[60px] font-bold leading-[1.14] tracking-[0.06em] uppercase text-center drop-shadow-[0_2px_14px_rgba(0,0,0,0.5)]"
-        >
-          THE PEOPLE
-          <br />
-          BEHIND THE MISSION
-        </motion.h2>
+        <div id="mission-headline">
+          <motion.h2
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[62px] font-bold leading-[1.12] tracking-[0.06em] uppercase text-center drop-shadow-[0_4px_20px_rgba(0,0,0,0.65)]"
+          >
+            THE PEOPLE
+            <br />
+            BEHIND THE MISSION
+          </motion.h2>
+        </div>
 
         {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.85, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-5 sm:mt-6 text-stone-200/90 text-xs sm:text-sm md:text-base font-sans font-normal leading-relaxed text-center max-w-md sm:max-w-lg drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
-        >
-          Meet the people who choose, to serve, believe in hope, and
-          <br className="hidden sm:inline" /> help bring this mission to life.
-        </motion.p>
+        <div id="mission-subtitle">
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.85, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-6 sm:mt-7 text-stone-200/90 text-sm sm:text-base lg:text-[17px] font-sans font-normal leading-relaxed text-center max-w-md sm:max-w-lg drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]"
+          >
+            Meet the people who choose to serve, believe in hope, and
+            <br className="hidden sm:inline" /> help bring this mission to life.
+          </motion.p>
+        </div>
       </div>
 
       {/* ─── Bottom-Right CTA: SCROLL TO ENTER STORY ─── */}
-      <div className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-8 sm:pb-10 lg:pb-12 flex justify-end items-end">
-        <motion.button
+      <div
+        id="mission-scroll-cta"
+        className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-10 sm:pb-12 lg:pb-14 flex justify-end items-end"
+      >
+        <button
           type="button"
           onClick={handleScrollDown}
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="group flex items-center gap-2.5 text-white/80 hover:text-white transition-colors duration-300 cursor-pointer select-none outline-none focus-visible:ring-1 focus-visible:ring-white rounded-full p-1"
         >
           {/* Circular Down Arrow Icon Badge matching Figma */}
@@ -108,9 +176,14 @@ export default function PeopleBehindMissionSection({
           >
             SCROLL TO ENTER STORY
           </span>
-        </motion.button>
+        </button>
       </div>
+
+      {/* ─── Bottom Smooth Fade into Section 3 Cream Background ─── */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-b from-transparent via-[#0c1414]/60 to-[#FAF4E6] pointer-events-none"
+        aria-hidden="true"
+      />
     </section>
   );
 }
-
