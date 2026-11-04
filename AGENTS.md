@@ -5,6 +5,7 @@ Comprehensive reference and instructions for AI agents working on this codebase.
 ---
 
 ## 1. Project Reference Links
+* **Creative Direction Master Doc**: [docs/website-directions.md](file:///d:/VS%20Code/Office/Fiverr/3d-frontend/docs/website-directions.md) (from `Website directions (1).docx`)
 * **Figma Design File**: [Figma - SynergyAssurg Cinematic Website](https://www.figma.com/design/YW7NkHHekXId1G1k3vV4hk/synergyassurg--Cinamatic-website?node-id=0-1&p=f&t=eNB472cKDMDvw79W-0)
 * **Design Benchmark & Motion Reference**: [Edolus](https://edolus.com/) (Awwwards Site of the Day / cinematic pacing, smooth inertia scrolling, theatrical shutter reveal).
 * **Local Dev Server**: `http://localhost:5173/`

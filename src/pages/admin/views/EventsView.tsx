@@ -24,6 +24,8 @@ import {
   EyeOutlined,
   MoreOutlined,
   CloseOutlined,
+  PictureOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import type { EventItem } from '../mockData';
 
@@ -41,6 +43,7 @@ export default function EventsView({
   const [viewMode, setViewMode] = useState<string>('list');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   // Mock RSVP guests for the selected event drawer
@@ -52,6 +55,30 @@ export default function EventsView({
     { name: 'Carlos Mendez', email: 'mendez.family@outlook.com', tickets: 3, date: '2026-10-28' },
     { name: 'Pastor Thomas Cole', email: 'tcole@gracelutheran.org', tickets: 6, date: '2026-10-27' },
   ];
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      message.error('Please upload an image file (PNG, JPG, WEBP).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      message.error('Image file must be under 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (typeof event.target?.result === 'string') {
+        setAttachedImage(event.target.result);
+        message.success('Cover image attached!');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAddSubmit = (values: {
     title: string;
@@ -73,10 +100,12 @@ export default function EventsView({
       rsvps_count: 0,
       status: 'Upcoming',
       description: values.description,
+      image_url: attachedImage || undefined,
     };
     onAddEvent(newEvt);
     message.success(`Created event: ${values.title}`);
     setIsAddModalOpen(false);
+    setAttachedImage(null);
     form.resetFields();
   };
 
@@ -109,14 +138,47 @@ export default function EventsView({
       title: 'Event & Venue',
       dataIndex: 'title',
       key: 'title',
-      width: 250,
+      width: 290,
       render: (title: string, record: EventItem) => (
-        <div>
-          <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 13.5 }}>
-            {title}
-          </div>
-          <div style={{ color: '#94A3B8', fontSize: 11.5, marginTop: 2 }}>
-            {record.location}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {record.image_url ? (
+            <img
+              src={record.image_url}
+              alt={title}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 8,
+                objectFit: 'cover',
+                border: '1px solid #E2E8F0',
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 8,
+                backgroundColor: '#FFF7ED',
+                border: '1px solid #FED7AA',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#EA580C',
+                flexShrink: 0,
+              }}
+            >
+              <PictureOutlined style={{ fontSize: 18 }} />
+            </div>
+          )}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 13.5 }}>
+              {title}
+            </div>
+            <div style={{ color: '#94A3B8', fontSize: 11.5, marginTop: 2 }}>
+              {record.location}
+            </div>
           </div>
         </div>
       ),
@@ -131,7 +193,7 @@ export default function EventsView({
             {record.event_date}
           </div>
           <div style={{ color: '#94A3B8', fontSize: 11.5, marginTop: 2 }}>
-            {record.start_time} – {record.end_time} EST
+            {record.start_time} - {record.end_time} EST
           </div>
         </div>
       ),
@@ -260,29 +322,7 @@ export default function EventsView({
         );
       },
     },
-    {
-      title: 'Admission',
-      dataIndex: 'status',
-      key: 'admission',
-      width: 140,
-      render: () => (
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '3px 10px',
-            borderRadius: 9999,
-            fontSize: 11.5,
-            fontWeight: 500,
-            backgroundColor: '#F0FDF4',
-            color: '#16A34A',
-            border: '1px solid #BBF7D0',
-          }}
-        >
-          Free Pass
-        </span>
-      ),
-    },
+    
     {
       title: '',
       key: 'actions',
@@ -394,7 +434,7 @@ export default function EventsView({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* ─── Unified SaaS Table Card ─── */}
+      {/* â”€â”€â”€ Unified SaaS Table Card â”€â”€â”€ */}
       <div className="admin-saas-card">
         {/* Top Header Row of Card */}
         <div
@@ -464,7 +504,7 @@ export default function EventsView({
           </Space>
         </div>
 
-        {/* ─── Main Content: List or Cards ─── */}
+        {/* â”€â”€â”€ Main Content: List or Cards â”€â”€â”€ */}
         {viewMode === 'list' ? (
           <Table
             className="admin-saas-table"
@@ -495,49 +535,62 @@ export default function EventsView({
                     backgroundColor: '#FFFFFF',
                     border: '1px solid #F1F5F9',
                     borderRadius: 14,
-                    padding: 20,
+                    overflow: 'hidden',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 16, color: '#0F172A' }}>{evt.title}</div>
-                      <div style={{ color: '#94A3B8', fontSize: 12, marginTop: 2 }}>{evt.location}</div>
+                  {evt.image_url && (
+                    <div style={{ width: '100%', height: 140, overflow: 'hidden', backgroundColor: '#F8FAFC' }}>
+                      <img
+                        src={evt.image_url}
+                        alt={evt.title}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     </div>
-                    <span
-                      style={{
-                        padding: '3px 10px',
-                        borderRadius: 9999,
-                        fontSize: 11.5,
-                        fontWeight: 600,
-                        backgroundColor: evt.status === 'Upcoming' ? '#EFF6FF' : '#F8FAFC',
-                        color: evt.status === 'Upcoming' ? '#2563EB' : '#64748B',
-                        border: `1px solid ${evt.status === 'Upcoming' ? '#BFDBFE' : '#E2E8F0'}`,
-                      }}
+                  )}
+                  <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 16, color: '#0F172A' }}>{evt.title}</div>
+                        <div style={{ color: '#94A3B8', fontSize: 12, marginTop: 2 }}>{evt.location}</div>
+                      </div>
+                      <span
+                        style={{
+                          padding: '3px 10px',
+                          borderRadius: 9999,
+                          fontSize: 11.5,
+                          fontWeight: 600,
+                          backgroundColor: evt.status === 'Upcoming' ? '#EFF6FF' : '#F8FAFC',
+                          color: evt.status === 'Upcoming' ? '#2563EB' : '#64748B',
+                          border: `1px solid ${evt.status === 'Upcoming' ? '#BFDBFE' : '#E2E8F0'}`,
+                        }}
+                      >
+                        {evt.status}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: 13, color: '#475569', marginBottom: 12 }}>
+                      📅 {evt.event_date} ({evt.start_time} - {evt.end_time})
+                    </div>
+
+                    <div style={{ marginBottom: 16, marginTop: 'auto' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                        <span style={{ fontWeight: 600 }}>{evt.rsvps_count} RSVPs</span>
+                        <span style={{ color: '#94A3B8' }}>Cap: {evt.capacity}</span>
+                      </div>
+                      <Progress percent={pct} strokeColor="#F97316" showInfo={false} size="small" />
+                    </div>
+
+                    <Button
+                      block
+                      onClick={() => setSelectedEvent(evt)}
+                      style={{ borderRadius: 8, borderColor: '#E2E8F0' }}
                     >
-                      {evt.status}
-                    </span>
+                      View Guest List
+                    </Button>
                   </div>
-
-                  <div style={{ fontSize: 13, color: '#475569', marginBottom: 12 }}>
-                    📅 {evt.event_date} ({evt.start_time} – {evt.end_time})
-                  </div>
-
-                  <div style={{ marginBottom: 16 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                      <span style={{ fontWeight: 600 }}>{evt.rsvps_count} RSVPs</span>
-                      <span style={{ color: '#94A3B8' }}>Cap: {evt.capacity}</span>
-                    </div>
-                    <Progress percent={pct} strokeColor="#F97316" showInfo={false} size="small" />
-                  </div>
-
-                  <Button
-                    block
-                    onClick={() => setSelectedEvent(evt)}
-                    style={{ borderRadius: 8, borderColor: '#E2E8F0' }}
-                  >
-                    View Guest List
-                  </Button>
                 </div>
               );
             })}
@@ -555,6 +608,24 @@ export default function EventsView({
       >
         {selectedEvent && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {selectedEvent.image_url && (
+              <div
+                style={{
+                  width: '100%',
+                  height: 160,
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <img
+                  src={selectedEvent.image_url}
+                  alt={selectedEvent.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+            )}
+
             <div
               style={{
                 padding: '16px 20px',
@@ -639,11 +710,155 @@ export default function EventsView({
       <Modal
         title="Schedule New Gathering / Dinner"
         open={isAddModalOpen}
-        onCancel={() => setIsAddModalOpen(false)}
+        onCancel={() => {
+          setIsAddModalOpen(false);
+          setAttachedImage(null);
+        }}
         footer={null}
         destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleAddSubmit} style={{ marginTop: 16 }}>
+          {/* Banner / Cover Image Attachment */}
+          <Form.Item label="Event Banner / Cover Image">
+            {attachedImage ? (
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: 150,
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  border: '1px solid #FED7AA',
+                  backgroundColor: '#FFF7ED',
+                }}
+              >
+                <img
+                  src={attachedImage}
+                  alt="Event Banner Preview"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    display: 'flex',
+                    gap: 8,
+                  }}
+                >
+                  <label
+                    style={{
+                      cursor: 'pointer',
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      color: '#0F172A',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                    }}
+                  >
+                    Change
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={handleImageUpload}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setAttachedImage(null)}
+                    style={{
+                      cursor: 'pointer',
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      backgroundColor: 'rgba(239, 68, 68, 0.95)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <DeleteOutlined /> Remove
+                  </button>
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 8,
+                    left: 10,
+                    backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                    color: '#FFFFFF',
+                    fontSize: 11,
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                  }}
+                >
+                  Banner Attached
+                </div>
+              </div>
+            ) : (
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '24px 16px',
+                  borderRadius: 12,
+                  border: '2px dashed #CBD5E1',
+                  backgroundColor: '#F8FAFC',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#F97316';
+                  e.currentTarget.style.backgroundColor = '#FFF7ED';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#CBD5E1';
+                  e.currentTarget.style.backgroundColor = '#F8FAFC';
+                }}
+              >
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#F97316',
+                    fontSize: 20,
+                    marginBottom: 8,
+                  }}
+                >
+                  <PictureOutlined />
+                </div>
+                <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 13 }}>
+                  Click to upload event banner or drag & drop
+                </div>
+                <div style={{ color: '#94A3B8', fontSize: 11.5, marginTop: 2 }}>
+                  Supports JPG, PNG, WEBP (Max 5MB)
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleImageUpload}
+                />
+              </label>
+            )}
+          </Form.Item>
+
           <Form.Item name="title" label="Event Title" rules={[{ required: true, message: 'Enter title' }]}>
             <Input placeholder="e.g. Hope Community Dinner #4" />
           </Form.Item>
@@ -674,7 +889,14 @@ export default function EventsView({
           </Form.Item>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24 }}>
-            <Button onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                setIsAddModalOpen(false);
+                setAttachedImage(null);
+              }}
+            >
+              Cancel
+            </Button>
             <Button type="primary" htmlType="submit" style={{ backgroundColor: '#F97316' }}>
               Create Event
             </Button>
