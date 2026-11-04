@@ -30,9 +30,9 @@ export default function EarthGlobe3D({
     // ─── 1. Scene, Camera, Renderer ───
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 1000);
-    // Low-orbit vantage point looking obliquely across Earth's limb
-    camera.position.set(0, 9, 34);
+    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
+    // Camera positioned at z=24 looking straight towards (0, 0, 0)
+    camera.position.set(0, 0, 24);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -42,10 +42,10 @@ export default function EarthGlobe3D({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.4;
     container.appendChild(renderer.domElement);
 
-    // ─── 2. Texture Loader with SRGB and Anisotropy ───
+    // ─── 2. Texture Loader with SRGB and Maximum Anisotropy ───
     const textureLoader = new THREE.TextureLoader();
     let loadedCount = 0;
     const checkAllLoaded = () => {
@@ -71,17 +71,18 @@ export default function EarthGlobe3D({
     );
     bumpRoughnessCloudsTexture.anisotropy = maxAnisotropy;
 
-    // ─── 3. Background Starfield ───
-    const starCount = 1500;
+    // ─── 3. Background Starfield (Focused in upper-left deep space) ───
+    const starCount = 1400;
     const starGeometry = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
     const starColors = new Float32Array(starCount * 3);
 
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
-      starPositions[i3] = (Math.random() - 0.5) * 700;
-      starPositions[i3 + 1] = Math.random() * 300 - 30;
-      starPositions[i3 + 2] = -Math.random() * 450 - 60;
+      // Scatter primarily across upper and middle-left space
+      starPositions[i3] = (Math.random() - 0.65) * 500;
+      starPositions[i3 + 1] = Math.random() * 260 - 20;
+      starPositions[i3 + 2] = -Math.random() * 350 - 40;
 
       const shade = 0.5 + Math.random() * 0.5;
       starColors[i3] = shade;
@@ -93,7 +94,7 @@ export default function EarthGlobe3D({
     starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
     const starMaterial = new THREE.PointsMaterial({
-      size: 1.3,
+      size: 1.25,
       vertexColors: true,
       transparent: true,
       opacity: 0.85,
@@ -102,21 +103,28 @@ export default function EarthGlobe3D({
     const starField = new THREE.Points(starGeometry, starMaterial);
     scene.add(starField);
 
-    // ─── 4. Globe Positioning & Orientation ───
+    // ─── 4. Exact Figma Horizon Arc Geometry (Scale & Position) ───
     const globeGroup = new THREE.Group();
     const isMobile = width < 768;
-    const earthRadius = isMobile ? 24 : 31;
-    // Position globe so its dramatic illuminated limb arcs across bottom-left to top-right
-    globeGroup.position.set(isMobile ? 3 : 11, isMobile ? -23.5 : -28, -4);
-    globeGroup.rotation.z = THREE.MathUtils.degToRad(-14);
-    globeGroup.rotation.x = THREE.MathUtils.degToRad(8);
+
+    // Desktop: R=64, Center=(28, -60, -4).
+    // This places the horizon from x=0.05, y=0.98 (bottom-left) to x=0.95, y=0.36 (middle-right)!
+    // Mobile: Scale down center to keep horizon visible in narrower viewport.
+    const earthRadius = isMobile ? 48 : 64;
+    const posX = isMobile ? 18 : 28;
+    const posY = isMobile ? -48 : -60;
+    const posZ = -4;
+
+    globeGroup.position.set(posX, posY, posZ);
+    // Realistic axial tilt (23.4 degrees) and orbit inclination
+    globeGroup.rotation.z = THREE.MathUtils.degToRad(-16);
+    globeGroup.rotation.x = THREE.MathUtils.degToRad(12);
     scene.add(globeGroup);
 
-    // ─── 5. Sun Direction Uniform (Exact TSL Example Angles) ───
-    // Sun positioned obliquely to create beautiful day/sunset/night terminator
-    const sunDirection = new THREE.Vector3(1.2, 0.7, 1.1).normalize();
+    // ─── 5. Sun Orientation (Sunlight flooding from lower-right horizon) ───
+    const sunDirection = new THREE.Vector3(1.6, 0.45, 0.95).normalize();
 
-    // ─── 6. Three.js Journey / TSL Earth Surface GLSL Shader ───
+    // ─── 6. Earth Surface Shader (Three.js Journey / TSL Math) ───
     const earthVertexShader = `
       varying vec2 vUv;
       varying vec3 vNormal;
@@ -157,49 +165,47 @@ export default function EarthGlobe3D({
         vec4 nightColor = texture2D(nightTexture, vUv);
         vec4 brcData = texture2D(bumpRoughnessCloudsTexture, vUv);
 
-        // Channel extraction:
-        // R: bump elevation, G: roughness, B: clouds
-        float cloudsStrength = smoothstep(0.2, 1.0, brcData.b);
+        // Channel B: clouds
+        float cloudsStrength = smoothstep(0.18, 0.95, brcData.b);
 
-        // Surface color mixed with clouds
-        vec3 surfaceColor = mix(dayColor.rgb, vec3(1.0), cloudsStrength * 1.85);
+        // Surface color mixed with vibrant white clouds
+        vec3 surfaceColor = mix(dayColor.rgb, vec3(1.0), cloudsStrength * 1.9);
 
-        // Sun orientation (Dot product between normal and sun direction)
+        // Sun orientation
         float sunOrientation = dot(vWorldNormal, sunDirection);
 
         // Day / Night transition
-        float dayStrength = smoothstep(-0.25, 0.5, sunOrientation);
+        float dayStrength = smoothstep(-0.25, 0.45, sunOrientation);
 
-        // Night city lights (boosted on dark side)
-        vec3 nightLights = nightColor.rgb * 1.5;
+        // City lights on the night side
+        vec3 nightLights = nightColor.rgb * 1.8;
 
         // View direction & Fresnel calculation
         vec3 viewDir = normalize(cameraWorldPos - vWorldPosition);
         float fresnel = 1.0 - max(0.0, dot(viewDir, vWorldNormal));
 
-        // Atmospheric color gradient (Twilight amber sunset -> Cyan blue daytime)
-        vec3 atmosphereColor = mix(atmosphereTwilightColor, atmosphereDayColor, smoothstep(-0.25, 0.75, sunOrientation));
+        // Atmospheric color gradient (Twilight sunset amber -> Electric cyan daytime)
+        vec3 atmosphereColor = mix(atmosphereTwilightColor, atmosphereDayColor, smoothstep(-0.2, 0.7, sunOrientation));
 
-        // Diffuse Lighting with subtle specular sheen for oceans
+        // Diffuse Lighting + Specular sun glint on ocean
         float diffuse = max(0.0, sunOrientation);
         float roughness = max(brcData.g, step(0.01, cloudsStrength));
-        roughness = remap(roughness, 0.0, 1.0, 0.25, 0.65);
+        roughness = remap(roughness, 0.0, 1.0, 0.2, 0.6);
 
-        // Specular glint on ocean surface
         vec3 halfVector = normalize(sunDirection + viewDir);
         float NdotH = max(0.0, dot(vWorldNormal, halfVector));
-        float specular = pow(NdotH, 32.0) * (1.0 - brcData.g) * (1.0 - cloudsStrength) * 0.85;
+        float specular = pow(NdotH, 36.0) * (1.0 - brcData.g) * (1.0 - cloudsStrength) * 0.95;
 
-        // Base lit day surface
-        vec3 litDay = surfaceColor * (diffuse + 0.08) + vec3(specular);
+        // Lit day surface
+        vec3 litDay = surfaceColor * (diffuse + 0.06) + vec3(specular);
 
         // Mix Day and Night
         vec3 colorOutput = mix(nightLights, litDay, dayStrength);
 
-        // Atmospheric rim blend on planet surface (TSL formula)
-        float atmosphereDayStrength = smoothstep(-0.5, 1.0, sunOrientation);
-        float atmosphereMix = clamp(atmosphereDayStrength * pow(fresnel, 2.5), 0.0, 1.0);
-        colorOutput = mix(colorOutput, atmosphereColor, atmosphereMix * 0.95);
+        // Intense atmospheric limb rim on planet surface (matching Figma's luminous blue rim)
+        float atmosphereDayStrength = smoothstep(-0.4, 1.0, sunOrientation);
+        float atmosphereMix = clamp(atmosphereDayStrength * pow(fresnel, 2.2), 0.0, 1.0);
+        colorOutput = mix(colorOutput, atmosphereColor, atmosphereMix * 0.96);
 
         gl_FragColor = vec4(colorOutput, 1.0);
       }
@@ -213,8 +219,8 @@ export default function EarthGlobe3D({
         nightTexture: { value: nightTexture },
         bumpRoughnessCloudsTexture: { value: bumpRoughnessCloudsTexture },
         sunDirection: { value: sunDirection },
-        atmosphereDayColor: { value: new THREE.Color('#4db2ff') }, // Edolus / TSL cyan-blue
-        atmosphereTwilightColor: { value: new THREE.Color('#bc490b') }, // Sunset twilight amber
+        atmosphereDayColor: { value: new THREE.Color('#38bdf8') }, // Radiant electric cyan
+        atmosphereTwilightColor: { value: new THREE.Color('#ea580c') }, // Warm twilight amber
         cameraWorldPos: { value: camera.position },
       },
     });
@@ -256,14 +262,15 @@ export default function EarthGlobe3D({
         vec3 viewDir = normalize(cameraWorldPos - vWorldPosition);
         float fresnel = 1.0 - abs(dot(viewDir, vWorldNormal));
 
-        // Exact TSL formula: remap(0.73, 1.0, 1.0, 0.0).pow(3) * smoothstep(-0.5, 1.0, sunOrientation)
-        float alpha = pow(clamp(remap(fresnel, 0.73, 1.0, 1.0, 0.0), 0.0, 1.0), 3.0);
+        // Exact TSL formula: remap(0.72, 1.0, 1.0, 0.0).pow(2.8)
+        float alpha = pow(clamp(remap(fresnel, 0.72, 1.0, 1.0, 0.0), 0.0, 1.0), 2.8);
         float sunOrientation = dot(vWorldNormal, sunDirection);
-        alpha *= smoothstep(-0.5, 1.0, sunOrientation);
+        alpha *= smoothstep(-0.4, 1.0, sunOrientation);
 
         vec3 atmosphereColor = mix(atmosphereTwilightColor, atmosphereDayColor, smoothstep(-0.25, 0.75, sunOrientation));
 
-        gl_FragColor = vec4(atmosphereColor, alpha * 0.95);
+        // Boost atmospheric limb intensity matching Figma's vivid blue streak
+        gl_FragColor = vec4(atmosphereColor, alpha * 1.15);
       }
     `;
 
@@ -272,8 +279,8 @@ export default function EarthGlobe3D({
       fragmentShader: atmosphereFragmentShader,
       uniforms: {
         sunDirection: { value: sunDirection },
-        atmosphereDayColor: { value: new THREE.Color('#4db2ff') },
-        atmosphereTwilightColor: { value: new THREE.Color('#bc490b') },
+        atmosphereDayColor: { value: new THREE.Color('#38bdf8') },
+        atmosphereTwilightColor: { value: new THREE.Color('#ea580c') },
         cameraWorldPos: { value: camera.position },
       },
       side: THREE.BackSide,
@@ -282,11 +289,30 @@ export default function EarthGlobe3D({
       depthWrite: false,
     });
 
-    const atmosphereGeometry = new THREE.SphereGeometry(earthRadius * 1.04, 64, 64);
+    const atmosphereGeometry = new THREE.SphereGeometry(earthRadius * 1.028, 64, 64);
     const atmosphereMesh = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
     globeGroup.add(atmosphereMesh);
 
-    // ─── 8. Interactive Mouse Tilt & Smooth Inertia ───
+    // ─── 8. Outer Soft Cyan Rayleigh Halo (Subtle feathering into deep space) ───
+    const outerHaloMaterial = new THREE.ShaderMaterial({
+      vertexShader: atmosphereVertexShader,
+      fragmentShader: atmosphereFragmentShader,
+      uniforms: {
+        sunDirection: { value: sunDirection },
+        atmosphereDayColor: { value: new THREE.Color('#0284c7') },
+        atmosphereTwilightColor: { value: new THREE.Color('#9a3412') },
+        cameraWorldPos: { value: camera.position },
+      },
+      side: THREE.BackSide,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const outerHaloGeometry = new THREE.SphereGeometry(earthRadius * 1.055, 64, 64);
+    const outerHaloMesh = new THREE.Mesh(outerHaloGeometry, outerHaloMaterial);
+    globeGroup.add(outerHaloMesh);
+
+    // ─── 9. Interactive Mouse Parallax with Smooth Inertia ───
     let mouseX = 0;
     let mouseY = 0;
     let targetX = 0;
@@ -297,13 +323,13 @@ export default function EarthGlobe3D({
       const rect = container.getBoundingClientRect();
       const xPct = (e.clientX - rect.left) / rect.width - 0.5;
       const yPct = (e.clientY - rect.top) / rect.height - 0.5;
-      targetX = xPct * 0.09;
-      targetY = yPct * 0.07;
+      targetX = xPct * 0.08;
+      targetY = yPct * 0.06;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
 
-    // ─── 9. Animation Loop with Performance Auto-Pause ───
+    // ─── 10. Animation Loop with Performance Auto-Pause ───
     let isVisible = true;
     let animationFrameId: number;
 
@@ -325,29 +351,30 @@ export default function EarthGlobe3D({
 
       const delta = clock.getDelta();
 
-      // Slow orbital Earth rotation (TSL rate)
+      // Continuous axial rotation (slow majestic cinematic rate)
       if (autoRotate) {
-        earthMesh.rotation.y += delta * 0.024;
+        earthMesh.rotation.y += delta * 0.018;
       }
 
       // Smooth inertia mouse response
       mouseX += (targetX - mouseX) * 0.05;
       mouseY += (targetY - mouseY) * 0.05;
 
-      camera.position.x = mouseX * 20;
-      camera.position.y = 9 + mouseY * 12;
-      camera.lookAt(0, -3, 0);
+      camera.position.x = mouseX * 8;
+      camera.position.y = mouseY * 6;
+      camera.lookAt(0, 0, 0);
 
-      // Keep camera uniform updated for Fresnel calculations
+      // Keep camera uniform updated
       earthMaterial.uniforms.cameraWorldPos.value.copy(camera.position);
       atmosphereMaterial.uniforms.cameraWorldPos.value.copy(camera.position);
+      outerHaloMaterial.uniforms.cameraWorldPos.value.copy(camera.position);
 
       renderer.render(scene, camera);
     };
 
     animate();
 
-    // ─── 10. Responsive Window Resize ───
+    // ─── 11. Responsive Window Resize ───
     const handleResize = () => {
       if (!container) return;
       const newWidth = container.clientWidth || window.innerWidth;
@@ -360,12 +387,12 @@ export default function EarthGlobe3D({
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
       const nowMobile = newWidth < 768;
-      globeGroup.position.set(nowMobile ? 3 : 11, nowMobile ? -23.5 : -28, -4);
+      globeGroup.position.set(nowMobile ? 18 : 28, nowMobile ? -48 : -60, -4);
     };
 
     window.addEventListener('resize', handleResize);
 
-    // ─── 11. Cleanup on Unmount ───
+    // ─── 12. Cleanup on Unmount ───
     return () => {
       cancelAnimationFrame(animationFrameId);
       observer.disconnect();
@@ -380,6 +407,8 @@ export default function EarthGlobe3D({
       earthMaterial.dispose();
       atmosphereGeometry.dispose();
       atmosphereMaterial.dispose();
+      outerHaloGeometry.dispose();
+      outerHaloMaterial.dispose();
       starGeometry.dispose();
       starMaterial.dispose();
       dayTexture.dispose();

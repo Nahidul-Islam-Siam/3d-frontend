@@ -30,7 +30,7 @@ export default function MeetUsBanner({
   return (
     <section
       id="meet-us-banner"
-      className={`relative w-full min-h-[calc(100vh-74px)] lg:h-[calc(100vh-74px)] lg:max-h-[920px] bg-black overflow-hidden flex flex-col justify-between select-none ${className}`}
+      className={`relative w-full min-h-screen lg:h-screen lg:max-h-[960px] bg-black overflow-hidden flex flex-col justify-between select-none ${className}`}
     >
       {/* ─── Static Fallback Image (Underneath) ─── */}
       <img
@@ -50,7 +50,7 @@ export default function MeetUsBanner({
       />
 
       {/* ─── Main Content Container (Max width 1416px matching Figma 253px margins) ─── */}
-      <div className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 h-full flex-1 flex flex-col justify-between pt-20 sm:pt-28 md:pt-36 lg:pt-[240px] xl:pt-[260px] pb-12 sm:pb-14 lg:pb-[91px]">
+      <div className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 h-full flex-1 flex flex-col justify-between pt-28 sm:pt-36 md:pt-44 lg:pt-[220px] xl:pt-[240px] pb-12 sm:pb-14 lg:pb-[91px]">
         {/* Top/Middle Left Narrative Block */}
         <div className="max-w-xl text-left pointer-events-auto">
           {/* Main Heading: MEET US */}
