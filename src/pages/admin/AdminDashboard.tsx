@@ -142,7 +142,7 @@ export default function AdminDashboard() {
     } catch {}
   }, [videos]);
 
-  useEffect(() => {
+  useEffect(() => {   
     try {
       localStorage.setItem('lab_admin_events', JSON.stringify(events));
     } catch {}
