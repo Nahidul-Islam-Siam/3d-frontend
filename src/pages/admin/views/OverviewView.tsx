@@ -159,12 +159,12 @@ export default function OverviewView({
                 borderRadius: 9999,
                 fontSize: 11.5,
                 fontWeight: 600,
-                backgroundColor: '#EFF6FF',
-                color: '#2563EB',
-                border: '1px solid #BFDBFE',
+                backgroundColor: '#FEF3C7',
+                color: '#D97706',
+                border: '1px solid #FDE68A',
               }}
             >
-              Scheduled
+              Pending
             </span>
           );
         }

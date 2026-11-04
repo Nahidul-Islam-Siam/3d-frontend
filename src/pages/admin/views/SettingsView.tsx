@@ -52,11 +52,11 @@ export default function SettingsView({
 
   // ─── 1. Profile / Personal Information State ───
   const [profile, setProfile] = useState({
-    name: 'Admin',
-    email: 'admin@gmail.com',
-    country: 'GB United Kingdom',
-    countryCode: 'BD +880',
-    phone: '1772593924',
+    name: 'Sarah Mitchell',
+    email: 'sarah.m@liveachievebelieve.org',
+    country: 'US United States',
+    countryCode: 'US +1',
+    phone: '(555) 382-9012',
     avatar: defaultAvatar,
   });
 

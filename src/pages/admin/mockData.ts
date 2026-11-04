@@ -36,6 +36,7 @@ export interface EventItem {
   rsvps_count: number;
   status: 'Upcoming' | 'Happening now' | 'Past' | 'Cancelled';
   description: string;
+  image_url?: string;
 }
 
 export interface VolunteerApplication {
@@ -385,6 +386,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     rsvps_count: 138,
     status: 'Upcoming',
     description: 'An evening of courage, music, and honest conversations breaking the silence around mental health and youth suicide.',
+    image_url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'evt-2',
@@ -397,6 +399,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     rsvps_count: 84,
     status: 'Upcoming',
     description: 'Day-long intensive workshop with civic leaders, scholarship coaches, and entrepreneurial mentors for teens.',
+    image_url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'evt-3',
@@ -409,6 +412,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     rsvps_count: 285,
     status: 'Upcoming',
     description: 'Our annual open-door banquet where 1,200+ plates of warm, homemade turkey and fixings are served family style.',
+    image_url: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'evt-4',
@@ -421,6 +425,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     rsvps_count: 80,
     status: 'Past',
     description: 'Connecting returning service members with counseling, housing vouchers, and brotherhood over coffee and pancakes.',
+    image_url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&q=80',
   },
 ];
 

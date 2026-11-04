@@ -11,6 +11,7 @@ import {
   ConfigProvider,
   Breadcrumb,
   Drawer,
+  Popover,
   theme,
 } from 'antd';
 import {
@@ -80,6 +81,7 @@ export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
 
   // Detect screen size for responsive drawer
   useEffect(() => {
@@ -91,11 +93,66 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Central Application State
-  const [donations, setDonations] = useState<Donation[]>(INITIAL_DONATIONS);
-  const [videos, setVideos] = useState<VideoSlot[]>(INITIAL_VIDEOS);
-  const [events, setEvents] = useState<EventItem[]>(INITIAL_EVENTS);
-  const [volunteers, setVolunteers] = useState<VolunteerApplication[]>(INITIAL_VOLUNTEERS);
+  // Central Application State with LocalStorage Persistence
+  const [donations, setDonations] = useState<Donation[]>(() => {
+    try {
+      const saved = localStorage.getItem('lab_admin_donations');
+      return saved ? JSON.parse(saved) : INITIAL_DONATIONS;
+    } catch {
+      return INITIAL_DONATIONS;
+    }
+  });
+
+  const [videos, setVideos] = useState<VideoSlot[]>(() => {
+    try {
+      const saved = localStorage.getItem('lab_admin_videos');
+      return saved ? JSON.parse(saved) : INITIAL_VIDEOS;
+    } catch {
+      return INITIAL_VIDEOS;
+    }
+  });
+
+  const [events, setEvents] = useState<EventItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('lab_admin_events');
+      return saved ? JSON.parse(saved) : INITIAL_EVENTS;
+    } catch {
+      return INITIAL_EVENTS;
+    }
+  });
+
+  const [volunteers, setVolunteers] = useState<VolunteerApplication[]>(() => {
+    try {
+      const saved = localStorage.getItem('lab_admin_volunteers');
+      return saved ? JSON.parse(saved) : INITIAL_VOLUNTEERS;
+    } catch {
+      return INITIAL_VOLUNTEERS;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lab_admin_donations', JSON.stringify(donations));
+    } catch {}
+  }, [donations]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lab_admin_videos', JSON.stringify(videos));
+    } catch {}
+  }, [videos]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lab_admin_events', JSON.stringify(events));
+    } catch {}
+  }, [events]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lab_admin_volunteers', JSON.stringify(volunteers));
+    } catch {}
+  }, [volunteers]);
 
   // State Updaters
   const handleAddDonation = (newDonation: Donation) => {
@@ -327,6 +384,156 @@ export default function AdminDashboard() {
     </div>
   );
 
+  // Notification Popover Content
+  const notificationContent = (
+    <div style={{ width: 330 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 16px',
+          borderBottom: '1px solid #F1F5F9',
+        }}
+      >
+        <span style={{ fontWeight: 600, fontSize: 13.5, color: '#1E293B' }}>
+          Notifications
+        </span>
+        <span
+          style={{ fontSize: 11.5, color: '#F97316', cursor: 'pointer', fontWeight: 600 }}
+          onClick={() => {}}
+        >
+          Mark all read
+        </span>
+      </div>
+      <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+        <div
+          style={{
+            padding: '12px 16px',
+            borderBottom: '1px solid #F8FAFC',
+            cursor: 'pointer',
+            display: 'flex',
+            gap: 12,
+          }}
+          onClick={() => {
+            setNotificationOpen(false);
+            handleTabChange('volunteers');
+          }}
+        >
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: '#F97316',
+              marginTop: 6,
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1E293B' }}>
+              4 Pending Volunteer Applications
+            </div>
+            <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 2 }}>
+              Amara Okafor & 3 others awaiting approval.
+            </div>
+            <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 4 }}>
+              1 hour ago
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            padding: '12px 16px',
+            borderBottom: '1px solid #F8FAFC',
+            cursor: 'pointer',
+            display: 'flex',
+            gap: 12,
+          }}
+          onClick={() => {
+            setNotificationOpen(false);
+            handleTabChange('donations');
+          }}
+        >
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: '#10B981',
+              marginTop: 6,
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1E293B' }}>
+              Major Gift: $5,000 Received
+            </div>
+            <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 2 }}>
+              Marcus Sterling contributed to Suicide Awareness.
+            </div>
+            <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 4 }}>
+              2 hours ago
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            padding: '12px 16px',
+            borderBottom: '1px solid #F8FAFC',
+            cursor: 'pointer',
+            display: 'flex',
+            gap: 12,
+          }}
+          onClick={() => {
+            setNotificationOpen(false);
+            handleTabChange('events');
+          }}
+        >
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: '#3B82F6',
+              marginTop: 6,
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1E293B' }}>
+              Suicide Awareness Dinner: 92% Full
+            </div>
+            <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 2 }}>
+              138 out of 150 RSVPs confirmed.
+            </div>
+            <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 4 }}>
+              Yesterday
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          padding: '8px 16px',
+          borderTop: '1px solid #F1F5F9',
+          textAlign: 'center',
+          backgroundColor: '#FAFAFA',
+        }}
+      >
+        <span
+          style={{ fontSize: 11.5, color: '#1677FF', cursor: 'pointer', fontWeight: 500 }}
+          onClick={() => {
+            setNotificationOpen(false);
+            handleTabChange('overview');
+          }}
+        >
+          View Overview Summary →
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <ConfigProvider
       theme={{
@@ -480,14 +687,23 @@ export default function AdminDashboard() {
                 </Button>
               )}
 
-              <Badge count={pendingVolunteersCount} offset={[-2, 4]}>
-                <Button
-                  type="text"
-                  icon={<BellOutlined style={{ fontSize: 18, color: '#475569' }} />}
-                  style={{ width: 40, height: 40, borderRadius: 8 }}
-                  onClick={() => handleTabChange('volunteers')}
-                />
-              </Badge>
+              <Popover
+                content={notificationContent}
+                trigger="click"
+                open={notificationOpen}
+                onOpenChange={setNotificationOpen}
+                placement="bottomRight"
+                arrow={{ pointAtCenter: true }}
+                overlayInnerStyle={{ padding: 0, borderRadius: 12, overflow: 'hidden' }}
+              >
+                <Badge count={pendingVolunteersCount} offset={[-2, 4]}>
+                  <Button
+                    type="text"
+                    icon={<BellOutlined style={{ fontSize: 18, color: '#475569' }} />}
+                    style={{ width: 40, height: 40, borderRadius: 8 }}
+                  />
+                </Badge>
+              </Popover>
 
               <Dropdown menu={userMenuItems} placement="bottomRight" arrow>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '4px 8px', borderRadius: 8 }}>
