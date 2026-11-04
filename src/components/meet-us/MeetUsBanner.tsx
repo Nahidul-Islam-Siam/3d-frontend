@@ -52,7 +52,7 @@ export default function MeetUsBanner({
       {/* ─── Main Content Container (Max width 1416px matching Figma 253px margins) ─── */}
       <div className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 h-full flex-1 flex flex-col justify-between pt-28 sm:pt-36 md:pt-44 lg:pt-[220px] xl:pt-[240px] pb-12 sm:pb-14 lg:pb-[91px]">
         {/* Top/Middle Left Narrative Block */}
-        <div className="max-w-xl text-left pointer-events-auto">
+        <div id="meet-us-hero-text" className="max-w-xl text-left pointer-events-auto">
           {/* Main Heading: MEET US */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
@@ -76,8 +76,40 @@ export default function MeetUsBanner({
           </motion.p>
         </div>
 
+        {/* Center Teaser Prompt (Matching image copy.png & image copy 2.png) */}
+        <div
+          id="meet-us-teaser"
+          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 select-none z-20"
+        >
+          <div className="flex items-center gap-3 text-white/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
+            <span className="w-6 h-6 rounded-full border border-white/70 flex items-center justify-center">
+              <svg
+                className="w-3 h-3 text-white"
+                viewBox="0 0 10 10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              >
+                <line x1="5" y1="2" x2="5" y2="8" strokeLinecap="round" />
+                <polyline
+                  points="2.5,5.5 5,8 7.5,5.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="text-xs sm:text-sm tracking-[0.22em] uppercase font-medium text-white"
+            >
+              SCROLL TO ENTER STORY
+            </span>
+          </div>
+        </div>
+
         {/* Bottom Right CTA Action Trigger: STEP INSIDE */}
         <motion.div
+          id="meet-us-step-inside"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
