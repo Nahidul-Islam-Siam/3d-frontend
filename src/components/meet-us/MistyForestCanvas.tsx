@@ -58,7 +58,6 @@ export default function MistyForestCanvas({
       uniform vec2 uMouse;
       uniform float uScrollProgress;
       uniform vec2 uResolution;
-      uniform vec2 uTextureAspect;
 
       varying vec2 vUv;
 
@@ -104,46 +103,57 @@ export default function MistyForestCanvas({
       }
 
       void main() {
-        // Calculate aspect-ratio cover mapping
-        vec2 screenRatio = uResolution;
-        vec2 sUv = vUv;
+        // Precise aspect-ratio cover mapping (background-size: cover in GLSL)
+        float screenAspect = uResolution.x / uResolution.y;
+        float textureAspect = 1920.0 / 920.0;
+        vec2 coverUv = vUv;
+        if (screenAspect > textureAspect) {
+          float scale = screenAspect / textureAspect;
+          coverUv.y = (coverUv.y - 0.5) * scale + 0.5;
+        } else {
+          float scale = textureAspect / screenAspect;
+          coverUv.x = (coverUv.x - 0.5) * scale + 0.5;
+        }
         
         // Dynamic camera fly-through zoom driven by GSAP scroll
         float zoom = 1.0 + uScrollProgress * 0.16;
-        vec2 centeredUv = (sUv - 0.5) / zoom + 0.5;
+        vec2 centeredUv = (coverUv - 0.5) / zoom + 0.5;
 
         // Subtle mouse inertia parallax on background trees
         vec2 forestUv = centeredUv + uMouse * 0.018;
-        forestUv = clamp(forestUv, 0.0, 1.0);
+        forestUv = clamp(forestUv, 0.001, 0.999);
 
-        vec4 forestColor = texture2D(uTexture, forestUv);
+        vec4 rawForestColor = texture2D(uTexture, forestUv);
+
+        // Enhance sunlight & vibrance on aerial forest canopy (matching Figma)
+        vec3 forestColor = pow(rawForestColor.rgb, vec3(0.90)) * 1.25;
 
         // Volumetric mist layer 1 (drifts slowly eastward)
-        vec2 fogUv1 = sUv * vec2(2.4, 1.3) + vec2(uTime * 0.022, uTime * 0.005) + uMouse * 0.045;
+        vec2 fogUv1 = vUv * vec2(2.4, 1.3) + vec2(uTime * 0.022, uTime * 0.005) + uMouse * 0.045;
         float mist1 = fbm(fogUv1);
 
         // Volumetric mist layer 2 (drifts diagonally across ridges)
-        vec2 fogUv2 = sUv * vec2(3.6, 1.9) - vec2(uTime * 0.034, -uTime * 0.012) + uMouse * 0.065;
+        vec2 fogUv2 = vUv * vec2(3.6, 1.9) - vec2(uTime * 0.034, -uTime * 0.012) + uMouse * 0.065;
         float mist2 = fbm(fogUv2);
 
         // Combined organic cloud billows
         float combinedMist = smoothstep(-0.25, 0.65, (mist1 * 0.58 + mist2 * 0.42));
 
         // Mask mist so valley depths and ridge tops have natural density
-        float heightMask = smoothstep(0.02, 0.85, sUv.y);
+        float heightMask = smoothstep(0.02, 0.85, vUv.y);
         
         // As camera dives forward, mist parts and disperses
-        float mistDispersion = 1.0 - smoothstep(0.25, 0.90, uScrollProgress);
-        float finalMistStrength = combinedMist * heightMask * mistDispersion * 0.38;
+        float mistDispersion = 1.0 - smoothstep(0.20, 0.92, uScrollProgress);
+        float finalMistStrength = combinedMist * heightMask * mistDispersion * 0.42;
 
-        // Cold alpine valley mist tint
-        vec3 mistColor = vec3(0.85, 0.89, 0.92);
-        vec3 finalColor = mix(forestColor.rgb, mistColor, finalMistStrength);
+        // Soft white-blue alpine mountain mist
+        vec3 mistColor = vec3(0.92, 0.95, 0.98);
+        vec3 finalColor = mix(forestColor, mistColor, finalMistStrength);
 
         // Atmospheric cinematic vignette
         vec2 vigUv = (vUv - 0.5) * vec2(1.0, 1.25);
-        float vignette = 1.0 - smoothstep(0.42, 1.25, length(vigUv));
-        finalColor *= mix(0.72, 1.0, vignette);
+        float vignette = 1.0 - smoothstep(0.48, 1.35, length(vigUv));
+        finalColor *= mix(0.78, 1.0, vignette);
 
         gl_FragColor = vec4(finalColor, 1.0);
       }

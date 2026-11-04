@@ -1,5 +1,6 @@
 import Seo from '@/components/Seo';
 import MeetUsBanner from '@/components/meet-us/MeetUsBanner';
+import AtmosphericDescentTransition from '@/components/meet-us/AtmosphericDescentTransition';
 import PeopleBehindMissionSection from '@/components/meet-us/PeopleBehindMissionSection';
 import PeopleLeadingWaySection from '@/components/meet-us/PeopleLeadingWaySection';
 import LeadershipSpotlightSection from '@/components/meet-us/LeadershipSpotlightSection';
@@ -15,10 +16,13 @@ export default function MeetUsPage() {
       />
 
       <div className="w-full bg-[#FAF4E6]">
-        {/* ─── Section 1: Meet Us Cinematic Banner ─── */}
+        {/* ─── Section 1: Meet Us Cinematic Banner (Space & 3D Earth) ─── */}
         <MeetUsBanner />
 
-        {/* ─── Section 2: The People Behind the Mission ─── */}
+        {/* ─── Transition: Atmospheric Descent (Edolus Cloud Plunge Bridge) ─── */}
+        <AtmosphericDescentTransition />
+
+        {/* ─── Section 2: The People Behind the Mission (Mountain Forest & Mist) ─── */}
         <PeopleBehindMissionSection />
 
         {/* ─── Section 3: The People Leading the Way (Impact Stat Cards) ─── */}

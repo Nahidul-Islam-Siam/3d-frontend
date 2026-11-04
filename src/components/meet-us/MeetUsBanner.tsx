@@ -18,6 +18,7 @@ export default function MeetUsBanner({
     }
 
     const nextSection =
+      document.getElementById('atmospheric-descent') ||
       document.getElementById('people-behind-the-mission') ||
       document.getElementById('meet-us-content');
     if (nextSection) {
