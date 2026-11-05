@@ -27,7 +27,7 @@ export default function LeadershipSpotlightSection({
   const subtitleRef = useRef<HTMLParagraphElement | null>(null);
   const scrollBtnRef = useRef<HTMLDivElement | null>(null);
 
-  // ─── 1. GSAP SCROLLTRIGGER PINNED SCRUB (Edolus / SomeoneNotices 1:1 Motion) ───
+  // ─── 1. GSAP SCROLLTRIGGER PINNED SCRUB (Scaled Up Card & Grand Scale Motion) ───
   useEffect(() => {
     const container = containerRef.current;
     const stage = pinnedStageRef.current;
@@ -40,12 +40,16 @@ export default function LeadershipSpotlightSection({
 
     if (!container || !stage || !card) return;
 
+    const isMobile = window.innerWidth < 768;
+    const targetScale = isMobile ? 1.05 : 1.18;
+    const settleScale = isMobile ? 1.0 : 1.14;
+
     const ctx = gsap.context(() => {
       // Resting states before scroll enters
       gsap.set(card, {
-        scale: 0.85,
-        rotateZ: -4.5,
-        autoAlpha: 0.35,
+        scale: isMobile ? 0.92 : 0.98,
+        rotateZ: -4,
+        autoAlpha: 0.4,
         transformPerspective: 1200,
       });
 
@@ -53,7 +57,7 @@ export default function LeadershipSpotlightSection({
         gsap.set(bgImg, { scale: 1.02, y: 0 });
       }
       if (bgGlow) {
-        gsap.set(bgGlow, { autoAlpha: 0.3, scale: 0.95 });
+        gsap.set(bgGlow, { autoAlpha: 0.35, scale: 0.95 });
       }
       if (title) {
         gsap.set(title, { x: -45, autoAlpha: 0 });
@@ -77,7 +81,7 @@ export default function LeadershipSpotlightSection({
         },
       });
 
-      // ── Stage 1 (0 to 0.45): Card scales forward, Title reveals, Glow blooms ──
+      // ── Stage 1 (0 to 0.45): Card scales up prominently forward, Title reveals, Glow blooms ──
       if (title) {
         tl.to(title, { x: 0, autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, 0.05);
       }
@@ -85,7 +89,7 @@ export default function LeadershipSpotlightSection({
         tl.to(subtitle, { x: 0, autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, 0.12);
       }
       if (bgGlow) {
-        tl.to(bgGlow, { autoAlpha: 0.85, scale: 1.05, duration: 0.65, ease: 'power1.inOut' }, 0.05);
+        tl.to(bgGlow, { autoAlpha: 0.9, scale: 1.08, duration: 0.65, ease: 'power1.inOut' }, 0.05);
       }
       if (bgImg) {
         tl.to(bgImg, { scale: 1.06, y: -15, duration: 0.8, ease: 'power1.out' }, 0.05);
@@ -94,8 +98,8 @@ export default function LeadershipSpotlightSection({
       tl.to(
         card,
         {
-          scale: 1.02,
-          rotateZ: -2,
+          scale: targetScale,
+          rotateZ: -1.5,
           autoAlpha: 1,
           duration: 0.45,
           ease: 'power2.out',
@@ -107,8 +111,8 @@ export default function LeadershipSpotlightSection({
       tl.to(
         card,
         {
-          scale: 1.0,
-          rotateZ: -2.5,
+          scale: settleScale,
+          rotateZ: -2,
           duration: 0.3,
           ease: 'power1.inOut',
         },
@@ -170,7 +174,7 @@ export default function LeadershipSpotlightSection({
       isHovering = true;
       if (glare) gsap.to(glare, { opacity: 1, duration: 0.35 });
       gsap.to(card, {
-        boxShadow: '0 35px 85px rgba(249, 115, 22, 0.32), 0 25px 60px rgba(0,0,0,0.95)',
+        boxShadow: '0 38px 95px rgba(249, 115, 22, 0.32), 0 30px 70px rgba(0,0,0,0.95)',
         duration: 0.35,
         ease: 'power2.out',
       });
@@ -182,7 +186,7 @@ export default function LeadershipSpotlightSection({
       gsap.to(card, {
         rotateX: 0,
         rotateY: 0,
-        boxShadow: '0 25px 70px rgba(0,0,0,0.9)',
+        boxShadow: '0 30px 90px rgba(0,0,0,0.95)',
         duration: 0.9,
         ease: 'elastic.out(1, 0.45)',
       });
@@ -206,7 +210,10 @@ export default function LeadershipSpotlightSection({
       return;
     }
 
-    const next = document.getElementById('moments-why-we-serve') || document.getElementById('meet-us-next') || document.getElementById('meet-us-team');
+    const next =
+      document.getElementById('moments-why-we-serve') ||
+      document.getElementById('meet-us-next') ||
+      document.getElementById('meet-us-team');
     if (next) {
       next.scrollIntoView({ behavior: 'smooth' });
     } else {
@@ -223,7 +230,7 @@ export default function LeadershipSpotlightSection({
       {/* ─── Pinned Stage Viewport (100vh - navbar) ─── */}
       <div
         ref={pinnedStageRef}
-        className="relative w-full h-[calc(100vh-74px)] bg-[#020409] text-white overflow-hidden flex flex-col justify-between py-8 sm:py-12 lg:py-16 px-6 sm:px-12 lg:px-16 xl:px-20 select-none"
+        className="relative w-full h-[calc(100vh-74px)] min-h-[720px] lg:min-h-[820px] bg-[#020409] text-white overflow-hidden flex flex-col justify-between py-6 sm:py-10 lg:py-12 px-6 sm:px-12 lg:px-16 xl:px-20 select-none"
       >
         {/* ─── Cosmic Starry Sky Photo Layer ─── */}
         <div className="absolute inset-0 w-full h-full pointer-events-none select-none z-0 overflow-hidden">
@@ -238,10 +245,10 @@ export default function LeadershipSpotlightSection({
         {/* ─── Ambient Horizon Amber Glow at Bottom ─── */}
         <div
           ref={bgGlowRef}
-          className="absolute bottom-0 inset-x-0 h-48 sm:h-72 lg:h-96 pointer-events-none z-0"
+          className="absolute bottom-0 inset-x-0 h-56 sm:h-80 lg:h-[440px] pointer-events-none z-0"
           style={{
             background:
-              'radial-gradient(ellipse 90% 65% at 50% 100%, rgba(234, 88, 12, 0.42) 0%, rgba(74, 29, 11, 0.24) 50%, transparent 80%)',
+              'radial-gradient(ellipse 95% 70% at 50% 100%, rgba(234, 88, 12, 0.48) 0%, rgba(74, 29, 11, 0.28) 50%, transparent 80%)',
           }}
           aria-hidden="true"
         />
@@ -251,37 +258,37 @@ export default function LeadershipSpotlightSection({
 
         {/* ─── Main Content Row (Perspective 3D Stage) ─── */}
         <div
-          className="max-w-[1416px] w-full mx-auto relative z-10 my-auto py-4 sm:py-6 lg:py-8"
+          className="max-w-[1540px] w-full mx-auto relative z-10 my-auto py-4 sm:py-6 lg:py-8"
           style={{ perspective: 1200 }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
             
             {/* Left Column: Sarah Mitchell & Title */}
             <div className="lg:col-span-5 text-left lg:pl-6 xl:pl-10">
               <h3
                 ref={titleRef}
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-bold leading-tight tracking-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.8)]"
+                className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-[58px] xl:text-[68px] font-bold leading-[1.08] tracking-tight drop-shadow-[0_2px_18px_rgba(0,0,0,0.9)]"
               >
                 Sarah Mitchell
               </h3>
 
               <p
                 ref={subtitleRef}
-                className="mt-2.5 sm:mt-3 text-[#A89880] text-sm sm:text-base lg:text-[17px] font-sans font-normal tracking-wide drop-shadow-[0_1px_6px_rgba(0,0,0,0.7)]"
+                className="mt-3 sm:mt-4 text-[#C4B59D] text-base sm:text-lg lg:text-[20px] xl:text-[22px] font-sans font-normal tracking-wide drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]"
               >
                 Chief Operating Officer
               </p>
             </div>
 
-            {/* Center/Right Column: 3D Inertia-Tilted Showcase Card */}
+            {/* Center/Right Column: 3D Inertia-Tilted Showcase Card (Scaled Up) */}
             <div className="lg:col-span-7 flex justify-center lg:justify-end">
               <div
                 ref={cardRef}
                 style={{
                   transformStyle: 'preserve-3d',
                 }}
-                className="relative rounded-[28px] sm:rounded-[32px] overflow-hidden max-w-[340px] sm:max-w-[440px] md:max-w-[500px] lg:max-w-[540px] shadow-[0_25px_70px_rgba(0,0,0,0.9)] border border-white/15 bg-stone-900 cursor-pointer shrink-0 transition-shadow duration-300 group"
+                className="relative rounded-[32px] sm:rounded-[38px] lg:rounded-[44px] overflow-hidden w-full max-w-[380px] sm:max-w-[480px] md:max-w-[560px] lg:max-w-[620px] xl:max-w-[680px] shadow-[0_30px_90px_rgba(0,0,0,0.95),0_15px_45px_rgba(249,115,22,0.18)] border border-white/20 bg-stone-900 cursor-pointer shrink-0 transition-shadow duration-300 group"
               >
                 {/* Portrait Photo */}
                 <img
@@ -298,7 +305,7 @@ export default function LeadershipSpotlightSection({
 
                 {/* Subtle Cinematic Edge Ring */}
                 <div
-                  className="absolute inset-0 rounded-[28px] sm:rounded-[32px] ring-1 ring-inset ring-white/15 pointer-events-none z-10"
+                  className="absolute inset-0 rounded-[32px] sm:rounded-[38px] lg:rounded-[44px] ring-1 ring-inset ring-white/20 pointer-events-none z-10"
                   aria-hidden="true"
                 />
               </div>
@@ -310,7 +317,7 @@ export default function LeadershipSpotlightSection({
         {/* ─── Bottom-Right CTA: SCROLL TO ENTER STORY ─── */}
         <div
           ref={scrollBtnRef}
-          className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-2 sm:pb-4 flex justify-end items-end"
+          className="relative z-10 w-full max-w-[1540px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-2 sm:pb-4 flex justify-end items-end"
         >
           <div
             onClick={handleScroll}
