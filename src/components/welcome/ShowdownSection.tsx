@@ -9,7 +9,8 @@ import {
   Phone,
   Globe,
   Info,
-  ChevronDown
+  ChevronDown,
+  Ticket
 } from 'lucide-react';
 import FigmaButton from '@/components/common/FigmaButton';
 import auditionBanner from '@/assets/welcome/audition_banner.png';
@@ -19,12 +20,16 @@ export interface ShowdownSectionProps {
   id?: string;
   className?: string;
   isStandaloneSection?: boolean;
+  topCreamBand?: boolean;
+  bottomCreamBand?: boolean;
 }
 
 export default function ShowdownSection({ 
   id = 'chapter-04',
   className = '',
-  isStandaloneSection = true 
+  isStandaloneSection = true,
+  topCreamBand = false,
+  bottomCreamBand = false,
 }: ShowdownSectionProps) {
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState<boolean>(false);
 
@@ -81,6 +86,7 @@ export default function ShowdownSection({
             target="_blank"
             variant="primary"
             size="sm"
+            rightIcon={<Ticket className="w-3.5 h-3.5 text-white" />}
           >
             TICKETS OPEN NOW
           </FigmaButton>
@@ -88,6 +94,7 @@ export default function ShowdownSection({
             onClick={openModal}
             variant="outline-white"
             size="sm"
+            showArrow={true}
             className="!border-white/30 !text-white !bg-white/10 hover:!bg-white/20"
           >
             Audition
@@ -117,20 +124,28 @@ export default function ShowdownSection({
 
   return (
     <>
+      {topCreamBand && (
+        <div className="w-full h-10 sm:h-14 lg:h-16 bg-[#FAF4E6]" aria-hidden="true" />
+      )}
+
       {isStandaloneSection ? (
         <section 
           id={id}
-          className={`relative w-full min-h-screen bg-gradient-to-b from-[#2B173E] via-[#1B0C2A] to-[#140820] flex items-center justify-center py-14 sm:py-20 px-4 sm:px-6 overflow-hidden select-none ${className}`}
+          className={`relative w-full min-h-screen bg-gradient-to-b from-[#251236] via-[#1A0B26] to-[#12071C] flex items-center justify-center py-14 sm:py-20 px-4 sm:px-6 overflow-hidden select-none ${className}`}
         >
-          {/* Ambient background glows */}
-          <div className="absolute -top-12 -left-12 w-[650px] h-[550px] bg-[#F97316]/22 rounded-full blur-[140px] pointer-events-none" />
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-[#F97316]/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="absolute top-1/2 right-10 w-96 h-96 bg-[#8b5cf6]/15 rounded-full blur-3xl pointer-events-none" />
+          {/* Intense ambient stage lighting glows matching Figma 1:1 */}
+          <div className="absolute top-1/2 -left-20 sm:-left-32 -translate-y-1/2 w-[420px] sm:w-[540px] h-[650px] sm:h-[800px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.42)_0%,_rgba(234,88,12,0.18)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
+          <div className="absolute top-1/2 -right-20 sm:-right-32 -translate-y-1/2 w-[400px] sm:w-[500px] h-[620px] sm:h-[750px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.32)_0%,_rgba(234,88,12,0.12)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#8b5cf6]/10 rounded-full blur-[140px] pointer-events-none" />
           
           {content}
         </section>
       ) : (
         content
+      )}
+
+      {bottomCreamBand && (
+        <div className="w-full h-10 sm:h-14 lg:h-16 bg-[#FAF4E6]" aria-hidden="true" />
       )}
 
       {/* ─── AUDITION FLYER MODAL PORTAL (Full Details & Requirements) ─── */}
