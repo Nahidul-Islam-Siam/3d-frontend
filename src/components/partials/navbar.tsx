@@ -126,7 +126,7 @@ export default function Navbar() {
 
           {/* 3. Donate Button (Figma Outline on Dark Hero, Solid Orange on Cream) */}
           <div className="flex items-center flex-shrink-0 ml-8 lg:ml-16 xl:mr-0 xl:ml-24">
-            <Link to="/contact">
+            <Link to="/donate">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

@@ -11,6 +11,7 @@ import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import Contact from "./pages/contact";
+import Donate from "./pages/donate";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
     element: <Dashboard />,
   },
 
-  // â”€â”€â”€ Client Cinematic Website Layout â”€â”€â”€
+
   {
     path: "",
     element: <RootLayout />,
@@ -81,6 +82,14 @@ export const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />,
+      },
+      {
+        path: "/donate",
+        element: <Donate />,
+      },
+      {
+        path: "/give-hope",
+        element: <Donate />,
       },
       {
         path: "*",
