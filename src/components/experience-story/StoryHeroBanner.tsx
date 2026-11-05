@@ -1,8 +1,8 @@
-import { useRef, useEffect } from 'react';
+﻿import { useRef, useEffect } from 'react';
 import { ArrowDown } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import storyVideo from '@/assets/experienc-story/experience-story.mp4';
+import storyVideo from '@/assets/experience-story/experience-story.mp4';
 import MovementStorySection from './MovementStorySection';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -24,7 +24,7 @@ export default function StoryHeroBanner({
   const section2WrapperRef = useRef<HTMLDivElement | null>(null);
   const promptBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  // ─── GSAP ScrollTrigger Pinned Cinema Stage Animation ───
+  // â”€â”€â”€ GSAP ScrollTrigger Pinned Cinema Stage Animation â”€â”€â”€
   useEffect(() => {
     const container = containerRef.current;
     const stage = pinnedStageRef.current;
@@ -124,7 +124,7 @@ export default function StoryHeroBanner({
       ref={containerRef}
       className={`relative w-full bg-[#FAF4E6] select-none ${className}`}
     >
-      {/* ─── Pinned Cinema Viewport Stage (Exact Same Position Below 74px Navbar) ─── */}
+      {/* â”€â”€â”€ Pinned Cinema Viewport Stage (Exact Same Position Below 74px Navbar) â”€â”€â”€ */}
       <div
         ref={pinnedStageRef}
         className="relative w-full h-[calc(100vh-74px)] min-h-[560px] max-h-[1080px] flex items-center justify-center px-2.5 sm:px-6 lg:px-12 xl:px-16 py-4 sm:py-6 overflow-hidden"

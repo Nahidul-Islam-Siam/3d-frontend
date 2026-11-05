@@ -1,4 +1,4 @@
-import roomBg from "@/assets/experienc-story/experience-story-2nd-section.jpg";
+﻿import roomBg from "@/assets/experience-story/experience-story-2nd-section.jpg";
 
 export interface MovementStorySectionProps {
   id?: string;

@@ -1,4 +1,4 @@
-export interface Donation {
+﻿export interface Donation {
   id: string;
   donor_name: string;
   donor_email: string;
@@ -55,7 +55,7 @@ export interface AdminMember {
   id: string;
   name: string;
   email: string;
-  role: 'Super admin' | 'Finance â€” donations only' | 'Editor â€” videos and events' | 'Moderator â€” volunteers';
+  role: 'Super admin' | 'Finance Ã¢â‚¬â€ donations only' | 'Editor Ã¢â‚¬â€ videos and events' | 'Moderator Ã¢â‚¬â€ volunteers';
   status: 'Active' | 'Invited';
   last_active: string;
 }
@@ -250,7 +250,7 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     description: 'Immersive narrative tracing 8,000 community members over 8 years of relentless care.',
     duration: '1:45',
     status: 'Live',
-    video_url: 'src/assets/experienc-story/experience-story.mp4',
+    video_url: 'src/assets/experience-story/experience-story.mp4',
     sort_order: 2,
     updated_at: '2026-10-29',
   },
@@ -274,7 +274,7 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     description: 'Behind the scenes at weekly community dinners and kitchen prep lines.',
     duration: '2:10',
     status: 'Draft',
-    video_url: 'src/assets/experienc-story/experience-story-2.mp4',
+    video_url: 'src/assets/experience-story/experience-story-2.mp4',
     sort_order: 4,
     updated_at: '2026-11-02',
   },
@@ -333,7 +333,7 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     description: 'Field report detailing emergency home setups and fellowship groups.',
     duration: '2:15',
     status: 'Draft',
-    video_url: 'src/assets/experienc-story/experience-story.mp4',
+    video_url: 'src/assets/experience-story/experience-story.mp4',
     sort_order: 9,
     updated_at: '2026-10-10',
   },
@@ -511,7 +511,7 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
     id: 'adm-2',
     name: 'Marcus Vance',
     email: 'marcus.v@liveachievebelieve.org',
-    role: 'Finance â€” donations only',
+    role: 'Finance Ã¢â‚¬â€ donations only',
     status: 'Active',
     last_active: '2 hours ago',
   },
@@ -519,7 +519,7 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
     id: 'adm-3',
     name: 'David Kim',
     email: 'david.k@liveachievebelieve.org',
-    role: 'Editor â€” videos and events',
+    role: 'Editor Ã¢â‚¬â€ videos and events',
     status: 'Active',
     last_active: 'Yesterday',
   },
@@ -527,7 +527,7 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
     id: 'adm-4',
     name: 'Elena Rostova',
     email: 'elena.r@liveachievebelieve.org',
-    role: 'Moderator â€” volunteers',
+    role: 'Moderator Ã¢â‚¬â€ volunteers',
     status: 'Active',
     last_active: '3 days ago',
   },
