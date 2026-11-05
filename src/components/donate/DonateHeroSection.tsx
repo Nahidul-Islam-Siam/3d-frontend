@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Sparkles } from 'lucide-react';
 import FigmaButton from '@/components/common/FigmaButton';
-import heroJarImg from '@/assets/donate/scrool/image.png';
+import Coin3DCanvas from '@/components/donate/Coin3DCanvas';
 
 interface DonateHeroSectionProps {
   onDonateClick: () => void;
@@ -13,35 +13,36 @@ export default function DonateHeroSection({
   onScrollClick,
 }: DonateHeroSectionProps) {
   return (
-    <section className="relative w-full min-h-[92vh] lg:min-h-screen bg-[#08070B] text-white flex flex-col justify-between overflow-hidden select-none px-6 sm:px-10 lg:px-16 xl:px-24 py-12 lg:py-16">
+    <section className="relative w-full min-h-[92vh] lg:min-h-screen bg-[#08070B] text-white flex flex-col justify-between overflow-hidden select-none px-6 sm:px-10 lg:px-16 xl:px-24 py-10 lg:py-14">
       
       {/* Ambient background glow */}
       <div
-        className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full pointer-events-none"
+        className="absolute top-1/3 right-1/4 w-[550px] h-[550px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%)',
-          filter: 'blur(80px)',
+          background: 'radial-gradient(circle, rgba(249, 115, 22, 0.22) 0%, rgba(217, 119, 6, 0.05) 50%, transparent 75%)',
+          filter: 'blur(70px)',
         }}
         aria-hidden="true"
       />
 
-      {/* Main 2-Column Hero Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center my-auto">
+      {/* Main 2-Column Hero Content: Left Copy + Right Full 3D WebGL Scene */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
         
         {/* Left Column: Heading, Narrative & CTA */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-6 space-y-6 sm:space-y-8"
+          className="lg:col-span-5 space-y-6 sm:space-y-8"
         >
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-[#F97316] text-[11px] uppercase tracking-widest font-sans font-semibold">
-            <span>Live Achieve Believe</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+            <span>Minted For Human Dignity</span>
           </div>
 
           <h1
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-5xl sm:text-6xl lg:text-7xl xl:text-[84px] font-bold text-white tracking-tight leading-[1.02]"
+            className="text-5xl sm:text-6xl lg:text-7xl xl:text-[80px] font-bold text-white tracking-tight leading-[1.04]"
           >
             GIVE HOPE
           </h1>
@@ -62,29 +63,20 @@ export default function DonateHeroSection({
           </div>
         </motion.div>
 
-        {/* Right Column: Hand Dropping Coin into CHARITY Jar */}
+        {/* Right Column: PURE 100% LIVE 3D WEBGL STAGE */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-6 flex items-center justify-center lg:justify-end"
+          className="lg:col-span-7 flex flex-col items-center justify-center relative w-full"
         >
-          <div className="relative w-full max-w-[540px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-white/5 bg-black/40">
-            <img
-              src={heroJarImg}
-              alt="Hand dropping coin of hope into charity jar"
-              className="w-full h-full object-cover object-right"
-              loading="eager"
-            />
-            {/* Subtle gradient overlay to blend into black stage */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#08070B] via-transparent to-transparent opacity-40 pointer-events-none" />
-          </div>
+          <Coin3DCanvas className="w-full" />
         </motion.div>
 
       </div>
 
       {/* Bottom Row: SCROLL Indicator Button */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto flex items-center justify-end pt-6">
+      <div className="relative z-10 w-full max-w-7xl mx-auto flex items-center justify-end pt-4">
         <button
           type="button"
           onClick={onScrollClick}
@@ -94,7 +86,7 @@ export default function DonateHeroSection({
             <ArrowDown className="w-3 h-3 text-stone-300 group-hover:text-[#F97316] group-hover:translate-y-0.5 transition-transform" />
           </div>
           <span className="text-xs uppercase tracking-widest font-serif font-bold">
-            SCROLL
+            SCROLL TO EXPLORE
           </span>
         </button>
       </div>
@@ -102,4 +94,3 @@ export default function DonateHeroSection({
     </section>
   );
 }
-
