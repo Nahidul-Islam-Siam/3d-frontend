@@ -16,7 +16,7 @@ module.exports = {
         "2xl": "1400px",
       },
     },
-    extend: {
+     extend: {
       fontFamily: {
         serif: ['"Playfair Display"', 'Georgia', 'serif'],
         playfair: ['"Playfair Display"', 'Georgia', 'serif'],
