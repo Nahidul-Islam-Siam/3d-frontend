@@ -1,11 +1,6 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import logoWithText from '@/assets/logo/logo-with-text.png';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface FooterProps {
   isHidden?: boolean;
@@ -13,98 +8,18 @@ interface FooterProps {
   isHome?: boolean;
 }
 
-export default function Footer({ isHidden = false, className = '', isHome = false }: FooterProps) {
-  const footerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    // If hidden or on home page (where ZAxisStage manages the cinematic choreography), skip internal trigger
-    if (isHidden || isHome) return;
-
-    const ctx = gsap.context(() => {
-      const footerEl = footerRef.current;
-      if (!footerEl) return;
-
-      const footerCard = footerEl.querySelector('.footer-card');
-      const footerCols = footerEl.querySelectorAll('.footer-col');
-      const footerEventBox = footerEl.querySelector('.footer-event-box');
-      const footerBottom = footerEl.querySelector('.footer-bottom');
-
-      if (footerCard) {
-        gsap.from(footerCard, {
-          autoAlpha: 0,
-          y: 40,
-          scale: 0.98,
-          duration: 0.85,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: footerEl,
-            start: 'top 88%',
-            toggleActions: 'play reverse play reverse',
-          }
-        });
-      }
-
-      if (footerCols && footerCols.length > 0) {
-        gsap.from(footerCols, {
-          autoAlpha: 0,
-          y: 30,
-          duration: 0.75,
-          stagger: 0.09,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: footerEl,
-            start: 'top 82%',
-            toggleActions: 'play reverse play reverse',
-          }
-        });
-      }
-
-      if (footerEventBox) {
-        gsap.from(footerEventBox, {
-          autoAlpha: 0,
-          scale: 0.95,
-          y: 20,
-          duration: 0.8,
-          delay: 0.15,
-          ease: 'back.out(1.3)',
-          scrollTrigger: {
-            trigger: footerEl,
-            start: 'top 82%',
-            toggleActions: 'play reverse play reverse',
-          }
-        });
-      }
-
-      if (footerBottom) {
-        gsap.from(footerBottom, {
-          autoAlpha: 0,
-          y: 15,
-          duration: 0.65,
-          ease: 'power1.out',
-          scrollTrigger: {
-            trigger: footerEl,
-            start: 'top 75%',
-            toggleActions: 'play reverse play reverse',
-          }
-        });
-      }
-    }, footerRef);
-
-    return () => ctx.revert();
-  }, [isHidden, isHome]);
-
+export default function Footer({ isHidden = false, className = '' }: FooterProps) {
   if (isHidden) return null;
 
   return (
     <footer 
-      ref={footerRef}
-      className={`w-full bg-[#FAF4E6] text-stone-800 border-t border-[#F9D3B2] rounded-t-[32px] sm:rounded-t-[40px] pt-[64px] pb-[64px] px-6 sm:px-10 md:px-16 lg:px-20 min-[1440px]:px-[250px] font-sans select-none ${className}`}
+      className={`w-full bg-[#FAF4E6] text-stone-800 border-t border-[#F9D3B2] rounded-t-[32px] sm:rounded-t-[40px] pt-[56px] pb-[56px] px-6 sm:px-10 md:px-16 lg:px-20 min-[1440px]:px-[250px] font-sans select-none ${className}`}
     >
-      <div className="footer-card w-full will-change-transform will-change-opacity">
+      <div className="footer-card w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-start">
           
           {/* Col 1: Brand Info */}
-          <div className="footer-col footer-brand lg:col-span-4 xl:col-span-4 space-y-4 will-change-transform will-change-opacity">
+          <div className="footer-col footer-brand lg:col-span-4 xl:col-span-4 space-y-4">
             <Link to="/" className="inline-block">
               <img 
                 src={logoWithText} 
@@ -119,7 +34,7 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
           </div>
 
           {/* Col 2: Pathways */}
-          <div className="footer-col footer-pathways lg:col-span-2 xl:col-span-2 space-y-3 will-change-transform will-change-opacity">
+          <div className="footer-col footer-pathways lg:col-span-2 xl:col-span-2 space-y-3">
             <h4 className="text-xs font-bold tracking-wider text-[#F97316] uppercase font-sans">
               PATHWAYS
             </h4>
@@ -148,7 +63,7 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
           </div>
 
           {/* Col 3: Engagement */}
-          <div className="footer-col footer-engagement lg:col-span-2 xl:col-span-2 space-y-3 will-change-transform will-change-opacity">
+          <div className="footer-col footer-engagement lg:col-span-2 xl:col-span-2 space-y-3">
             <h4 className="text-xs font-bold tracking-wider text-[#F97316] uppercase font-sans">
               ENGAGEMENT
             </h4>
@@ -182,8 +97,8 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
           </div>
 
           {/* Col 4: Next Event Broadcast Box (Same border color #F9D3B2 as main frame) */}
-          <div className="footer-col footer-event-col lg:col-span-4 xl:col-span-4 will-change-transform will-change-opacity">
-            <div className="footer-event-box rounded-2xl border border-[#F9D3B2] bg-[#FAEAD5] p-5 sm:p-6 space-y-2.5 will-change-transform will-change-opacity">
+          <div className="footer-col footer-event-col lg:col-span-4 xl:col-span-4">
+            <div className="footer-event-box rounded-2xl border border-[#F9D3B2] bg-[#FAEAD5] p-5 sm:p-6 space-y-2.5">
               <span className="block text-[11px] font-bold tracking-wider text-[#F97316] uppercase font-sans">
                 NEXT EVENT BROADCAST
               </span>
@@ -209,7 +124,7 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
         </div>
 
         {/* Bottom Sub-Bar with thin divider (Contained inside the padded footer) */}
-        <div className="footer-bottom w-full mt-10 sm:mt-12 pt-6 border-t border-[#F9D3B2]/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600 font-sans will-change-transform will-change-opacity">
+        <div className="footer-bottom w-full mt-10 sm:mt-12 pt-6 border-t border-[#F9D3B2]/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600 font-sans">
           <p>
             © 2025 Live Achieve Believe (LAB) Foundation. All rights reserved.
           </p>
@@ -227,4 +142,3 @@ export default function Footer({ isHidden = false, className = '', isHome = fals
     </footer>
   );
 }
-

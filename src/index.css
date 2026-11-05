@@ -73,8 +73,21 @@
     font-family: inherit;
   }
 
-  button, [type="button"], [type="submit"], [role="button"], .btn {
+  /* Landing page buttons use Playfair Display; Ant Design / Admin UI strictly use modern sans */
+  button:not(.ant-btn):not(.ant-btn *),
+  [type="button"]:not(.ant-btn):not(.ant-btn *),
+  [type="submit"]:not(.ant-btn):not(.ant-btn *),
+  [role="button"]:not(.ant-btn):not(.ant-btn *),
+  .btn {
     font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .ant-btn,
+  .ant-btn *,
+  .ant-radio-button-wrapper,
+  .ant-radio-button-wrapper *,
+  .ant-pagination * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
   }
 }
 

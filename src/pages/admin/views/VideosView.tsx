@@ -123,7 +123,24 @@ export default function VideosView({
             One slot for every film on the website. Replace a video and it goes live in place.
           </Paragraph>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setIsAddModalOpen(true)}
+          style={{
+            backgroundColor: '#F97316',
+            borderColor: '#F97316',
+            borderRadius: 8,
+            height: 40,
+            fontWeight: 600,
+            padding: '0 18px',
+            color: '#FFFFFF',
+            boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
           Add Video Slot
         </Button>
       </div>
@@ -258,6 +275,20 @@ export default function VideosView({
                 <Button
                   size="small"
                   icon={<UploadOutlined />}
+                  style={{
+                    borderRadius: 8,
+                    borderColor: '#E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    fontWeight: 600,
+                    fontSize: 12,
+                    height: 32,
+                    padding: '0 12px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                  }}
                   onClick={() => {
                     setSelectedVideo(slot);
                     replaceForm.setFieldsValue({
@@ -276,7 +307,30 @@ export default function VideosView({
                   {slot.status !== 'Empty' && (
                     <Button
                       size="small"
-                      type={slot.status === 'Live' ? 'default' : 'primary'}
+                      style={
+                        slot.status === 'Live'
+                          ? {
+                              borderRadius: 8,
+                              backgroundColor: '#FEF3C7',
+                              borderColor: '#FDE68A',
+                              color: '#D97706',
+                              fontWeight: 600,
+                              fontSize: 12,
+                              height: 32,
+                              padding: '0 12px',
+                            }
+                          : {
+                              borderRadius: 8,
+                              backgroundColor: '#F97316',
+                              borderColor: '#F97316',
+                              color: '#FFFFFF',
+                              fontWeight: 600,
+                              fontSize: 12,
+                              height: 32,
+                              padding: '0 12px',
+                              boxShadow: '0 2px 6px rgba(249,115,22,0.25)',
+                            }
+                      }
                       onClick={() => handleTogglePublish(slot)}
                     >
                       {slot.status === 'Live' ? 'Unpublish' : 'Go Live'}
@@ -290,7 +344,23 @@ export default function VideosView({
                     okText="Yes"
                     cancelText="No"
                   >
-                    <Button size="small" type="text" danger icon={<DeleteOutlined />} />
+                    <Button
+                      size="small"
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      style={{
+                        borderRadius: 8,
+                        backgroundColor: '#FEF2F2',
+                        borderColor: '#FEE2E2',
+                        color: '#EF4444',
+                        height: 32,
+                        width: 32,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    />
                   </Popconfirm>
                 </Space>
               </div>
@@ -383,9 +453,36 @@ export default function VideosView({
             <Input placeholder="src/assets/video/welcome.mp4 or CDN URL" />
           </Form.Item>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
-            <Button onClick={() => setIsReplaceModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit">Save & Publish</Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+            <Button
+              onClick={() => setIsReplaceModalOpen(false)}
+              style={{
+                borderRadius: 8,
+                height: 38,
+                borderColor: '#CBD5E1',
+                color: '#475569',
+                fontWeight: 500,
+                padding: '0 18px',
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                backgroundColor: '#F97316',
+                borderColor: '#F97316',
+                borderRadius: 8,
+                height: 38,
+                fontWeight: 600,
+                color: '#FFFFFF',
+                padding: '0 20px',
+                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+              }}
+            >
+              Save & Publish
+            </Button>
           </div>
         </Form>
       </Modal>
@@ -452,9 +549,36 @@ export default function VideosView({
             <Input placeholder="1:30" />
           </Form.Item>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
-            <Button onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit">Create Slot</Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+            <Button
+              onClick={() => setIsAddModalOpen(false)}
+              style={{
+                borderRadius: 8,
+                height: 38,
+                borderColor: '#CBD5E1',
+                color: '#475569',
+                fontWeight: 500,
+                padding: '0 18px',
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                backgroundColor: '#F97316',
+                borderColor: '#F97316',
+                borderRadius: 8,
+                height: 38,
+                fontWeight: 600,
+                color: '#FFFFFF',
+                padding: '0 20px',
+                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+              }}
+            >
+              Create Slot
+            </Button>
           </div>
         </Form>
       </Modal>

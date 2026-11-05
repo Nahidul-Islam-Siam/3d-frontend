@@ -1,11 +1,11 @@
 import Seo from '@/components/Seo';
 import MeetUsBanner from '@/components/meet-us/MeetUsBanner';
-import AtmosphericDescentTransition from '@/components/meet-us/AtmosphericDescentTransition';
 import PeopleBehindMissionSection from '@/components/meet-us/PeopleBehindMissionSection';
-import PeopleLeadingWaySection from '@/components/meet-us/PeopleLeadingWaySection';
 import LeadershipSpotlightSection from '@/components/meet-us/LeadershipSpotlightSection';
 import MomentsWhyWeServeSection from '@/components/meet-us/MomentsWhyWeServeSection';
 import MissionBiggerSection from '@/components/meet-us/MissionBiggerSection';
+import OneMovementSection from '@/components/meet-us/OneMovementSection';
+import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function MeetUsPage() {
   return (
@@ -19,26 +19,23 @@ export default function MeetUsPage() {
         {/* ─── Section 1: Meet Us Cinematic Banner (Space & 3D Earth) ─── */}
         <MeetUsBanner />
 
-        {/* ─── Transition: Atmospheric Descent (Edolus Cloud Plunge Bridge) ─── */}
-        <AtmosphericDescentTransition />
-
-        {/* ─── Section 2: The People Behind the Mission (Mountain Forest & Mist) ─── */}
+        {/* ─── Section 2: The People Behind the Mission (Interactive 3D Zoom Map) ─── */}
         <PeopleBehindMissionSection />
 
-        {/* ─── Section 3: The People Leading the Way (Impact Stat Cards) ─── */}
-        <PeopleLeadingWaySection />
-
-        {/* ─── Section 4: Leadership Spotlight — Sarah Mitchell (Interactive 3D Section) ─── */}
+        {/* ─── Section 3: The People Leading the Way & Leadership Voices (Stats & 3D Cards) ─── */}
         <LeadershipSpotlightSection />
 
-        {/* ─── Section 5: The People, Places, and Moments That Remind Us Why We Serve (Interactive Gallery) ─── */}
+        {/* ─── Section 4: The People, Places, and Moments That Remind Us Why We Serve (Interactive Gallery) ─── */}
         <MomentsWhyWeServeSection />
 
-        {/* ─── Section 6: The Mission Is Bigger Than Any One Person (Cinematic Hands Section) ─── */}
+        {/* ─── Section 5: The Mission Is Bigger Than Any One Person (Cinematic Hands Section) ─── */}
         <MissionBiggerSection />
 
-        {/* ─── Bottom Cream Transition Band (Figma Frame 150px) ─── */}
-        <div className="w-full h-24 sm:h-32 lg:h-40 bg-[#FAF4E6]" aria-hidden="true" />
+        {/* ─── Section 6: WE ARE MANY PEOPLE. ONE MOVEMENT. (Community Table Banner) ─── */}
+        <OneMovementSection />
+
+        {/* ─── Section 7: What's Coming Up Next (Showdown Suicide Awareness & Auditions) ─── */}
+        <ShowdownSection id="what-coming-up-next" topCreamBand={true} bottomCreamBand={true} />
       </div>
     </>
   );
