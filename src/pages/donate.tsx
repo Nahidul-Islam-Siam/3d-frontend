@@ -1,113 +1,51 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Heart, ShieldCheck, ArrowRight, X } from 'lucide-react';
+import { Heart, ShieldCheck, X } from 'lucide-react';
 import Seo from '@/components/Seo';
 import FigmaButton from '@/components/common/FigmaButton';
-import Coin3DCanvas from '@/components/donate/Coin3DCanvas';
+import DonateHeroSection from '@/components/donate/DonateHeroSection';
+import WhyYourGiftMattersSection from '@/components/donate/WhyYourGiftMattersSection';
+import DonateFinaleSection from '@/components/donate/DonateFinaleSection';
 
 export default function DonatePage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number>(50);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const whySectionRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScrollToWhy = () => {
+    whySectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <>
       <Seo
         title="Give Hope — Live Achieve Believe"
-        description="A single coin creates an enduring ripple. Explore the minted coin of hope in interactive 3D."
+        description="Your generosity can become part of someone else's story. Explore the 3D coin of hope and see what actually happens when we show up."
       />
 
-      {/* ─── ORYZO.AI CINEMATIC 3D COIN STAGE ─── */}
-      <section className="relative w-full min-h-screen bg-[#0E0C13] text-stone-100 flex flex-col justify-between overflow-hidden select-none px-4 sm:px-8 lg:px-14 py-8 lg:py-12">
+      <div className="w-full bg-[#08070B] text-white">
         
-        {/* Warm Amber Radial Spotlight (Behind Coin) */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(ellipse 65% 55% at 50% 50%, rgba(249, 115, 22, 0.22) 0%, rgba(217, 119, 6, 0.08) 40%, rgba(14, 12, 19, 0) 75%)',
-          }}
-          aria-hidden="true"
+        {/* ─── 1. HERO SECTION ("GIVE HOPE" + Charity Jar) ─── */}
+        <DonateHeroSection
+          onDonateClick={() => setShowModal(true)}
+          onScrollClick={handleScrollToWhy}
         />
 
-        {/* Ambient Top Subtle Dust / Vignette */}
-        <div
-          className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.03)_0%,_transparent_60%)]"
-          aria-hidden="true"
+        {/* ─── 2. STICKY 3D SCROLLYTELLING ("WHY YOUR GIFT MATTERS" + Oryzo.ai 3D Coin) ─── */}
+        <div ref={whySectionRef}>
+          <WhyYourGiftMattersSection />
+        </div>
+
+        {/* ─── 3. FINALE SECTION ("YOUR GIFT BECOMES PART OF A STORY") ─── */}
+        <DonateFinaleSection
+          onDonateClick={() => setShowModal(true)}
         />
 
-        {/* ─── 1. TOP EDITORIAL BAR (Oryzo.ai style) ─── */}
-        <div className="relative z-20 w-full max-w-7xl mx-auto flex flex-col md:flex-row md:items-start justify-between gap-6 pt-2">
-          
-          {/* Brand & Section Title */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/25 text-[#F97316] text-[11px] uppercase tracking-widest font-sans font-semibold mb-3">
-              <Sparkles className="w-3 h-3 text-[#F97316]" />
-              <span>Minted For Human Dignity</span>
-            </div>
-            <h1
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight"
-            >
-              Give Hope.
-            </h1>
-          </div>
+      </div>
 
-          {/* Right Editorial Statement (Oryzo editorial quote) */}
-          <div className="max-w-md md:text-right">
-            <p
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-stone-300 text-base sm:text-lg lg:text-xl leading-relaxed italic"
-            >
-              "Do not take our word for it. Toss the coin of hope and watch how a single act of compassion alters the trajectory of a human life."
-            </p>
-            <span className="block mt-2 text-xs font-sans uppercase tracking-widest text-[#F97316] font-semibold">
-              Live Achieve Believe • 501(c)(3)
-            </span>
-          </div>
-
-        </div>
-
-        {/* ─── 2. HERO 3D COIN CENTERPIECE ─── */}
-        <div className="relative z-20 w-full flex-1 flex flex-col items-center justify-center my-6 sm:my-10">
-          <Coin3DCanvas className="w-full" />
-        </div>
-
-        {/* ─── 3. BOTTOM TELEMETRY DOCK (Oryzo.ai style telemetry line) ─── */}
-        <div className="relative z-20 w-full max-w-7xl mx-auto border-t border-white/10 pt-5 mt-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-stone-400">
-          
-          {/* Left: Trust & Impact */}
-          <div className="flex items-center gap-2">
-            <span className="text-[#F97316] font-bold tracking-wider uppercase text-[11px]">
-              Impact Rating:
-            </span>
-            <div className="flex text-[#F97316] text-xs">★★★★★</div>
-            <span className="text-stone-400 hidden sm:inline">[ 92¢ of each dollar directly to community meals ]</span>
-          </div>
-
-          {/* Center: Instruction badge */}
-          <div className="text-stone-400 text-[11px] uppercase tracking-wider font-medium">
-            Click Coin to Toss • Drag 360° to Inspect
-          </div>
-
-          {/* Right: Quick Action Pill */}
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setShowModal(true)}
-              className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-[#F97316] text-white text-xs font-serif font-bold border border-white/15 hover:border-[#F97316] transition-all duration-300 cursor-pointer"
-            >
-              <Heart className="w-3.5 h-3.5 text-[#F97316] group-hover:text-white transition-colors" />
-              <span>Plant a Seed ($50)</span>
-              <ArrowRight className="w-3 h-3 text-[#F97316] group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-            </button>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ─── OPTIONAL MODAL POPUP FOR DONOR GIFT (Keeps main page 100% clean) ─── */}
+      {/* ─── ELEGANT GIVING MODAL DIALOG ─── */}
       <AnimatePresence>
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -116,7 +54,7 @@ export default function DonatePage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowModal(false)}
-              className="absolute inset-0 bg-black/70 backdrop-blur-md"
+              className="absolute inset-0 bg-black/75 backdrop-blur-md"
             />
 
             <motion.div
@@ -145,7 +83,7 @@ export default function DonatePage() {
                     Thank You for Giving Hope!
                   </h3>
                   <p className="text-sm text-stone-600 font-sans max-w-sm mx-auto">
-                    Your gift of ${selectedAmount} directly fuels community meals and mentorship.
+                    Your gift of ${selectedAmount} directly fuels community meals, youth mentorship, and veteran shelter.
                   </p>
                   <FigmaButton
                     onClick={() => {
@@ -178,7 +116,7 @@ export default function DonatePage() {
                         key={amt}
                         type="button"
                         onClick={() => setSelectedAmount(amt)}
-                        className={`py-2.5 rounded-xl border text-sm font-bold font-serif transition-all ${
+                        className={`py-2.5 rounded-xl border text-sm font-bold font-serif transition-all cursor-pointer ${
                           selectedAmount === amt
                             ? 'bg-[#F97316] text-white border-[#F97316] shadow-md'
                             : 'bg-stone-50 text-stone-700 border-stone-200 hover:border-[#F97316]'
