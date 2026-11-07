@@ -22,18 +22,19 @@ export interface VideoSlot {
   status: 'Live' | 'Draft' | 'Empty';
   video_url?: string;
   thumbnail?: string;
-  video_type?: 'MP4 Video' | 'YouTube' | 'Vimeo';
+  video_type?: 'MP4 Video' | 'YouTube' | 'Vimeo';   
   category?: 'Community Meals' | 'LEADS Youth Development' | 'Suicide Awareness Showdown' | 'Veterans Support' | 'General';
   featured?: boolean;
   views_count?: number;
   sort_order: number;
-  updated_at: string;
+  updated_at: string;    
   created_at?: string;
 }
-
+          
 export interface EventItem {
   id: string;
   title: string;
+  category?: 'Community Meals & Dinners' | 'Suicide Awareness Showdown' | 'Youth Mentorship & LEADS' | 'Veterans Fellowship' | 'Fundraiser Gala' | 'Other';
   event_date: string;
   start_time: string;
   end_time: string;
@@ -43,6 +44,12 @@ export interface EventItem {
   status: 'Upcoming' | 'Happening now' | 'Past' | 'Cancelled';
   description: string;
   image_url?: string;
+  ticket_type?: 'Free RSVP' | 'Paid Ticket' | 'Suggested Donation';
+  price?: number;
+  registration_url?: string;
+  featured?: boolean;
+  host_lead?: string;
+  dress_code?: string;
 }
 
 export interface VolunteerApplication {
@@ -217,11 +224,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-1',
     slot_label: 'Welcome Hero',
     page_location: '/ (Homepage)',
+    section_anchor: '#hero-cinema',
+    category: 'General',
+    video_type: 'MP4 Video',
     title: 'Theatrical Welcome & Cinematic Reveal',
     description: 'First video experienced by visitors entering through the golden shutter door.',
     duration: '0:22',
     status: 'Live',
     video_url: 'src/assets/video/welcome.mp4',
+    views_count: 14200,
+    featured: true,
     sort_order: 1,
     updated_at: '2026-11-01',
   },
@@ -229,11 +241,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-2',
     slot_label: 'Experience the Story',
     page_location: '/experience-the-story',
+    section_anchor: '#story-hero',
+    category: 'Community Meals',
+    video_type: 'MP4 Video',
     title: 'The Story Behind the Living Table',
     description: 'Immersive narrative tracing 8,000 community members over 8 years of relentless care.',
     duration: '1:45',
     status: 'Live',
     video_url: 'src/assets/experience-story/experience-story.mp4',
+    views_count: 8900,
+    featured: true,
     sort_order: 2,
     updated_at: '2026-10-29',
   },
@@ -241,11 +258,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-3',
     slot_label: 'Who We Are',
     page_location: '/who-we-are',
+    section_anchor: '#foundations',
+    category: 'LEADS Youth Development',
+    video_type: 'MP4 Video',
     title: 'Strong Foundations: Faith, Dignity, Tomorrow',
     description: 'Documentary profile showcasing the frontline mentors and pantry organizers.',
     duration: '1:30',
     status: 'Live',
     video_url: 'src/assets/join-movement/join-the-movement-2.mp4',
+    views_count: 4300,
+    featured: false,
     sort_order: 3,
     updated_at: '2026-10-25',
   },
@@ -253,11 +275,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-4',
     slot_label: 'How We Serve',
     page_location: '/how-we-serve',
+    section_anchor: '#community-feasts',
+    category: 'Community Meals',
+    video_type: 'MP4 Video',
     title: 'A Warm Seat: Community Feasts in Action',
     description: 'Behind the scenes at weekly community dinners and kitchen prep lines.',
     duration: '2:10',
     status: 'Draft',
     video_url: 'src/assets/experience-story/experience-story-2.mp4',
+    views_count: 2100,
+    featured: false,
     sort_order: 4,
     updated_at: '2026-11-02',
   },
@@ -265,11 +292,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-5',
     slot_label: 'Join the Movement',
     page_location: '/join-the-movement',
+    section_anchor: '#movement-hero',
+    category: 'General',
+    video_type: 'MP4 Video',
     title: 'Living Movement: Real Change Needs Real Hands',
     description: 'Call to action driving donations, volunteering, and recurring sponsorship.',
     duration: '1:55',
     status: 'Live',
     video_url: 'src/assets/join-movement/join-movement.mp4',
+    views_count: 11400,
+    featured: true,
     sort_order: 5,
     updated_at: '2026-10-28',
   },
@@ -277,10 +309,15 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-6',
     slot_label: 'Meet Us',
     page_location: '/meet-us',
+    section_anchor: '#founder-spotlight',
+    category: 'Suicide Awareness Showdown',
+    video_type: 'YouTube',
     title: 'Leadership Spotlight & Sarah Mitchell Story',
     description: 'Cinematic portrait of leadership and personal stories that save lives.',
     duration: '2:05',
     status: 'Empty',
+    views_count: 0,
+    featured: false,
     sort_order: 6,
     updated_at: '2026-10-20',
   },
@@ -288,11 +325,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-7',
     slot_label: 'LEADS Youth Stories',
     page_location: '/who-we-are#youth',
+    section_anchor: '#youth-mentorship',
+    category: 'LEADS Youth Development',
+    video_type: 'MP4 Video',
     title: 'Rising Scholars: From Tutoring to College Gates',
     description: 'Mini-documentary following three first-generation students in the LEADS initiative.',
     duration: '1:40',
     status: 'Live',
     video_url: 'src/assets/video/welcome.mp4',
+    views_count: 3600,
+    featured: false,
     sort_order: 7,
     updated_at: '2026-10-18',
   },
@@ -300,11 +342,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-8',
     slot_label: 'Holiday Community Feast',
     page_location: '/events/holiday-feast',
+    section_anchor: '#harvest-reel',
+    category: 'Community Meals',
+    video_type: 'MP4 Video',
     title: 'Gathering at the Table: Thanksgiving Harvest',
     description: 'Highlight reel of 1,200 warm plates served by community volunteers.',
     duration: '2:30',
     status: 'Live',
     video_url: 'src/assets/join-movement/join-the-movement-3.mp4',
+    views_count: 6700,
+    featured: false,
     sort_order: 8,
     updated_at: '2026-10-15',
   },
@@ -312,11 +359,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-9',
     slot_label: 'Veterans Bridge Feature',
     page_location: '/how-we-serve#veterans',
+    section_anchor: '#veterans-bridge',
+    category: 'Veterans Support',
+    video_type: 'MP4 Video',
     title: 'Honor in Transition: Rehousing Tampa Veterans',
     description: 'Field report detailing emergency home setups and fellowship groups.',
     duration: '2:15',
     status: 'Draft',
     video_url: 'src/assets/experience-story/experience-story.mp4',
+    views_count: 1500,
+    featured: false,
     sort_order: 9,
     updated_at: '2026-10-10',
   },
@@ -324,11 +376,16 @@ export const INITIAL_VIDEOS: VideoSlot[] = [
     id: 'vid-10',
     slot_label: 'Volunteer Family Voices',
     page_location: '/join-the-movement#volunteers',
+    section_anchor: '#volunteer-reel',
+    category: 'General',
+    video_type: 'MP4 Video',
     title: 'Why I Serve: Stories Behind the Apron',
     description: 'Interviews with long-time kitchen prep and distribution volunteers.',
     duration: '1:15',
     status: 'Live',
     video_url: 'src/assets/join-movement/join-the-movement-2.mp4',
+    views_count: 5200,
+    featured: false,
     sort_order: 10,
     updated_at: '2026-10-05',
   },
@@ -361,6 +418,7 @@ export const INITIAL_EVENTS: EventItem[] = [
   {
     id: 'evt-1',
     title: 'Suicide Awareness Community Showcase & Dinner',
+    category: 'Suicide Awareness Showdown',
     event_date: '2026-11-18',
     start_time: '18:00',
     end_time: '21:00',
@@ -368,12 +426,18 @@ export const INITIAL_EVENTS: EventItem[] = [
     capacity: 150,
     rsvps_count: 138,
     status: 'Upcoming',
-    description: 'An evening of courage, music, and honest conversations breaking the silence around mental health and youth suicide.',
+    description: '<p>An evening of courage, music, and honest conversations breaking the silence around mental health and youth suicide prevention.</p><p><strong>Event Schedule:</strong></p><ul><li>6:00 PM – Welcome Reception & Acoustic Performances</li><li>7:00 PM – Community Storytellers & Panel Discussion</li><li>8:15 PM – Family-Style Dinner & Open Table Fellowship</li></ul>',
     image_url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
+    ticket_type: 'Free RSVP',
+    featured: true,
+    host_lead: 'Dr. Raymond Chen & Sarah Mitchell',
+    registration_url: 'https://zeffy.com/ticketing/suicide-awareness-dinner-2026',
+    dress_code: 'Smart Casual / Comfortable',
   },
   {
     id: 'evt-2',
     title: 'Winter LEADS Youth Leadership Summit',
+    category: 'Youth Mentorship & LEADS',
     event_date: '2026-12-05',
     start_time: '10:00',
     end_time: '15:30',
@@ -381,12 +445,18 @@ export const INITIAL_EVENTS: EventItem[] = [
     capacity: 100,
     rsvps_count: 84,
     status: 'Upcoming',
-    description: 'Day-long intensive workshop with civic leaders, scholarship coaches, and entrepreneurial mentors for teens.',
+    description: '<p>Day-long intensive workshop with civic leaders, scholarship coaches, and entrepreneurial mentors for high school teens.</p><p>Includes complimentary lunch, notebook portfolios, and 1-on-1 resume reviews.</p>',
     image_url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80',
+    ticket_type: 'Free RSVP',
+    featured: true,
+    host_lead: 'Marcus Sterling (Youth Director)',
+    registration_url: 'https://eventbrite.com/e/leads-youth-summit-2026',
+    dress_code: 'Business Casual',
   },
   {
     id: 'evt-3',
     title: 'Thanksgiving Community Harvest Feast',
+    category: 'Community Meals & Dinners',
     event_date: '2026-11-26',
     start_time: '12:00',
     end_time: '16:00',
@@ -394,12 +464,17 @@ export const INITIAL_EVENTS: EventItem[] = [
     capacity: 300,
     rsvps_count: 285,
     status: 'Upcoming',
-    description: 'Our annual open-door banquet where 1,200+ plates of warm, homemade turkey and fixings are served family style.',
+    description: '<p>Our annual open-door banquet where 1,200+ plates of warm, homemade turkey and harvest fixings are served family style.</p><p>Everyone is welcome. No ticket required, but RSVPs help kitchen prep teams calculate portions.</p>',
     image_url: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600&q=80',
+    ticket_type: 'Free RSVP',
+    featured: true,
+    host_lead: 'Grace Montgomery & Community Kitchen',
+    dress_code: 'Casual',
   },
   {
     id: 'evt-4',
     title: 'Veterans Outreach & Fellowship Breakfast',
+    category: 'Veterans Fellowship',
     event_date: '2026-10-28',
     start_time: '08:00',
     end_time: '10:30',
@@ -407,8 +482,12 @@ export const INITIAL_EVENTS: EventItem[] = [
     capacity: 80,
     rsvps_count: 80,
     status: 'Past',
-    description: 'Connecting returning service members with counseling, housing vouchers, and brotherhood over coffee and pancakes.',
+    description: '<p>Connecting returning service members with counseling, housing vouchers, and brotherhood over hot coffee and pancakes.</p>',
     image_url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&q=80',
+    ticket_type: 'Free RSVP',
+    featured: false,
+    host_lead: 'Carlos Mendez (VFW Liaison)',
+    dress_code: 'Casual',
   },
 ];
 
