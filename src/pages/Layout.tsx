@@ -8,7 +8,7 @@ import SmoothScroll from "../components/common/SmoothScroll";
 export default function RootLayout() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us';
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are';
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
