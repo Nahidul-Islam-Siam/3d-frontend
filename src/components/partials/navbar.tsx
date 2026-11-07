@@ -13,7 +13,7 @@ export default function Navbar() {
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
-  const isDarkHeroPage = location.pathname === '/meet-us';
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are';
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
