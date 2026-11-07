@@ -18,6 +18,11 @@ export default function DonatePage() {
     whySectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleCompleteSquareDonation = () => {
+    window.open('https://square.link/u/D9O5AJW0', '_blank', 'noopener,noreferrer');
+    setIsSubmitted(true);
+  };
+
   return (
     <>
       <Seo
@@ -135,12 +140,12 @@ export default function DonatePage() {
                   </div>
 
                   <FigmaButton
-                    onClick={() => setIsSubmitted(true)}
+                    onClick={handleCompleteSquareDonation}
                     variant="primary"
                     size="lg"
-                    className="w-full justify-center"
+                    className="w-full justify-center shadow-[0_6px_20px_rgba(249,115,22,0.35)]"
                   >
-                    Complete Gift of ${selectedAmount}
+                    Proceed with Square Checkout (${selectedAmount})
                   </FigmaButton>
                 </div>
               )}
