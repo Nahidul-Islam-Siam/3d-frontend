@@ -13,7 +13,7 @@ export default function Navbar() {
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are';
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate';
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
@@ -22,7 +22,7 @@ export default function Navbar() {
   useEffect(() => {
     // Initial reveal state
     setIsRevealed(!isHomePage);
-
+ 
     const handleReveal = () => setIsRevealed(true);
     const handleHide = () => setIsRevealed(false);
 
