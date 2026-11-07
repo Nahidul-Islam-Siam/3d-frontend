@@ -13,8 +13,11 @@ export default function Navbar() {
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate';
+  const isDonatePage = location.pathname === '/donate';
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
+  const isDarkScrolled = isDonatePage && hasScrolled;
+  const isDarkTheme = isTransparent || isDarkScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
   const toggleOpen = () => setIsOpen(!isOpen);
@@ -65,8 +68,10 @@ export default function Navbar() {
         className={`fixed top-0 left-0 right-0 h-[74px] z-50 transition-all duration-300 ${
           isTransparent
             ? 'bg-transparent border-b border-transparent shadow-none'
-            : 'bg-[#FAF4E6] border-b border-[#e9dcbe]'
-        } ${hasScrolled && !isTransparent ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''} ${
+            : isDarkScrolled
+              ? 'bg-[#08070B]/90 backdrop-blur-md border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]'
+              : 'bg-[#FAF4E6] border-b border-[#e9dcbe]'
+        } ${hasScrolled && !isTransparent && !isDarkScrolled ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''} ${
           isRevealed ? 'pointer-events-auto' : 'pointer-events-none'
         }`}
       >
@@ -75,7 +80,7 @@ export default function Navbar() {
           {/* 1. Official Logo (White Icon on Dark Hero, Full Logo on Cream) */}
           <div className="flex-shrink-0 mr-2 lg:mr-16 xl:mr-24">
             <Link to="/" className="flex items-center">
-              {isTransparent ? (
+              {isDarkTheme ? (
                 <img 
                   src={logoIconWhite} 
                   alt="Live Achieve Believe" 
@@ -93,7 +98,7 @@ export default function Navbar() {
 
           {/* 2. Desktop Navigation Links (Centered, Single Line, Helvetica 16px) */}
           <div className={`hidden lg:flex items-center justify-center gap-7 xl:gap-9 whitespace-nowrap text-[16px] leading-[24px] font-normal transition-colors duration-300 ${
-            isTransparent ? 'text-white/80' : 'text-[#746343]'
+            isDarkTheme ? 'text-white/80' : 'text-[#746343]'
           }`}>
             {navItems.map((item) => {
               const isActive = location.pathname === item.to;
@@ -103,7 +108,7 @@ export default function Navbar() {
                   key={item.label}
                   to={item.to} 
                   className={`relative py-1.5 whitespace-nowrap transition-colors font-normal text-[16px] leading-[24px] ${
-                    isTransparent
+                    isDarkTheme
                       ? isActive
                         ? 'text-[#F97316] font-medium'
                         : 'text-white/80 hover:text-white'
@@ -131,12 +136,16 @@ export default function Navbar() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className={`group inline-flex items-center gap-3.5 pl-6 pr-4 py-2 rounded-full transition-all whitespace-nowrap ${
-                  isTransparent
-                    ? 'border border-white/50 hover:border-white text-white bg-transparent hover:bg-white/10 shadow-none'
+                  isDarkTheme
+                    ? isDonatePage
+                      ? 'border border-[#F97316]/80 text-[#F97316] bg-transparent hover:bg-[#F97316]/10 shadow-none'
+                      : 'border border-white/50 hover:border-white text-white bg-transparent hover:bg-white/10 shadow-none'
                     : 'bg-[#F97316] hover:bg-[#ea580c] text-white shadow-sm border border-transparent'
                 }`}
               >
-                <span className="font-serif font-bold text-[15px] tracking-wide text-white leading-none whitespace-nowrap">
+                <span className={`font-serif font-bold text-[15px] tracking-wide leading-none whitespace-nowrap ${
+                  isDarkTheme && isDonatePage ? 'text-[#F97316]' : 'text-white'
+                }`}>
                   Donate
                 </span>
                 <img 
@@ -146,21 +155,20 @@ export default function Navbar() {
                 />
               </motion.button>
             </Link>
-
-            {/* Mobile Hamburger */}
-            <button
-              onClick={toggleOpen}
-              aria-label="Open navigation menu"
-              className={`lg:hidden ml-4 p-2 rounded-xl transition-colors ${
-                isTransparent 
-                  ? 'text-white hover:text-[#F97316] hover:bg-white/10' 
-                  : 'text-stone-800 hover:text-[#ea580c] hover:bg-orange-100/50'
-              }`}
-            >
-              <CiMenuFries className="w-6 h-6" />
-            </button>
           </div>
 
+          {/* Mobile Hamburger */}
+          <button
+            onClick={toggleOpen}
+            aria-label="Open navigation menu"
+            className={`lg:hidden ml-4 p-2 rounded-xl transition-colors ${
+              isDarkTheme 
+                ? 'text-white hover:text-[#F97316] hover:bg-white/10' 
+                : 'text-stone-800 hover:text-[#ea580c] hover:bg-orange-100/50'
+            }`}
+          >
+            <CiMenuFries className="w-6 h-6" />
+          </button>
         </div>
       </motion.nav>
     </>

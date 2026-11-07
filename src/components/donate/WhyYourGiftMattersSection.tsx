@@ -1,112 +1,167 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { motion, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import Coin3DCanvas from './Coin3DCanvas';
 import story1 from '@/assets/donate/story-1-living-room.png';
 import story2 from '@/assets/donate/story-2-woodworking.png';
 import story3 from '@/assets/donate/story-3-robotics.png';
-import './coin-scrollytelling.css';
 
 const stories = [
   {
+    id: 1,
     title: 'Creating spaces where people feel welcomed and seen.',
-    narrative: 'Isolation is the quietest crisis of our neighborhoods. Your gifts sustain open, unpoliced living rooms where unhoused neighbors, single parents, and young creatives gather without judgment or prerequisites.',
-    image: story1, alt: 'Neighbors gathered together in a welcoming community living room', side: 'Heads',
+    narrative:
+      'Isolation is the quietest crisis of our neighborhoods. Your gifts sustain open, unpoliced living rooms where unhoused neighbors, single parents, and young creatives gather without judgment or prerequisites.',
+    image: story1,
+    alt: 'Neighbors gathered together in a welcoming community living room',
+    side: 'Heads',
   },
   {
+    id: 2,
     title: 'Coming alongside people when they need someone to believe in them.',
-    narrative: 'Mentorship is consistency. Your generosity helps mentors walk shoulder to shoulder with people through craft, trades, and the work of rebuilding their lives.',
-    image: story2, alt: 'A woodworking mentor and apprentice working together in a workshop', side: 'The edge',
+    narrative:
+      'Mentorship isn’t a curriculum; it’s consistency. When someone steps forward to rebuild their life, our mentors walk shoulder-to-shoulder with them through craft, trades, and personal healing.',
+    image: story2,
+    alt: 'A woodworking mentor and apprentice working together in a workshop',
+    side: 'The edge',
   },
   {
+    id: 3,
     title: 'Helping make the next chapter possible.',
-    narrative: 'Tools, apprenticeships, studio time, and licensing funds. When a community member determines their pathway forward, your gift ensures that poverty of capital does not extinguish courage.',
-    image: story3, alt: 'Young people building a robotics project together', side: 'Tails',
+    narrative:
+      'Tools, apprenticeships, studio time, and licensing funds. When a community member determines their pathway forward, your gift ensures that poverty of capital does not extinguish courage.',
+    image: story3,
+    alt: 'Young people building a robotics project together in STEM laboratory',
+    side: 'Tails',
   },
 ];
 
-const motionQuery = '(prefers-reduced-motion: reduce)';
-const subscribeMotion = (callback: () => void) => {
-  const media = window.matchMedia(motionQuery);
-  media.addEventListener('change', callback);
-  return () => media.removeEventListener('change', callback);
-};
-const getMotionPreference = () => window.matchMedia(motionQuery).matches;
-
-/** Overlapping ranges provide a true scroll-scrubbed dissolve, including in reverse. */
-function useStoryOpacity(progress: MotionValue<number>, index: number) {
-  const ranges = [[0, 0.28, 0.38, 1], [0.28, 0.38, 0.61, 0.71], [0, 0.61, 0.71, 1]];
-  const values = [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1]];
-  return useTransform(progress, ranges[index], values[index]);
-}
-
-function StoryLayer({ index, progress }: { index: number; progress: MotionValue<number> }) {
-  const opacity = useStoryOpacity(progress, index);
-  const y = useTransform(opacity, [0, 1], [18, 0]);
-  return <motion.article style={{ opacity, y }} className="gift-story-layer" aria-hidden="true">
-    <p className="gift-story-side">{stories[index].side}</p>
-    <h3>{stories[index].title}</h3>
-    <p className="gift-narrative">{stories[index].narrative}</p>
-  </motion.article>;
-}
-
-function PreviewLayer({ index, progress }: { index: number; progress: MotionValue<number> }) {
-  const opacity = useStoryOpacity(progress, index);
-  return <motion.img style={{ opacity }} src={stories[index].image} alt="" aria-hidden="true" decoding="async" />;
-}
-
-function Step({ index, progress }: { index: number; progress: MotionValue<number> }) {
-  const opacity = useStoryOpacity(progress, index);
-  return <motion.span style={{ opacity }} className="gift-step">[ {index + 1} / 3 ]</motion.span>;
-}
-
 export default function WhyYourGiftMattersSection() {
-  const containerRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const storiesTrackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
-  const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionPreference, () => true);
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] });
-  const smoothed = useSpring(scrollYProgress, { stiffness: 95, damping: 28, restDelta: 0.0001 });
-  const staticProgress = useMotionValue(0);
-  const progress = reducedMotion ? staticProgress : smoothed;
+
+  const { scrollYProgress } = useScroll({
+    target: storiesTrackRef,
+    offset: ['start center', 'end center'],
+  });
+
+  // Butter-smooth spring damping for realistic coin rotation
+  const smoothed = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    restDelta: 0.0001,
+  });
+
   useEffect(() => {
-    progressRef.current = progress.get();
-    return progress.on('change', value => { progressRef.current = value; });
-  }, [progress]);
+    progressRef.current = smoothed.get();
+    return smoothed.on('change', (value) => {
+      progressRef.current = Math.max(0, Math.min(1, value));
+    });
+  }, [smoothed]);
 
   return (
-    <section ref={containerRef} className={`gift-scroll ${reducedMotion ? 'gift-scroll-reduced' : ''}`} aria-labelledby="gift-title">
-      <div className="gift-stage">
-        <header className="gift-header">
-          <h2 id="gift-title">WHY YOUR GIFT<br />MATTERS</h2>
-          <p>Your generosity helps create moments of hope, belonging, and new beginnings. Here is what happens when we show up.</p>
-        </header>
-
-        <div className="gift-main">
-          <div className="gift-coin-wrap">
-            <div className="gift-coin-halo" aria-hidden="true" />
-            {!reducedMotion && <Coin3DCanvas progressRef={progressRef} className="gift-coin" />}
-          </div>
-          <div className="gift-stories">
-            {stories.map((story, index) => <StoryLayer key={story.side} index={index} progress={progress} />)}
-          </div>
-        </div>
-
-        <footer className="gift-media-bar" aria-hidden="true">
-          <div className="gift-category">STORIES OF HOPE<span>One gift. A lasting impact.</span></div>
-          <div className="gift-timeline">
-            <div className="gift-step-wrap">{stories.map((story, index) => <Step key={story.side} index={index} progress={progress} />)}</div>
-            <div className="gift-track"><motion.div style={{ scaleX: progress }} /></div>
-            <span className="gift-scroll-hint">Scroll to discover</span>
-          </div>
-          <div className="gift-preview">{stories.map((story, index) => <PreviewLayer key={story.side} index={index} progress={progress} />)}</div>
-        </footer>
+    <section
+      ref={sectionRef}
+      id="why-your-gift-matters"
+      className="relative w-full bg-[#08070B] text-white py-16 sm:py-20 lg:py-28 px-6 sm:px-10 lg:px-16 xl:px-24 overflow-hidden select-none"
+      aria-label="Why Your Gift Matters Stories"
+    >
+      {/* ─── Ambient Warm Golden Atmosphere (Matching Figma Glow) ─── */}
+      <div 
+        className="absolute inset-0 pointer-events-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <div 
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] lg:w-[1100px] h-[800px] lg:h-[1100px] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.16) 0%, rgba(217, 119, 6, 0.06) 45%, transparent 70%)',
+            filter: 'blur(90px)',
+          }}
+        />
+        <div 
+          className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 65%)',
+            filter: 'blur(80px)',
+          }}
+        />
       </div>
 
-      {/* All three narratives remain available without announcing every scroll tick. */}
-      <div className={reducedMotion ? 'gift-static-stories' : 'sr-only'}>
-        {stories.map(story => <article key={story.side}>
-          <img src={story.image} alt={story.alt} loading="lazy" />
-          <div><h3>{story.title}</h3><p>{story.narrative}</p></div>
-        </article>)}
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
+        
+        {/* ─── Header: Left Title | Right Narrative (Exact Figma) ─── */}
+        <header className="w-full flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 sm:pb-12 border-b border-white/15">
+          <h2
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-white text-3xl sm:text-4xl lg:text-[44px] font-bold tracking-tight leading-[1.05] uppercase"
+          >
+            WHY YOUR GIFT<br />MATTERS
+          </h2>
+          <p className="text-stone-300 text-[13px] sm:text-[14px] lg:text-[14.5px] leading-relaxed max-w-md font-sans font-normal">
+            Your generosity helps create a continuum of care, belonging, and new beginnings. We focus on community-rooted struggles, one individual family, home, school, and individual program.
+          </p>
+        </header>
+
+        {/* ─── Main Stories Container with Sticky 3D Coin ─── */}
+        <div ref={storiesTrackRef} className="relative w-full">
+          
+          {/* Vertical Stack of 3 Stories */}
+          <div className="w-full flex flex-col divide-y divide-white/15">
+            {stories.map((story, index) => (
+              <article
+                key={story.id}
+                className="w-full py-12 sm:py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
+              >
+                {/* Left Column: Title & Subtitle */}
+                <div className="lg:col-span-6 space-y-4 max-w-xl pr-0 lg:pr-8">
+                  <h3
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    className="text-white text-2xl sm:text-3xl lg:text-[34px] font-normal leading-[1.18]"
+                  >
+                    {story.title}
+                  </h3>
+                  <p className="text-stone-300 text-[13px] sm:text-[14px] lg:text-[14.5px] leading-relaxed font-sans font-normal max-w-lg">
+                    {story.narrative}
+                  </p>
+                </div>
+
+                {/* Right Column: Photo Card */}
+                <div className="lg:col-span-6 flex justify-end pl-0 lg:pl-12">
+                  <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.8)] w-full max-w-[380px] sm:max-w-[440px] lg:max-w-[480px] aspect-[16/10]">
+                    <img
+                      src={story.image}
+                      alt={story.alt}
+                      className="w-full h-full object-cover object-center"
+                    />
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* ─── Sticky 3D Floating Coin (Centered between columns) ─── */}
+          <div className="hidden lg:flex absolute left-[50%] xl:left-[52%] top-0 bottom-0 -translate-x-1/2 pointer-events-none flex-col justify-start">
+            <div className="sticky top-1/2 -translate-y-1/2 flex items-center justify-center">
+              {/* Warm Ambient Radial Glow Halo */}
+              <div
+                className="absolute w-[260px] h-[260px] rounded-full pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(circle, rgba(249, 115, 22, 0.45) 0%, rgba(217, 119, 6, 0.15) 45%, transparent 70%)',
+                  filter: 'blur(35px)',
+                }}
+                aria-hidden="true"
+              />
+              
+              {/* 3D WebGL Coin Canvas */}
+              <div className="relative w-36 h-36 lg:w-44 lg:h-44 xl:w-48 xl:h-48 pointer-events-auto">
+                <Coin3DCanvas progressRef={progressRef} className="w-full h-full" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
   );
