@@ -20,7 +20,6 @@ import {
 } from 'antd';
 import {
   VideoCameraOutlined,
-  PlusOutlined,
   UploadOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -30,6 +29,11 @@ import {
   ExportOutlined,
   LinkOutlined,
   InboxOutlined,
+  PictureOutlined,
+  CloudUploadOutlined,
+  ArrowLeftOutlined,
+  CheckOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import type { VideoSlot } from '../mockData';
 import {
@@ -37,6 +41,7 @@ import {
   parseEmbedUrl,
   DEFAULT_POSTERS,
 } from '@/utils/videoRegistry';
+import RichTextEditor from '@/components/common/RichTextEditor';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -55,25 +60,27 @@ export default function VideosView({
   onAddSlot,
   onDeleteSlot,
 }: VideosViewProps) {
+  // Page View Modes: 'list' | 'create' | 'edit'
+  const [viewMode, setViewMode] = useState<'list' | 'create' | 'edit'>('list');
+
   const [statusFilter, setStatusFilter] = useState<'All' | 'Live' | 'Draft' | 'Empty'>('All');
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
 
   const [selectedVideo, setSelectedVideo] = useState<VideoSlot | null>(null);
-  const [isReplaceModalOpen, setIsReplaceModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
-  // Upload state for replacement modal
+  // Form states
+  const [form] = Form.useForm();
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>('');
-  const [uploadedFileName, setUploadedFileName] = useState<string>('');
-  const [replaceSourceType, setReplaceSourceType] = useState<'upload' | 'url'>('upload');
+  const [uploadedVideoFileName, setUploadedVideoFileName] = useState<string>('');
+  const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<string>('');
+  const [uploadedThumbnailFileName, setUploadedThumbnailFileName] = useState<string>('');
+  const [sourceType, setSourceType] = useState<'upload' | 'url'>('upload');
+  const [editorHtml, setEditorHtml] = useState<string>('');
 
-  const [replaceForm] = Form.useForm();
-  const [addForm] = Form.useForm();
-
-  // Filtered and searched videos
+  // Filtered and searched videos for grid
   const filteredVideos = videos.filter((v) => {
     const matchesStatus = statusFilter === 'All' || v.status === statusFilter;
     const searchLower = searchText.toLowerCase();
@@ -82,7 +89,8 @@ export default function VideosView({
       v.title.toLowerCase().includes(searchLower) ||
       v.slot_label.toLowerCase().includes(searchLower) ||
       v.page_location.toLowerCase().includes(searchLower) ||
-      v.description.toLowerCase().includes(searchLower);
+      v.description.toLowerCase().includes(searchLower) ||
+      (v.category && v.category.toLowerCase().includes(searchLower));
 
     return matchesStatus && matchesSearch;
   });
@@ -102,56 +110,116 @@ export default function VideosView({
     message.success(`${slot.slot_label} is now ${nextStatus === 'Live' ? 'LIVE on the website' : 'saved as Draft'}`);
   };
 
-  const handleOpenReplace = (slot: VideoSlot) => {
-    setSelectedVideo(slot);
-    setUploadedVideoUrl(slot.video_url || '');
-    setUploadedFileName('');
-    setReplaceSourceType('upload');
-    replaceForm.setFieldsValue({
-      title: slot.title,
-      description: slot.description,
-      duration: slot.duration,
-      video_url: slot.video_url,
+  // Navigate to Dedicated Create Page
+  const handleOpenCreatePage = () => {
+    setSelectedVideo(null);
+    setUploadedVideoUrl('');
+    setUploadedVideoFileName('');
+    setUploadedThumbnailUrl('');
+    setUploadedThumbnailFileName('');
+    setSourceType('upload');
+    setEditorHtml('');
+    form.resetFields();
+    form.setFieldsValue({
+      status: 'Live',
+      category: 'General',
+      video_type: 'MP4 Video',
+      duration: '1:30',
     });
-    setIsReplaceModalOpen(true);
+    setViewMode('create');
   };
 
-  const handleReplaceSubmit = (values: { title: string; description: string; duration: string; video_url?: string }) => {
-    if (!selectedVideo) return;
+  // Navigate to Dedicated Edit Page
+  const handleOpenEditPage = (slot: VideoSlot) => {
+    setSelectedVideo(slot);
+    setUploadedVideoUrl(slot.video_url || '');
+    setUploadedVideoFileName('');
+    setUploadedThumbnailUrl(slot.thumbnail || '');
+    setUploadedThumbnailFileName('');
+    setSourceType('upload');
+    setEditorHtml(slot.description || '');
 
-    const finalVideoUrl = uploadedVideoUrl || values.video_url || selectedVideo.video_url || 'welcome';
-    const updated: VideoSlot = {
-      ...selectedVideo,
-      title: values.title,
-      description: values.description,
-      duration: values.duration,
-      video_url: finalVideoUrl,
-      status: 'Live',
-      updated_at: new Date().toISOString().slice(0, 10),
-    };
-    onUpdateVideo(updated);
-    message.success(`Updated and published film for ${selectedVideo.slot_label}`);
-    setIsReplaceModalOpen(false);
+    form.setFieldsValue({
+      slot_label: slot.slot_label,
+      page_location: slot.page_location,
+      section_anchor: slot.section_anchor || '',
+      title: slot.title,
+      description: slot.description,
+      category: slot.category || 'General',
+      video_type: slot.video_type || 'MP4 Video',
+      duration: slot.duration,
+      status: slot.status,
+      thumbnail: slot.thumbnail || '',
+      video_url: slot.video_url,
+    });
+    setViewMode('edit');
+  };
+
+  const handleBackToList = () => {
+    setViewMode('list');
     setSelectedVideo(null);
   };
 
-  const handleAddSubmit = (values: { slot_label: string; page_location: string; title: string; description: string; duration: string; video_url?: string }) => {
-    const newSlot: VideoSlot = {
-      id: `vid-${Date.now().toString().slice(-4)}`,
-      slot_label: values.slot_label,
-      page_location: values.page_location,
-      title: values.title,
-      description: values.description,
-      duration: values.duration || '1:30',
-      status: 'Draft',
-      sort_order: videos.length + 1,
-      updated_at: new Date().toISOString().slice(0, 10),
-      video_url: values.video_url || 'welcome',
-    };
-    onAddSlot(newSlot);
-    message.success(`Added new video slot: ${values.slot_label}`);
-    setIsAddModalOpen(false);
-    addForm.resetFields();
+  // Form Submit for both Create and Edit dedicated pages
+  const handleFormSubmit = (values: {
+    slot_label: string;
+    page_location: string;
+    section_anchor?: string;
+    title: string;
+    category?: VideoSlot['category'];
+    video_type?: VideoSlot['video_type'];
+    duration: string;
+    status: VideoSlot['status'];
+    thumbnail?: string;
+    video_url?: string;
+  }) => {
+    const finalVideoUrl = uploadedVideoUrl || values.video_url || 'welcome';
+    const finalThumbnail = uploadedThumbnailUrl || values.thumbnail || '';
+    const finalDescription = editorHtml || values.title;
+
+    if (viewMode === 'create') {
+      const newSlot: VideoSlot = {
+        id: `vid-${Date.now().toString().slice(-4)}`,
+        slot_label: values.slot_label,
+        page_location: values.page_location,
+        section_anchor: values.section_anchor || '',
+        category: values.category || 'General',
+        video_type: values.video_type || 'MP4 Video',
+        title: values.title,
+        description: finalDescription,
+        duration: values.duration || '1:30',
+        thumbnail: finalThumbnail,
+        views_count: 0,
+        featured: false,
+        status: values.status || 'Live',
+        sort_order: videos.length + 1,
+        updated_at: new Date().toISOString().slice(0, 10),
+        video_url: finalVideoUrl,
+      };
+      onAddSlot(newSlot);
+      message.success(`Created & Published new video slot: ${values.slot_label}`);
+    } else if (viewMode === 'edit' && selectedVideo) {
+      const updated: VideoSlot = {
+        ...selectedVideo,
+        slot_label: values.slot_label,
+        page_location: values.page_location,
+        section_anchor: values.section_anchor || selectedVideo.section_anchor,
+        title: values.title,
+        description: finalDescription,
+        duration: values.duration,
+        category: values.category || selectedVideo.category || 'General',
+        video_type: values.video_type || selectedVideo.video_type || 'MP4 Video',
+        status: values.status || selectedVideo.status,
+        thumbnail: finalThumbnail || selectedVideo.thumbnail,
+        video_url: finalVideoUrl,
+        updated_at: new Date().toISOString().slice(0, 10),
+      };
+      onUpdateVideo(updated);
+      message.success(`Saved changes for ${selectedVideo.slot_label}`);
+    }
+
+    setViewMode('list');
+    setSelectedVideo(null);
   };
 
   // Helper to get clean route for "View on Website"
@@ -160,29 +228,429 @@ export default function VideosView({
     return pageLocation.split(' ')[0] || '/';
   };
 
+  // ═════════════════════════════════════════════════════════════════
+  // ─── DEDICATED FULL-PAGE VIEW: CREATE OR EDIT VIDEO ───────────────
+  // ═════════════════════════════════════════════════════════════════
+  if (viewMode === 'create' || viewMode === 'edit') {
+    const isEdit = viewMode === 'edit';
+    const pageHeading = isEdit
+      ? `Edit Film: ${selectedVideo?.slot_label}`
+      : 'Upload New Cinematic Film';
+    const pageSubheading = isEdit
+      ? 'Update video media, narrative description, and frontend target anchors.'
+      : 'Create a new website video slot with media uploads and rich description.';
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1200, margin: '0 auto' }}>
+        {/* Top Header Bar with Back Button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <button
+              type="button"
+              onClick={handleBackToList}
+              title="Back to video list"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#475569',
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+              }}
+            >
+              <ArrowLeftOutlined style={{ fontSize: 16 }} />
+            </button>
+            <div>
+              <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.3px' }}>
+                {pageHeading}
+              </Title>
+              <Paragraph type="secondary" style={{ margin: '3px 0 0 0', fontSize: 13.5 }}>
+                {pageSubheading}
+              </Paragraph>
+            </div>
+          </div>
+
+          <Space size="middle">
+            <Button
+              onClick={handleBackToList}
+              style={{ borderRadius: 8, height: 40, borderColor: '#CBD5E1', color: '#475569', fontWeight: 500, padding: '0 18px' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={() => form.submit()}
+              style={{
+                backgroundColor: '#F97316',
+                borderColor: '#F97316',
+                borderRadius: 8,
+                height: 40,
+                fontWeight: 600,
+                color: '#FFFFFF',
+                padding: '0 24px',
+                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+              }}
+            >
+              {isEdit ? 'Save Changes' : 'Publish Film'}
+            </Button>
+          </Space>
+        </div>
+
+        {/* Main Editor Form in 2-Column Responsive Layout */}
+        <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
+          <Row gutter={[24, 24]}>
+            {/* ─── LEFT COLUMN: Text, Narrative, & Rich Editor (60%) ─── */}
+            <Col xs={24} lg={15}>
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 16,
+                  border: '1px solid #E2E8F0',
+                  padding: '24px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 18,
+                }}
+              >
+                <div style={{ borderBottom: '1px solid #F1F5F9', paddingBottom: 14 }}>
+                  <Text strong style={{ fontSize: 16, color: '#0F172A' }}>
+                    Film Information & Story Narrative
+                  </Text>
+                  <Paragraph type="secondary" style={{ fontSize: 13, margin: '2px 0 0 0' }}>
+                    General identification, titles, and public synopsis shown across website reels.
+                  </Paragraph>
+                </div>
+
+                <Row gutter={16}>
+                  <Col xs={24} sm={12}>
+                    <Form.Item
+                      name="slot_label"
+                      label="Slot Identifier"
+                      rules={[{ required: true, message: 'e.g. Welcome Hero' }]}
+                      help="Internal reference label (e.g. Welcome Hero, Founder Story)"
+                    >
+                      <Input placeholder="e.g. Welcome Hero" style={{ height: 40, borderRadius: 8 }} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <Form.Item
+                      name="page_location"
+                      label="Website Page Route"
+                      rules={[{ required: true }]}
+                    >
+                      <Select placeholder="Select route" style={{ height: 40 }}>
+                        <Option value="/ (Homepage)">/ (Homepage)</Option>
+                        <Option value="/experience-the-story">/experience-the-story</Option>
+                        <Option value="/who-we-are">/who-we-are</Option>
+                        <Option value="/how-we-serve">/how-we-serve</Option>
+                        <Option value="/join-the-movement">/join-the-movement</Option>
+                        <Option value="/meet-us">/meet-us</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Form.Item
+                  name="title"
+                  label="Film Title (Public)"
+                  rules={[{ required: true }]}
+                >
+                  <Input placeholder="e.g. The Story Behind the Living Table" style={{ height: 40, borderRadius: 8 }} />
+                </Form.Item>
+
+                {/* ─── RICH TEXT EDITOR FOR DESCRIPTION / SYNOPSIS ─── */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <label style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>
+                      Detailed Story Synopsis & Director Notes
+                    </label>
+                    <span style={{ fontSize: 11.5, color: '#94A3B8' }}>Rich Text Enabled</span>
+                  </div>
+                  <RichTextEditor
+                    value={editorHtml}
+                    onChange={setEditorHtml}
+                    placeholder="Describe this film's emotional narrative, background story, and message to the community..."
+                    minHeight={220}
+                  />
+                </div>
+
+                <Row gutter={16}>
+                  <Col xs={24} sm={12}>
+                    <Form.Item name="category" label="Mission Pillar / Category">
+                      <Select placeholder="Select pillar" style={{ height: 40 }}>
+                        <Option value="General">General Mission</Option>
+                        <Option value="Community Meals">Community Meals (Food Relief)</Option>
+                        <Option value="LEADS Youth Development">LEADS Youth Development</Option>
+                        <Option value="Suicide Awareness Showdown">Suicide Awareness Showdown</Option>
+                        <Option value="Veterans Support">Veterans Support</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <Form.Item name="section_anchor" label="Target Section Anchor (Optional)">
+                      <Input placeholder="e.g. #hero-cinema or #documentary" style={{ height: 40, borderRadius: 8 }} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Row gutter={16}>
+                  <Col xs={24} sm={12}>
+                    <Form.Item name="duration" label="Duration (e.g. 1:45)" rules={[{ required: true }]}>
+                      <Input placeholder="1:45" style={{ height: 40, borderRadius: 8 }} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <Form.Item name="video_type" label="Media Provider Type">
+                      <Select placeholder="Select media format" style={{ height: 40 }}>
+                        <Option value="MP4 Video">MP4 Video File</Option>
+                        <Option value="YouTube">YouTube Embed</Option>
+                        <Option value="Vimeo">Vimeo Embed</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+
+            {/* ─── RIGHT COLUMN: Video & Poster Uploaders + Status (40%) ─── */}
+            <Col xs={24} lg={9}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {/* 1. Video File Upload Box */}
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 16,
+                    border: '1px solid #E2E8F0',
+                    padding: '20px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <Text strong style={{ fontSize: 15, display: 'block', marginBottom: 4, color: '#0F172A' }}>
+                    <VideoCameraOutlined style={{ color: '#F97316', marginRight: 6 }} /> Video Media Upload
+                  </Text>
+                  <Paragraph type="secondary" style={{ fontSize: 12.5, marginBottom: 14 }}>
+                    Select MP4/MOV file or paste direct YouTube/Vimeo embed URL.
+                  </Paragraph>
+
+                  <Tabs
+                    activeKey={sourceType}
+                    onChange={(k) => setSourceType(k as 'upload' | 'url')}
+                    items={[
+                      {
+                        key: 'upload',
+                        label: <span><UploadOutlined /> File Upload</span>,
+                        children: (
+                          <div>
+                            <Dragger
+                              accept="video/mp4,video/webm,video/quicktime"
+                              maxCount={1}
+                              beforeUpload={(file) => {
+                                const blobUrl = URL.createObjectURL(file);
+                                setUploadedVideoUrl(blobUrl);
+                                setUploadedVideoFileName(file.name);
+                                form.setFieldsValue({ video_url: blobUrl });
+                                message.success(`Video selected: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
+                                return false;
+                              }}
+                              showUploadList={false}
+                              style={{ padding: '22px 14px', background: '#F8FAFC', borderRadius: 10, borderColor: '#CBD5E1' }}
+                            >
+                              <p className="ant-upload-drag-icon">
+                                <InboxOutlined style={{ color: '#F97316', fontSize: 36 }} />
+                              </p>
+                              <p style={{ fontWeight: 600, color: '#0F172A', fontSize: 13, margin: 0 }}>
+                                Drop video file here or click to browse
+                              </p>
+                              <p style={{ color: '#64748B', fontSize: 11.5, marginTop: 4 }}>
+                                MP4, WebM, MOV supported
+                              </p>
+                              {uploadedVideoFileName && (
+                                <Tag color="success" style={{ marginTop: 8, padding: '4px 10px', fontSize: 12 }}>
+                                  ✓ Ready: {uploadedVideoFileName}
+                                </Tag>
+                              )}
+                            </Dragger>
+
+                            {/* Mini Video Player Preview */}
+                            {uploadedVideoUrl && (
+                              <div style={{ marginTop: 14, borderRadius: 10, overflow: 'hidden', height: 160, backgroundColor: '#000' }}>
+                                <video
+                                  controls
+                                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                  src={resolveVideoUrl(uploadedVideoUrl)}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ),
+                      },
+                      {
+                        key: 'url',
+                        label: <span><LinkOutlined /> Video Link</span>,
+                        children: (
+                          <Form.Item
+                            name="video_url"
+                            label="Paste Video Link / Embed"
+                            help="Supports YouTube, Vimeo, or CDN URL"
+                            style={{ margin: 0 }}
+                          >
+                            <Input
+                              placeholder="e.g. https://www.youtube.com/watch?v=..."
+                              onChange={(e) => setUploadedVideoUrl(e.target.value)}
+                              style={{ height: 38, borderRadius: 8 }}
+                            />
+                          </Form.Item>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+
+                {/* 2. Poster / Thumbnail Image Upload Box */}
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 16,
+                    border: '1px solid #E2E8F0',
+                    padding: '20px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <Text strong style={{ fontSize: 15, display: 'block', marginBottom: 4, color: '#0F172A' }}>
+                    <PictureOutlined style={{ color: '#F97316', marginRight: 6 }} /> Poster & Thumbnail Image
+                  </Text>
+                  <Paragraph type="secondary" style={{ fontSize: 12.5, marginBottom: 14 }}>
+                    Cover photo shown before film starts playing.
+                  </Paragraph>
+
+                  <Dragger
+                    accept="image/png,image/jpeg,image/webp"
+                    maxCount={1}
+                    beforeUpload={(file) => {
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        const res = e.target?.result as string;
+                        setUploadedThumbnailUrl(res);
+                        setUploadedThumbnailFileName(file.name);
+                        form.setFieldsValue({ thumbnail: res });
+                        message.success(`Poster image loaded: ${file.name}`);
+                      };
+                      reader.readAsDataURL(file);
+                      return false;
+                    }}
+                    showUploadList={false}
+                    style={{ padding: '16px 12px', background: '#F8FAFC', borderRadius: 10, borderColor: '#CBD5E1' }}
+                  >
+                    <PictureOutlined style={{ fontSize: 28, color: '#F97316', marginBottom: 4 }} />
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>Click or drag thumbnail image</div>
+                    <div style={{ fontSize: 11.5, color: '#64748B' }}>PNG, JPG, or WebP</div>
+                    {uploadedThumbnailFileName && (
+                      <Tag color="orange" style={{ marginTop: 6 }}>
+                        ✓ {uploadedThumbnailFileName}
+                      </Tag>
+                    )}
+                  </Dragger>
+
+                  {/* Thumbnail Preview Box */}
+                  <div
+                    style={{
+                      marginTop: 12,
+                      height: 120,
+                      borderRadius: 10,
+                      border: '1px dashed #CBD5E1',
+                      backgroundColor: '#F8FAFC',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundImage: uploadedThumbnailUrl
+                        ? `url(${uploadedThumbnailUrl})`
+                        : selectedVideo?.thumbnail
+                        ? `url(${selectedVideo.thumbnail})`
+                        : 'none',
+                    }}
+                  >
+                    {!uploadedThumbnailUrl && !selectedVideo?.thumbnail && (
+                      <span style={{ fontSize: 12, color: '#94A3B8' }}>Live Poster Preview</span>
+                    )}
+                  </div>
+
+                  <Form.Item name="thumbnail" label="Or Poster Image URL" style={{ marginTop: 12, marginBottom: 0 }}>
+                    <Input
+                      placeholder="https://.../poster.jpg"
+                      onChange={(e) => setUploadedThumbnailUrl(e.target.value)}
+                      style={{ height: 36, borderRadius: 8 }}
+                    />
+                  </Form.Item>
+                </div>
+
+                {/* 3. Publication Status Card */}
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 16,
+                    border: '1px solid #E2E8F0',
+                    padding: '20px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <Text strong style={{ fontSize: 15, display: 'block', marginBottom: 12, color: '#0F172A' }}>
+                    Publishing Status
+                  </Text>
+                  <Form.Item name="status" initialValue="Live" style={{ margin: 0 }}>
+                    <Radio.Group buttonStyle="solid" style={{ width: '100%' }}>
+                      <Radio.Button value="Live" style={{ width: '50%', textAlign: 'center' }}>
+                        Live on Site
+                      </Radio.Button>
+                      <Radio.Button value="Draft" style={{ width: '50%', textAlign: 'center' }}>
+                        Draft Slot
+                      </Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Form>
+      </div>
+    );
+  }
+
+  // ═════════════════════════════════════════════════════════════════
+  // ─── MAIN LIST VIEW: CARDS ROSTER (GRID) ─────────────────────────
+  // ═════════════════════════════════════════════════════════════════
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* ─── Header ─── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.3px' }}>
-            Cinematic Videos & Story CMS
+            Cinematic Videos & Reels CMS
           </Title>
           <Paragraph type="secondary" style={{ margin: '4px 0 0 0', fontSize: 14 }}>
-            Direct control over all website films, hero videos, and testimonial reels. Live sync with public pages.
+            Manage video films, upload media, edit story narratives, and review engagement telemetry.
           </Paragraph>
         </div>
         <Button
           type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsAddModalOpen(true)}
+          icon={<CloudUploadOutlined />}
+          onClick={handleOpenCreatePage}
           style={{
             backgroundColor: '#F97316',
             borderColor: '#F97316',
             borderRadius: 8,
             height: 40,
             fontWeight: 600,
-            padding: '0 18px',
+            padding: '0 20px',
             color: '#FFFFFF',
             boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
             display: 'inline-flex',
@@ -190,7 +658,7 @@ export default function VideosView({
             gap: 6,
           }}
         >
-          Add Video Slot
+          Upload New Video
         </Button>
       </div>
 
@@ -214,7 +682,7 @@ export default function VideosView({
         </Radio.Group>
 
         <Input
-          placeholder="Search by title, route, or synopsis..."
+          placeholder="Search by title, pillar, route, or synopsis..."
           prefix={<SearchOutlined style={{ color: '#94A3B8' }} />}
           value={searchText}
           onChange={(e) => {
@@ -222,7 +690,7 @@ export default function VideosView({
             setCurrentPage(1);
           }}
           allowClear
-          style={{ width: 320, height: 38, borderRadius: 8 }}
+          style={{ width: 340, height: 38, borderRadius: 8 }}
         />
       </div>
 
@@ -295,13 +763,11 @@ export default function VideosView({
                     }
                   }}
                 >
-                  {/* Subtle darkening tint */}
                   <div
                     style={{
                       position: 'absolute',
                       inset: 0,
                       backgroundColor: slot.status !== 'Empty' ? 'rgba(15, 23, 42, 0.45)' : 'transparent',
-                      transition: 'background-color 0.2s',
                     }}
                   />
 
@@ -328,7 +794,6 @@ export default function VideosView({
                             alignItems: 'center',
                             justifyContent: 'center',
                             boxShadow: '0 4px 14px rgba(249, 115, 22, 0.4)',
-                            transition: 'transform 0.2s',
                           }}
                         >
                           <PlayCircleOutlined style={{ fontSize: 28, color: '#FFFFFF', marginLeft: 2 }} />
@@ -359,20 +824,65 @@ export default function VideosView({
                     </>
                   ) : (
                     <div style={{ textAlign: 'center', color: '#94A3B8', position: 'relative', zIndex: 2 }}>
-                      <VideoCameraOutlined style={{ fontSize: 32, marginBottom: 6, color: '#64748B' }} />
-                      <div style={{ fontSize: 12.5, fontWeight: 500 }}>No film connected yet</div>
+                      <VideoCameraOutlined style={{ fontSize: 34, marginBottom: 6, color: '#64748B' }} />
+                      <div style={{ fontSize: 12.5, fontWeight: 500 }}>No video uploaded yet</div>
+                      <Button
+                        size="small"
+                        type="primary"
+                        icon={<UploadOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditPage(slot);
+                        }}
+                        style={{ marginTop: 8, backgroundColor: '#F97316', borderColor: '#F97316', borderRadius: 6, fontSize: 12 }}
+                      >
+                        Upload Video
+                      </Button>
                     </div>
                   )}
                 </div>
 
                 {/* Slot Details */}
                 <div style={{ flex: 1 }}>
+                  {/* Category, Provider & Views Tags */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                    {slot.category && (
+                      <Tag color="orange" style={{ margin: 0, borderRadius: 6, fontSize: 11, fontWeight: 500 }}>
+                        {slot.category}
+                      </Tag>
+                    )}
+                    {slot.video_type && (
+                      <Tag color="blue" style={{ margin: 0, borderRadius: 6, fontSize: 11 }}>
+                        {slot.video_type}
+                      </Tag>
+                    )}
+                    {slot.views_count !== undefined && slot.views_count > 0 && (
+                      <span style={{ fontSize: 11, color: '#64748B', marginLeft: 'auto' }}>
+                        👁️ {slot.views_count.toLocaleString()} views
+                      </span>
+                    )}
+                  </div>
+
                   <Text strong style={{ fontSize: 15, display: 'block', color: '#0F172A', lineHeight: 1.3 }}>
                     {slot.title}
                   </Text>
-                  <Paragraph type="secondary" style={{ fontSize: 12.5, marginTop: 4, minHeight: 38, marginBottom: 8 }}>
-                    {slot.description}
-                  </Paragraph>
+                  
+                  {/* Render clean description text */}
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      color: '#64748B',
+                      marginTop: 4,
+                      minHeight: 38,
+                      marginBottom: 8,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: slot.description }}
+                  />
 
                   {/* Target route with View on Site link */}
                   <div
@@ -389,9 +899,12 @@ export default function VideosView({
                       border: '1px solid #F1F5F9',
                     }}
                   >
-                    <span>
-                      Route: <Text code style={{ fontSize: 11 }}>{slot.page_location}</Text>
-                    </span>
+                    <div>
+                      <span>Route: <Text code style={{ fontSize: 11 }}>{slot.page_location}</Text></span>
+                      {slot.section_anchor && (
+                        <span style={{ marginLeft: 6, color: '#94A3B8', fontSize: 11 }}>{slot.section_anchor}</span>
+                      )}
+                    </div>
                     <a
                       href={targetRoute}
                       target="_blank"
@@ -414,7 +927,7 @@ export default function VideosView({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, gap: 8 }}>
                   <Button
                     size="small"
-                    icon={<UploadOutlined />}
+                    icon={<EditOutlined />}
                     style={{
                       borderRadius: 8,
                       borderColor: '#E2E8F0',
@@ -429,9 +942,9 @@ export default function VideosView({
                       gap: 5,
                       boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                     }}
-                    onClick={() => handleOpenReplace(slot)}
+                    onClick={() => handleOpenEditPage(slot)}
                   >
-                    Replace Video
+                    Edit & Replace
                   </Button>
 
                   <Space size="small">
@@ -539,135 +1052,6 @@ export default function VideosView({
         />
       </div>
 
-      {/* ─── Modal: Replace / Upload Video ─── */}
-      <Modal
-        title={`Replace Film for ${selectedVideo?.slot_label}`}
-        open={isReplaceModalOpen}
-        onCancel={() => {
-          setIsReplaceModalOpen(false);
-          setSelectedVideo(null);
-        }}
-        footer={null}
-        width={680}
-        destroyOnClose
-      >
-        <Form form={replaceForm} layout="vertical" onFinish={handleReplaceSubmit} style={{ marginTop: 12 }}>
-          <Tabs
-            activeKey={replaceSourceType}
-            onChange={(key) => setReplaceSourceType(key as 'upload' | 'url')}
-            items={[
-              {
-                key: 'upload',
-                label: (
-                  <span>
-                    <UploadOutlined /> Select Local Video File
-                  </span>
-                ),
-                children: (
-                  <div style={{ marginBottom: 16 }}>
-                    <Dragger
-                      accept="video/*"
-                      maxCount={1}
-                      beforeUpload={(file) => {
-                        const blobUrl = URL.createObjectURL(file);
-                        setUploadedVideoUrl(blobUrl);
-                        setUploadedFileName(file.name);
-                        replaceForm.setFieldsValue({ video_url: blobUrl });
-                        message.success(`Loaded video: ${file.name}`);
-                        return false; // prevent default upload POST
-                      }}
-                      showUploadList={false}
-                      style={{ padding: '24px 16px', background: '#F8FAFC', borderRadius: 10, borderColor: '#CBD5E1' }}
-                    >
-                      <p className="ant-upload-drag-icon">
-                        <InboxOutlined style={{ color: '#F97316', fontSize: 44 }} />
-                      </p>
-                      <p style={{ fontWeight: 600, color: '#0F172A', fontSize: 14 }}>
-                        Click or drag MP4, WebM, or MOV file here
-                      </p>
-                      <p style={{ color: '#64748B', fontSize: 12 }}>
-                        Seamlessly load new reel for this website slot
-                      </p>
-                      {uploadedFileName && (
-                        <Tag color="success" style={{ marginTop: 8, padding: '4px 10px', fontSize: 12 }}>
-                          Ready: {uploadedFileName}
-                        </Tag>
-                      )}
-                    </Dragger>
-                  </div>
-                ),
-              },
-              {
-                key: 'url',
-                label: (
-                  <span>
-                    <LinkOutlined /> Video Link / YouTube / CDN
-                  </span>
-                ),
-                children: (
-                  <div style={{ marginBottom: 16 }}>
-                    <Form.Item
-                      name="video_url"
-                      label="Direct MP4 URL or YouTube / Vimeo link"
-                      help="Supports direct MP4 links (https://...), YouTube (https://youtu.be/...), or Vimeo"
-                    >
-                      <Input
-                        placeholder="e.g. https://www.youtube.com/watch?v=... or https://cdn.../video.mp4"
-                        onChange={(e) => setUploadedVideoUrl(e.target.value)}
-                      />
-                    </Form.Item>
-                  </div>
-                ),
-              },
-            ]}
-          />
-
-          <Form.Item name="title" label="Film Title" rules={[{ required: true }]}>
-            <Input placeholder="Enter film title" />
-          </Form.Item>
-
-          <Form.Item name="description" label="Short Synopsis" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} placeholder="Brief description of this video feature" />
-          </Form.Item>
-
-          <Form.Item name="duration" label="Duration (e.g. 1:45)" rules={[{ required: true }]}>
-            <Input placeholder="1:45" />
-          </Form.Item>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24 }}>
-            <Button
-              onClick={() => setIsReplaceModalOpen(false)}
-              style={{
-                borderRadius: 8,
-                height: 38,
-                borderColor: '#CBD5E1',
-                color: '#475569',
-                fontWeight: 500,
-                padding: '0 18px',
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                backgroundColor: '#F97316',
-                borderColor: '#F97316',
-                borderRadius: 8,
-                height: 38,
-                fontWeight: 600,
-                color: '#FFFFFF',
-                padding: '0 20px',
-                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
-              }}
-            >
-              Save & Go Live
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-
       {/* ─── Modal: Live Interactive Video Preview ─── */}
       <Modal
         title={
@@ -693,14 +1077,14 @@ export default function VideosView({
             </a>
             <Button
               type="primary"
-              icon={<UploadOutlined />}
+              icon={<EditOutlined />}
               onClick={() => {
                 setIsPreviewModalOpen(false);
-                if (selectedVideo) handleOpenReplace(selectedVideo);
+                if (selectedVideo) handleOpenEditPage(selectedVideo);
               }}
               style={{ backgroundColor: '#F97316', borderColor: '#F97316', borderRadius: 8, fontWeight: 600 }}
             >
-              Replace This Film
+              Edit This Film Page
             </Button>
           </div>
         }
@@ -761,81 +1145,13 @@ export default function VideosView({
                   Duration: <strong>{selectedVideo.duration}</strong> · Updated: {selectedVideo.updated_at}
                 </span>
               </div>
-              <Paragraph style={{ marginTop: 12, fontSize: 13.5, color: '#334155', lineHeight: 1.6 }}>
-                {selectedVideo.description}
-              </Paragraph>
+              <div
+                style={{ marginTop: 12, fontSize: 13.5, color: '#334155', lineHeight: 1.6 }}
+                dangerouslySetInnerHTML={{ __html: selectedVideo.description }}
+              />
             </div>
           </div>
         )}
-      </Modal>
-
-      {/* ─── Modal: Add Video Slot ─── */}
-      <Modal
-        title="Add New Video Slot"
-        open={isAddModalOpen}
-        onCancel={() => setIsAddModalOpen(false)}
-        footer={null}
-        destroyOnClose
-      >
-        <Form form={addForm} layout="vertical" onFinish={handleAddSubmit}>
-          <Form.Item name="slot_label" label="Slot Identifier" rules={[{ required: true, message: 'e.g. Testimonial Cinema' }]}>
-            <Input placeholder="e.g. Stories That Save Lives" />
-          </Form.Item>
-          <Form.Item name="page_location" label="Page Location" rules={[{ required: true }]}>
-            <Select placeholder="Select target route">
-              <Option value="/ (Homepage)">/ (Homepage)</Option>
-              <Option value="/experience-the-story">/experience-the-story</Option>
-              <Option value="/who-we-are">/who-we-are</Option>
-              <Option value="/how-we-serve">/how-we-serve</Option>
-              <Option value="/join-the-movement">/join-the-movement</Option>
-              <Option value="/meet-us">/meet-us</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="title" label="Initial Title" rules={[{ required: true }]}>
-            <Input placeholder="e.g. Living Proof: Stories of Community Hope" />
-          </Form.Item>
-          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} placeholder="Brief summary of what this film conveys to visitors." />
-          </Form.Item>
-          <Form.Item name="duration" label="Duration" initialValue="1:30">
-            <Input placeholder="1:30" />
-          </Form.Item>
-          <Form.Item name="video_url" label="Initial Video (Optional)">
-            <Input placeholder="welcome or YouTube URL" />
-          </Form.Item>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
-            <Button
-              onClick={() => setIsAddModalOpen(false)}
-              style={{
-                borderRadius: 8,
-                height: 38,
-                borderColor: '#CBD5E1',
-                color: '#475569',
-                fontWeight: 500,
-                padding: '0 18px',
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                backgroundColor: '#F97316',
-                borderColor: '#F97316',
-                borderRadius: 8,
-                height: 38,
-                fontWeight: 600,
-                color: '#FFFFFF',
-                padding: '0 20px',
-                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
-              }}
-            >
-              Create Slot
-            </Button>
-          </div>
-        </Form>
       </Modal>
     </div>
   );

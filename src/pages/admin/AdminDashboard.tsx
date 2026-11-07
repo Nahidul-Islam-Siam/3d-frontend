@@ -157,6 +157,10 @@ export default function AdminDashboard() {
     setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
   };
 
+  const handleDeleteEvent = (id: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+  };
+
   const handleUpdateVolunteerStatus = (id: string, status: VolunteerApplication['status']) => {
     setVolunteers((prev) =>
       prev.map((v) => (v.id === id ? { ...v, status } : v))
@@ -748,6 +752,7 @@ export default function AdminDashboard() {
                   events={events}
                   onAddEvent={handleAddEvent}
                   onUpdateEvent={handleUpdateEvent}
+                  onDeleteEvent={handleDeleteEvent}
                 />
               )}
 
