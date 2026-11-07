@@ -16,7 +16,6 @@ import {
 } from 'antd';
 import {
   DashboardOutlined,
-  DollarOutlined,
   VideoCameraOutlined,
   CalendarOutlined,
   TeamOutlined,
@@ -37,11 +36,9 @@ import {
 
 // Import Mock Data
 import {
-  INITIAL_DONATIONS,
   INITIAL_VIDEOS,
   INITIAL_EVENTS,
   INITIAL_VOLUNTEERS,
-  type Donation,
   type VideoSlot,
   type EventItem,
   type VolunteerApplication,
@@ -49,7 +46,6 @@ import {
 
 // Import Views
 import OverviewView from './views/OverviewView';
-import DonationsView from './views/DonationsView';
 import VideosView from './views/VideosView';
 import EventsView from './views/EventsView';
 import VolunteersView from './views/VolunteersView';
@@ -71,7 +67,7 @@ export default function AdminDashboard() {
       }
       return 'settings-profile';
     }
-    if (sub && ['donations', 'videos', 'events', 'volunteers'].includes(sub)) {
+    if (sub && ['videos', 'events', 'volunteers'].includes(sub)) {
       return sub;
     }
     return 'overview';
@@ -94,15 +90,6 @@ export default function AdminDashboard() {
   }, []);
 
   // Central Application State with LocalStorage Persistence
-  const [donations, setDonations] = useState<Donation[]>(() => {
-    try {
-      const saved = localStorage.getItem('lab_admin_donations');
-      return saved ? JSON.parse(saved) : INITIAL_DONATIONS;
-    } catch {
-      return INITIAL_DONATIONS;
-    }
-  });
-
   const [videos, setVideos] = useState<VideoSlot[]>(() => {
     try {
       const saved = localStorage.getItem('lab_admin_videos');
@@ -132,12 +119,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('lab_admin_donations', JSON.stringify(donations));
-    } catch {}
-  }, [donations]);
-
-  useEffect(() => {
-    try {
       localStorage.setItem('lab_admin_videos', JSON.stringify(videos));
     } catch {}
   }, [videos]);
@@ -155,15 +136,6 @@ export default function AdminDashboard() {
   }, [volunteers]);
 
   // State Updaters
-  const handleAddDonation = (newDonation: Donation) => {
-    setDonations((prev) => [newDonation, ...prev]);
-  };
-
-  const handleUpdateDonationStatus = (id: string, status: Donation['status']) => {
-    setDonations((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, status } : d))
-    );
-  };
 
   const handleUpdateVideo = (updated: VideoSlot) => {
     setVideos((prev) => prev.map((v) => (v.id === updated.id ? updated : v)));
@@ -217,11 +189,6 @@ export default function AdminDashboard() {
       key: 'overview',
       icon: <DashboardOutlined style={{ fontSize: 16 }} />,
       label: 'Overview',
-    },
-    {
-      key: 'donations',
-      icon: <DollarOutlined style={{ fontSize: 16 }} />,
-      label: 'Donations',
     },
     {
       key: 'videos',
@@ -311,7 +278,6 @@ export default function AdminDashboard() {
 
   const activeTitleMap: Record<string, string> = {
     overview: 'Mission Overview',
-    donations: 'Donations & Giving',
     videos: 'Cinematic Story Reel',
     events: 'Events & Dinners',
     volunteers: 'Volunteer Family',
@@ -452,7 +418,7 @@ export default function AdminDashboard() {
           }}
           onClick={() => {
             setNotificationOpen(false);
-            handleTabChange('donations');
+            handleTabChange('volunteers');
           }}
         >
           <span
@@ -467,10 +433,10 @@ export default function AdminDashboard() {
           />
           <div>
             <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1E293B' }}>
-              Major Gift: $5,000 Received
+              Volunteer Approved: Sarah Davis
             </div>
             <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 2 }}>
-              Marcus Sterling contributed to Suicide Awareness.
+              Onboarded to Community Meals team.
             </div>
             <div style={{ fontSize: 10.5, color: '#94A3B8', marginTop: 4 }}>
               2 hours ago
@@ -761,19 +727,10 @@ export default function AdminDashboard() {
             <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }}>
               {activeTab === 'overview' && (
                 <OverviewView
-                  donations={donations}
                   videos={videos}
                   events={events}
                   volunteers={volunteers}
                   onNavigateTab={handleTabChange}
-                />
-              )}
-
-              {activeTab === 'donations' && (
-                <DonationsView
-                  donations={donations}
-                  onAddDonation={handleAddDonation}
-                  onUpdateStatus={handleUpdateDonationStatus}
                 />
               )}
 

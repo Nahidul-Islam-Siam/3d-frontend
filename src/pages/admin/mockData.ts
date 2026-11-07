@@ -1,12 +1,12 @@
-﻿export interface Donation {
+export interface Donation {
   id: string;
   donor_name: string;
   donor_email: string;
   program: string;  
   frequency: 'One-time' | 'Monthly recurring';
-  method: 'Card (Stripe)' | 'Bank transfer (ACH)' | 'Check' | 'Cash';
+  method: 'Square' | 'Zeffy' | 'Bank transfer (ACH)' | 'Check' | 'Cash';
   donation_date: string;
-  status: 'Paid' | 'Pending' | 'Failed' | 'Refunded';
+  status: 'Paid';
   amount: number;
   notes?: string;
 }
@@ -15,14 +15,20 @@ export interface VideoSlot {
   id: string;
   slot_label: string;
   page_location: string;
+  section_anchor?: string;
   title: string;
   description: string;
   duration: string;
   status: 'Live' | 'Draft' | 'Empty';
   video_url?: string;
   thumbnail?: string;
+  video_type?: 'MP4 Video' | 'YouTube' | 'Vimeo';
+  category?: 'Community Meals' | 'LEADS Youth Development' | 'Suicide Awareness Showdown' | 'Veterans Support' | 'General';
+  featured?: boolean;
+  views_count?: number;
   sort_order: number;
   updated_at: string;
+  created_at?: string;
 }
 
 export interface EventItem {
@@ -61,7 +67,8 @@ export interface AdminMember {
 }
 
 export interface SystemSettings {
-  stripe_enabled: boolean;
+  square_enabled: boolean;
+  zeffy_enabled: boolean;
   ach_enabled: boolean;
   apple_pay_enabled: boolean;
   offline_gifts_enabled: boolean;
@@ -89,7 +96,7 @@ export const INITIAL_DONATIONS: Donation[] = [
     donor_email: 'eleanor.wright@heritage.org',
     program: 'Community Meals',
     frequency: 'Monthly recurring',
-    method: 'Card (Stripe)',
+    method: 'Square',
     donation_date: '2026-11-03',
     status: 'Paid',
     amount: 500,
@@ -113,7 +120,7 @@ export const INITIAL_DONATIONS: Donation[] = [
     donor_email: 'raymond.chen@metrohealth.edu',
     program: 'LEADS Youth Development',
     frequency: 'One-time',
-    method: 'Card (Stripe)',
+    method: 'Square',
     donation_date: '2026-11-02',
     status: 'Paid',
     amount: 1250,
@@ -125,7 +132,7 @@ export const INITIAL_DONATIONS: Donation[] = [
     donor_email: 'gmontgomery@gmail.com',
     program: 'Community Meals',
     frequency: 'Monthly recurring',
-    method: 'Card (Stripe)',
+    method: 'Zeffy',
     donation_date: '2026-11-01',
     status: 'Paid',
     amount: 150,
@@ -139,9 +146,9 @@ export const INITIAL_DONATIONS: Donation[] = [
     frequency: 'One-time',
     method: 'Check',
     donation_date: '2026-10-31',
-    status: 'Pending',
+    status: 'Paid',
     amount: 3200,
-    notes: 'Check #4829 deposited; clearing with regional credit union.',
+    notes: 'Check #4829 deposited directly into endowment account.',
   },
   {
     id: 'don-106',
@@ -149,7 +156,7 @@ export const INITIAL_DONATIONS: Donation[] = [
     donor_email: 'mendez.family@outlook.com',
     program: 'Veterans Support',
     frequency: 'Monthly recurring',
-    method: 'Card (Stripe)',
+    method: 'Square',
     donation_date: '2026-10-30',
     status: 'Paid',
     amount: 250,
@@ -161,7 +168,7 @@ export const INITIAL_DONATIONS: Donation[] = [
     donor_email: 'giving@donoradvisory.com',
     program: 'General Fund',
     frequency: 'One-time',
-    method: 'Card (Stripe)',
+    method: 'Square',
     donation_date: '2026-10-29',
     status: 'Paid',
     amount: 10000,
@@ -169,18 +176,6 @@ export const INITIAL_DONATIONS: Donation[] = [
   },
   {
     id: 'don-108',
-    donor_name: 'Hannah Abbott',
-    donor_email: 'hannah.abbott@yahoo.com',
-    program: 'LEADS Youth Development',
-    frequency: 'Monthly recurring',
-    method: 'Card (Stripe)',
-    donation_date: '2026-10-28',
-    status: 'Failed',
-    amount: 100,
-    notes: 'Card expired. Automated retry scheduled by Stripe.',
-  },
-  {
-    id: 'don-109',
     donor_name: 'David K. Morrison',
     donor_email: 'dmorrison@northstarlogistics.com',
     program: 'Community Meals',
@@ -192,31 +187,19 @@ export const INITIAL_DONATIONS: Donation[] = [
     notes: 'Handed in at the Sunday fellowship supper.',
   },
   {
-    id: 'don-110',
+    id: 'don-109',
     donor_name: 'Beatrice Lawson',
     donor_email: 'blawson@lawsonlegal.com',
     program: 'Suicide Awareness Showdown',
     frequency: 'One-time',
-    method: 'Card (Stripe)',
+    method: 'Square',
     donation_date: '2026-10-27',
     status: 'Paid',
     amount: 1500,
     notes: 'Youth mental health helpline resource printings.',
   },
   {
-    id: 'don-111',
-    donor_name: 'Keith Patterson',
-    donor_email: 'kpatterson@fastmail.fm',
-    program: 'Community Meals',
-    frequency: 'One-time',
-    method: 'Card (Stripe)',
-    donation_date: '2026-10-25',
-    status: 'Refunded',
-    amount: 300,
-    notes: 'Donor accidentally charged twice; second charge refunded.',
-  },
-  {
-    id: 'don-112',
+    id: 'don-110',
     donor_name: 'Sarah Mitchell',
     donor_email: 'sarah.m@liveachievebelieve.org',
     program: 'General Fund',
@@ -534,7 +517,8 @@ export const INITIAL_ADMIN_MEMBERS: AdminMember[] = [
 ];
 
 export const INITIAL_SETTINGS: SystemSettings = {
-  stripe_enabled: true,
+  square_enabled: true,
+  zeffy_enabled: true,
   ach_enabled: true,
   apple_pay_enabled: true,
   offline_gifts_enabled: true,

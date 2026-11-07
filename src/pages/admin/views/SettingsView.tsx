@@ -114,7 +114,7 @@ Last updated: November 2026
 Live Achieve Believe ("we", "us", or "our") respects your privacy and is committed to protecting the personal information you share with us.
 
 1. Information We Collect
-We collect personal information when you register as a donor, apply as a volunteer, RSVP for community dinners, or subscribe to our newsletter. This includes your name, email, phone number, mailing address, and payment information processed through secure PCI-compliant processors (Stripe).
+We collect personal information when you register as a donor, apply as a volunteer, RSVP for community dinners, or subscribe to our newsletter. This includes your name, email, phone number, mailing address, and payment information processed through secure PCI-compliant processors (Square, Zeffy).
 
 2. Donor Data Protection & Non-Commercial Guarantee
 We will never sell, rent, trade, or share your personal donor information with any outside commercial entities or marketing brokers. All donor data is used solely for tax receipt issuance, stewardship updates, and mission transparency.
