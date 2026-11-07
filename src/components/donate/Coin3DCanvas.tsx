@@ -1,519 +1,205 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import * as THREE from 'three';
-import coinHeadsImg from '@/assets/donate/coin-heads-final.png';
-import coinHeadsBump from '@/assets/donate/coin-heads-bump.png';
-import coinTailsImg from '@/assets/donate/coin-tails-final.png';
-import coinTailsBump from '@/assets/donate/coin-tails-bump.png';
-import { RotateCw, Sparkles, Hand, Volume2, VolumeX, Eye } from 'lucide-react';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import InteractiveCoinCanvas from './InteractiveCoinCanvas';
+import headsUrl from '@/assets/donate/coin-heads-final.png';
+import headsBumpUrl from '@/assets/donate/coin-heads-bump.png';
+import tailsUrl from '@/assets/donate/coin-tails-final.png';
+import tailsBumpUrl from '@/assets/donate/coin-tails-bump.png';
 
 export interface Coin3DCanvasProps {
   className?: string;
   onFlipEnd?: (side: 'heads' | 'tails') => void;
+  /** Already damped stage progress. Reading a ref avoids React renders per frame. */
+  progressRef?: RefObject<number>;
 }
 
-export default function Coin3DCanvas({
-  className = '',
-  onFlipEnd,
-}: Coin3DCanvasProps) {
-  const mountRef = useRef<HTMLDivElement | null>(null);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const [currentSide, setCurrentSide] = useState<'heads' | 'tails'>('heads');
-  const [flipCount, setFlipCount] = useState(0);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+export default function Coin3DCanvas(props: Coin3DCanvasProps) {
+  return props.progressRef
+    ? <ScrollCoinCanvas progressRef={props.progressRef} className={props.className} />
+    : <InteractiveCoinCanvas className={props.className} onFlipEnd={props.onFlipEnd} />;
+}
 
-  const flipActionRef = useRef<() => void>(() => {});
-  const showSideRef = useRef<(side: 'heads' | 'tails') => void>(() => {});
-
-  // Web Audio synthetic realistic coin ring clink
-  const playCoinSound = useCallback(() => {
-    if (!soundEnabled) return;
-    try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      if (ctx.state === 'suspended') ctx.resume();
-
-      const now = ctx.currentTime;
-      const osc1 = ctx.createOscillator();
-      const osc2 = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(2800, now);
-      osc1.frequency.exponentialRampToValueAtTime(1600, now + 0.5);
-
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(5600, now);
-      osc2.frequency.exponentialRampToValueAtTime(3200, now + 0.35);
-
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-      osc1.connect(gain);
-      osc2.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc1.start(now);
-      osc2.start(now);
-      osc1.stop(now + 0.65);
-      osc2.stop(now + 0.65);
-    } catch {
-      // Audio not permitted yet
-    }
-  }, [soundEnabled]);
+function ScrollCoinCanvas({ progressRef, className = '' }: {
+  progressRef: RefObject<number>;
+  className?: string;
+}) {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-
-    // ─── 1. THREE.JS SCENE SETUP ───
-    const width = mount.clientWidth || 500;
-    const height = mount.clientHeight || 500;
-
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+    } catch {
+      // The textured image remains visible when WebGL is unavailable.
+      return;
+    }
+    let disposed = false;
+    let frame = 0;
+    let visible = false;
+    let previousTime = 0;
     const scene = new THREE.Scene();
-
-    // Balanced perspective camera: coin fills ~60% of viewport, leaving room for 3D depth & shadow
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0, 7.5);
-
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 50);
+    camera.position.z = 9.4;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 0.95;
     mount.appendChild(renderer.domElement);
 
-    // ─── 2. REEDED EDGE TEXTURE (Milled metallic ridges) ───
-    const createReededEdgeTexture = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 64;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = '#b3823f';
-        ctx.fillRect(0, 0, 1024, 64);
-        for (let x = 0; x < 1024; x += 4) {
-          ctx.fillStyle = '#4a2c08';
-          ctx.fillRect(x, 0, 1.5, 64);
-          ctx.fillStyle = '#fed789';
-          ctx.fillRect(x + 1.5, 0, 1.5, 64);
-        }
+    // Metals need reflected light as well as direct lights to retain their relief.
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    const environment = pmrem.fromScene(room, 0.04);
+    scene.environment = environment.texture;
+    scene.environmentIntensity = 1.1;
+    room.dispose();
+    pmrem.dispose();
+
+    const textures: THREE.Texture[] = [];
+    const loader = new THREE.TextureLoader();
+    let loaded = 0;
+    const load = (url: string, color: boolean) => {
+      const texture = loader.load(url, () => {
+        if (disposed) { texture.dispose(); return; }
+        loaded += 1;
+        if (loaded === 4) setReady(true);
+      });
+      if (color) texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      textures.push(texture);
+      return texture;
+    };
+    const heads = load(headsUrl, true);
+    const headsBump = load(headsBumpUrl, false);
+    const tails = load(tailsUrl, true);
+    const tailsBump = load(tailsBumpUrl, false);
+
+    const edgeCanvas = document.createElement('canvas');
+    edgeCanvas.width = 1024;
+    edgeCanvas.height = 32;
+    const context = edgeCanvas.getContext('2d');
+    if (context) {
+      context.fillStyle = '#D4AF37';
+      context.fillRect(0, 0, 1024, 32);
+      for (let x = 0; x < 1024; x += 8) {
+        context.fillStyle = '#B8860B';
+        context.fillRect(x, 0, 3, 32);
+        context.fillStyle = '#f5d886';
+        context.fillRect(x + 3, 0, 2, 32);
       }
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.repeat.set(16, 1);
-      return tex;
-    };
-
-    // ─── 3. SOFT CONTACT SHADOW (Velvety floating shadow) ───
-    const createShadowTexture = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 235);
-        grad.addColorStop(0, 'rgba(0, 0, 0, 0.60)');
-        grad.addColorStop(0.3, 'rgba(0, 0, 0, 0.38)');
-        grad.addColorStop(0.65, 'rgba(0, 0, 0, 0.12)');
-        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 512, 512);
+    }
+    const edgeTexture = new THREE.CanvasTexture(edgeCanvas);
+    edgeTexture.colorSpace = THREE.SRGBColorSpace;
+    textures.push(edgeTexture);
+    const rim = new THREE.MeshStandardMaterial({
+      color: '#D4AF37', map: edgeTexture, bumpMap: edgeTexture,
+      bumpScale: 0.035, metalness: 0.9, roughness: 0.3,
+    });
+    const face = (map: THREE.Texture, bumpMap: THREE.Texture) => new THREE.MeshStandardMaterial({
+      color: '#d4af6a', map, bumpMap, bumpScale: 0.045, metalness: 0.85, roughness: 0.28,
+    });
+    const materials = [rim, face(heads, headsBump), face(tails, tailsBump)];
+    const geometry = new THREE.CylinderGeometry(2.2, 2.2, 0.2, 128, 1);
+    // Bake the cylinder's Y axis into Z. Heads now faces the camera at rotation.y = 0.
+    geometry.rotateX(Math.PI / 2);
+    // Map each cap in world XY so both artwork faces are upright and never mirrored.
+    const positions = geometry.getAttribute('position');
+    const uv = geometry.getAttribute('uv');
+    for (const group of geometry.groups.slice(1)) {
+      const index = geometry.getIndex();
+      if (!index) continue;
+      for (let i = group.start; i < group.start + group.count; i++) {
+        const vertex = index.getX(i);
+        const x = positions.getX(vertex) / 4.4;
+        uv.setXY(vertex, 0.5 + (group.materialIndex === 2 ? -x : x), 0.5 + positions.getY(vertex) / 4.4);
       }
-      return new THREE.CanvasTexture(canvas);
-    };
+    }
+    uv.needsUpdate = true;
+    const coin = new THREE.Mesh(geometry, materials);
+    scene.add(coin);
+    scene.add(new THREE.AmbientLight('#fff0dc', 0.8));
+    const key = new THREE.DirectionalLight('#fff7e7', 3.5);
+    key.position.set(-3, 4, 6);
+    const warm = new THREE.DirectionalLight('#FFA500', 2);
+    warm.position.set(5, 1, -3);
+    const rimLight = new THREE.DirectionalLight('#F97316', 2.5);
+    rimLight.position.set(-4, -2, -2);
+    scene.add(key, warm, rimLight);
 
-    const shadowTex = createShadowTexture();
-    const shadowGeo = new THREE.PlaneGeometry(6.2, 6.2);
-    const shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTex,
-      transparent: true,
-      opacity: 0.70,
-      depthWrite: false,
-    });
-    const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-    shadowMesh.rotation.x = -Math.PI / 2;
-    shadowMesh.position.y = -2.35;
-    scene.add(shadowMesh);
-
-    // ─── 4. COIN GEOMETRY & PBR MATERIALS ───
-    // Diameter = 3.8, Thickness = 0.24 (Prominent 3D thickness so bevel & reeded rim are unmistakable!)
-    const coinGeometry = new THREE.CylinderGeometry(1.9, 1.9, 0.24, 128, 1, false);
-
-    const textureLoader = new THREE.TextureLoader();
-
-    // Side Rim Material
-    const reededTex = createReededEdgeTexture();
-    const edgeMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd8a252,
-      roughness: 0.28,
-      metalness: 0.94,
-      map: reededTex,
-      bumpMap: reededTex,
-      bumpScale: 0.04,
-    });
-
-    // Top Cap: HEADS SIDE (President John F. Kennedy • LIBERTY • 2015)
-    const headsTex = textureLoader.load(coinHeadsImg);
-    headsTex.colorSpace = THREE.SRGBColorSpace;
-    headsTex.anisotropy = 16;
-    headsTex.center.set(0.5, 0.5);
-    headsTex.rotation = Math.PI / 2;
-
-    const headsBump = textureLoader.load(coinHeadsBump);
-    headsBump.anisotropy = 16;
-    headsBump.center.set(0.5, 0.5);
-    headsBump.rotation = Math.PI / 2;
-
-    const headsMaterial = new THREE.MeshStandardMaterial({
-      color: 0xdfa058, // Warm lustrous mint gold / bronze
-      map: headsTex,
-      bumpMap: headsBump,
-      bumpScale: 0.075,
-      roughness: 0.24,
-      metalness: 0.92,
-    });
-
-    // Bottom Cap: TAILS SIDE (Presidential Seal • Eagle • HALF DOLLAR)
-    const tailsTex = textureLoader.load(coinTailsImg);
-    tailsTex.colorSpace = THREE.SRGBColorSpace;
-    tailsTex.anisotropy = 16;
-    tailsTex.center.set(0.5, 0.5);
-    tailsTex.rotation = -Math.PI / 2;
-
-    const tailsBump = textureLoader.load(coinTailsBump);
-    tailsBump.anisotropy = 16;
-    tailsBump.center.set(0.5, 0.5);
-    tailsBump.rotation = -Math.PI / 2;
-
-    const tailsMaterial = new THREE.MeshStandardMaterial({
-      color: 0xdfa058, // Matching warm lustrous metal
-      map: tailsTex,
-      bumpMap: tailsBump,
-      bumpScale: 0.075,
-      roughness: 0.24,
-      metalness: 0.92,
-    });
-
-    // Cylinder materials: [0: side, 1: top (Heads), 2: bottom (Tails)]
-    const materials = [edgeMaterial, headsMaterial, tailsMaterial];
-    const coinMesh = new THREE.Mesh(coinGeometry, materials);
-
-    // Initial dramatic 3D perspective angle (clearly exposes front face, thickness, and rim bevel)
-    const defaultRotX = 0.42; // Tilted back so top face is facing viewer at 3D angle
-    const defaultRotY = -0.55; // Turned sideways so side thickness & reeded edge are prominent!
-    const defaultRotZ = 0.12;
-
-    coinMesh.rotation.set(defaultRotX, defaultRotY, defaultRotZ);
-    scene.add(coinMesh);
-
-    // ─── 5. STUDIO LIGHTING RIG (Oryzo.ai Cinematic Model) ───
-    const ambientLight = new THREE.AmbientLight(0xfff6ec, 1.4);
-    scene.add(ambientLight);
-
-    // Main Key Spotlight (Picks out relief of the portrait and eagle)
-    const keyLight = new THREE.DirectionalLight(0xfffaed, 4.0);
-    keyLight.position.set(4, 7, 6);
-    scene.add(keyLight);
-
-    // Searing Golden Rim Light (Ignites the reeded edge ridges)
-    const rimLight = new THREE.DirectionalLight(0xf97316, 4.8);
-    rimLight.position.set(-6, -2, -5);
-    scene.add(rimLight);
-
-    // Soft Upward Fill Light
-    const fillLight = new THREE.DirectionalLight(0xffdfbe, 1.8);
-    fillLight.position.set(2, -5, 4);
-    scene.add(fillLight);
-
-    // Interactive Specular Cursor Gleam
-    const gleamLight = new THREE.PointLight(0xffffff, 3.5, 15);
-    gleamLight.position.set(0, 0, 5);
-    scene.add(gleamLight);
-
-    // ─── 6. DRAG & MOUSE TILT PHYSICS ───
-    let mouseTargetX = 0;
-    let mouseTargetY = 0;
-    let mouseCurrentX = 0;
-    let mouseCurrentY = 0;
-
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dragRotY = defaultRotY;
-    let dragRotX = defaultRotX;
-
-    const onPointerDown = (e: PointerEvent) => {
-      isDragging = true;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
+    let pointerX = 0;
+    let pointerY = 0;
+    let tiltX = 0;
+    let tiltY = 0;
+    const onMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return;
       const rect = mount.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-
-      gleamLight.position.x = x * 4.0;
-      gleamLight.position.y = y * 4.0;
-
-      if (isDragging) {
-        const deltaX = (e.clientX - dragStartX) * 0.01;
-        const deltaY = (e.clientY - dragStartY) * 0.01;
-        dragRotY += deltaX;
-        dragRotX += deltaY;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-      } else {
-        mouseTargetX = x * 0.45;
-        mouseTargetY = y * 0.35;
-      }
+      pointerX = THREE.MathUtils.clamp((event.clientX - rect.left) / rect.width * 2 - 1, -1, 1);
+      pointerY = THREE.MathUtils.clamp((event.clientY - rect.top) / rect.height * 2 - 1, -1, 1);
     };
-
-    const onPointerUp = () => {
-      isDragging = false;
-    };
-
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('pointerup', onPointerUp);
-    mount.addEventListener('pointerdown', onPointerDown);
-
-    // ─── 7. INTERACTIVE COIN TOSS & SIDE SWITCHING PHYSICS ───
-    let flipping = false;
-    let flipStartTime = 0;
-    const flipDuration = 1.35;
-    let targetSideIsHeads = true;
-
-    const flipCoin = () => {
-      if (flipping) return;
-      flipping = true;
-      setIsFlipping(true);
-      flipStartTime = performance.now();
-      // Decide landing side randomly
-      targetSideIsHeads = Math.random() > 0.5;
-      setFlipCount((prev) => prev + 1);
-      playCoinSound();
-    };
-
-    const showSide = (side: 'heads' | 'tails') => {
-      targetSideIsHeads = side === 'heads';
-      if (side === 'heads') {
-        dragRotX = defaultRotX;
-        dragRotY = defaultRotY;
-        setCurrentSide('heads');
-      } else {
-        dragRotX = defaultRotX + Math.PI;
-        dragRotY = defaultRotY;
-        setCurrentSide('tails');
-      }
-    };
-
-    flipActionRef.current = flipCoin;
-    showSideRef.current = showSide;
-
-    // ─── 8. ANIMATION RENDER LOOP ───
-    let animationFrameId: number;
-    const clock = new THREE.Clock();
-
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
-
-      // Inertia smoothing
-      mouseCurrentX += (mouseTargetX - mouseCurrentX) * 0.07;
-      mouseCurrentY += (mouseTargetY - mouseCurrentY) * 0.07;
-
-      if (!flipping) {
-        // Idle gentle weightless floating levitation
-        const idleHover = Math.sin(elapsedTime * 1.5) * 0.07;
-        coinMesh.position.y = idleHover;
-        shadowMesh.scale.setScalar(1 - idleHover * 0.55);
-        shadowMat.opacity = 0.70 - idleHover * 0.14;
-
-        if (isDragging) {
-          coinMesh.rotation.y = dragRotY;
-          coinMesh.rotation.x = dragRotX;
-        } else {
-          // Slow continuous ambient turn + responsive mouse tilt
-          dragRotY += 0.005;
-          coinMesh.rotation.y = dragRotY + mouseCurrentX;
-          coinMesh.rotation.x = dragRotX - mouseCurrentY;
-          coinMesh.rotation.z = defaultRotZ + mouseCurrentX * 0.2;
-        }
-
-        // Detect which side is facing camera based on normal
-        const normalZ = Math.cos(coinMesh.rotation.x);
-        setCurrentSide(normalZ > 0 ? 'heads' : 'tails');
-      } else {
-        // Physics parabolic arc toss
-        const now = performance.now();
-        const progress = (now - flipStartTime) / (flipDuration * 1000);
-
-        if (progress < 1) {
-          const maxHeight = 3.2;
-          const arc = 4 * maxHeight * progress * (1 - progress);
-          coinMesh.position.y = arc;
-
-          // Multi-axis high-speed spin
-          const totalFlips = targetSideIsHeads ? 6 : 7;
-          coinMesh.rotation.x = dragRotX + progress * Math.PI * totalFlips;
-          coinMesh.rotation.y = dragRotY + progress * Math.PI * 3;
-          coinMesh.rotation.z = Math.sin(progress * Math.PI * 4) * 0.35;
-
-          shadowMesh.scale.setScalar(Math.max(0.35, 1 - arc * 0.22));
-          shadowMat.opacity = Math.max(0.12, 0.70 - arc * 0.16);
-        } else {
-          // Settling
-          flipping = false;
-          setIsFlipping(false);
-          coinMesh.position.y = 0;
-          dragRotX = targetSideIsHeads ? defaultRotX : defaultRotX + Math.PI;
-          dragRotY = defaultRotY;
-          shadowMesh.scale.setScalar(1);
-          shadowMat.opacity = 0.70;
-          playCoinSound();
-          const finalSide = targetSideIsHeads ? 'heads' : 'tails';
-          setCurrentSide(finalSide);
-          if (onFlipEnd) onFlipEnd(finalSide);
-        }
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // ─── 9. RESIZE LISTENER ───
-    const handleResize = () => {
-      if (!mount) return;
-      const newW = mount.clientWidth;
-      const newH = mount.clientHeight;
-      camera.aspect = newW / newH;
+    const resetPointer = () => { pointerX = 0; pointerY = 0; };
+    mount.addEventListener('pointermove', onMove, { passive: true });
+    mount.addEventListener('pointerleave', resetPointer);
+    const resize = new ResizeObserver(() => {
+      const { width, height } = mount.getBoundingClientRect();
+      if (!width || !height) return;
+      camera.aspect = width / height;
+      // Keep the whole coin in view, even in narrow portrait containers.
+      camera.position.z = 9.4 / Math.min(camera.aspect, 1);
       camera.updateProjectionMatrix();
-      renderer.setSize(newW, newH);
-    };
+      renderer.setSize(width, height);
+    });
+    resize.observe(mount);
 
-    window.addEventListener('resize', handleResize);
+    const render = (time: number) => {
+      if (disposed || !visible) return;
+      const delta = Math.min((time - previousTime) / 1000, 0.05);
+      previousTime = time;
+      const damping = 1 - Math.exp(-10 * delta);
+      tiltX += (pointerY * Math.PI / 18 - tiltX) * damping;
+      tiltY += (pointerX * Math.PI / 18 - tiltY) * damping;
+      const p = THREE.MathUtils.clamp(progressRef.current, 0, 1);
+      // Hold heads, turn through the edge at 0.5, then settle on tails.
+      const turn = THREE.MathUtils.smoothstep(p, 0.28, 0.72);
+      coin.rotation.set(0.07 + tiltX, turn * Math.PI + tiltY, -0.035);
+      renderer.render(scene, camera);
+      frame = requestAnimationFrame(render);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      cancelAnimationFrame(frame);
+      if (visible) {
+        previousTime = performance.now();
+        frame = requestAnimationFrame(render);
+      }
+    }, { rootMargin: '100px' });
+    observer.observe(mount);
 
     return () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('resize', handleResize);
-      mount.removeEventListener('pointerdown', onPointerDown);
-      cancelAnimationFrame(animationFrameId);
-      if (mount.contains(renderer.domElement)) {
-        mount.removeChild(renderer.domElement);
-      }
+      disposed = true;
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      resize.disconnect();
+      mount.removeEventListener('pointermove', onMove);
+      mount.removeEventListener('pointerleave', resetPointer);
+      geometry.dispose();
+      materials.forEach(material => material.dispose());
+      textures.forEach(texture => texture.dispose());
+      environment.dispose();
+      scene.clear();
       renderer.dispose();
-      coinGeometry.dispose();
-      materials.forEach((m) => m.dispose());
-      shadowGeo.dispose();
-      shadowMat.dispose();
-      headsTex.dispose();
-      headsBump.dispose();
-      tailsTex.dispose();
-      tailsBump.dispose();
+      renderer.forceContextLoss();
+      renderer.domElement.remove();
     };
-  }, [onFlipEnd, playCoinSound]);
+  }, [progressRef]);
 
   return (
-    <div className={`relative flex flex-col items-center justify-center select-none w-full max-w-4xl mx-auto ${className}`}>
-      
-      {/* ─── 3D Three.js WebGL Canvas (Constrained height so it never cuts off or overflows!) ─── */}
-      <div
-        ref={mountRef}
-        onClick={() => flipActionRef.current()}
-        className="w-full h-[360px] sm:h-[440px] md:h-[500px] max-h-[58vh] cursor-grab active:cursor-grabbing touch-none relative z-10"
-        title="Click coin to toss, drag to inspect 360°"
-      />
-
-      {/* ─── Side Indicator Badge (Heads / Tails) ─── */}
-      <div className="relative z-20 flex items-center gap-2 mb-3 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-sans text-stone-300">
-        <Eye className="w-3.5 h-3.5 text-[#F97316]" />
-        <span>Currently Viewing:</span>
-        <strong className="text-white uppercase tracking-wider font-serif">
-          {currentSide === 'heads' ? 'Heads (Liberty Profile)' : 'Tails (Heraldic Eagle)'}
-        </strong>
-      </div>
-
-      {/* ─── Minimalist Control Pills ─── */}
-      <div className="flex flex-wrap items-center justify-center gap-2.5 relative z-20">
-        
-        {/* Toss Coin Button */}
-        <button
-          type="button"
-          onClick={() => flipActionRef.current()}
-          disabled={isFlipping}
-          className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-xs sm:text-sm font-serif font-bold shadow-[0_8px_25px_rgba(249,115,22,0.4)] transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 cursor-pointer"
-        >
-          <RotateCw
-            className={`w-4 h-4 text-white transition-transform duration-700 ${
-              isFlipping ? 'animate-spin' : 'group-hover:rotate-180'
-            }`}
-          />
-          <span>{isFlipping ? 'Tossing in the Air...' : 'Toss the Coin'}</span>
-          <Sparkles className="w-4 h-4 text-white animate-pulse" />
-        </button>
-
-        {/* Quick Side View Toggles */}
-        <button
-          type="button"
-          onClick={() => showSideRef.current('heads')}
-          className={`px-3.5 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer border ${
-            currentSide === 'heads'
-              ? 'bg-white/20 border-white/40 text-white font-bold'
-              : 'bg-white/5 border-white/10 text-stone-400 hover:text-white hover:bg-white/10'
-          }`}
-        >
-          Heads
-        </button>
-
-        <button
-          type="button"
-          onClick={() => showSideRef.current('tails')}
-          className={`px-3.5 py-2 rounded-full text-xs font-sans font-medium transition-all cursor-pointer border ${
-            currentSide === 'tails'
-              ? 'bg-white/20 border-white/40 text-white font-bold'
-              : 'bg-white/5 border-white/10 text-stone-400 hover:text-white hover:bg-white/10'
-          }`}
-        >
-          Tails
-        </button>
-
-        {/* Drag Hint */}
-        <div className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-sans">
-          <Hand className="w-3.5 h-3.5 text-[#F97316]" />
-          <span>Drag 360°</span>
-        </div>
-
-        {/* Sound Toggle */}
-        <button
-          type="button"
-          onClick={() => setSoundEnabled((prev) => !prev)}
-          className="p-2 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          title={soundEnabled ? 'Mute coin ring sound' : 'Unmute coin ring sound'}
-          aria-label="Toggle coin sound"
-        >
-          {soundEnabled ? (
-            <Volume2 className="w-3.5 h-3.5 text-[#F97316]" />
-          ) : (
-            <VolumeX className="w-3.5 h-3.5 text-stone-400" />
-          )}
-        </button>
-
-      </div>
-
-      {flipCount > 0 && (
-        <span className="mt-2.5 text-xs font-sans text-stone-400 tracking-wider">
-          Tosses: {flipCount} • Every coin represents tangible hope
-        </span>
-      )}
-
+    <div className={`relative ${className}`} role="img" aria-label="A gold coin turns from heads through its reeded edge to tails as you scroll.">
+      <img src={headsUrl} alt="" aria-hidden="true" className={`absolute inset-0 m-auto w-3/4 h-3/4 object-contain ${ready ? 'invisible' : ''}`} />
+      <div ref={mountRef} className={`absolute inset-0 ${ready ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
     </div>
   );
 }
