@@ -31,7 +31,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF4E6] text-stone-900 overflow-x-hidden selection:bg-[#F97316] selection:text-white">
+    <div className={`min-h-screen flex flex-col bg-[#FAF4E6] text-stone-900 ${location.pathname === '/donate' ? 'overflow-x-clip' : 'overflow-x-hidden'} selection:bg-[#F97316] selection:text-white`}>
       {/* Butter-smooth Lenis scroll across the entire application */}
       <SmoothScroll />
 
