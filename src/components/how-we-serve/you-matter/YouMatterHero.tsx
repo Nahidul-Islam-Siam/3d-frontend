@@ -111,14 +111,7 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
         <div className="flex-1" />
 
         {/* Bottom Right: Scroll to Title */}
-        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pb-10 sm:pb-12 flex justify-between items-end">
-          <div className="hidden sm:block">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white/90 text-xs font-sans tracking-wide">
-              <span className="w-2 h-2 rounded-full bg-[#F97316] animate-pulse" />
-              Live Achieve Believe · Bright Hopeful Youth Community
-            </span>
-          </div>
-
+        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pb-10 sm:pb-12 flex justify-end items-end">
           <button
             type="button"
             onClick={handleScrollToTitle}
