@@ -1,15 +1,24 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CiMenuFries } from "react-icons/ci";
-import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import SideNav from "./side-nav";
 import logoWithText from "@/assets/logo/logo-with-text.png";
 import logoIconWhite from "@/assets/logo/logo-icon-white.png";
 import btnArrow from "@/assets/icons/btn-arrow.png";
 
+interface NavItem {
+  label: string;
+  to: string;
+  children?: { label: string; to: string }[];
+}
+
 export default function Navbar() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
@@ -21,6 +30,21 @@ export default function Navbar() {
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
   const toggleOpen = () => setIsOpen(!isOpen);
+
+  const handleMouseEnter = (label: string) => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    setOpenDropdown(label);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 150);
+  };
+
+  useEffect(() => {
+    setOpenDropdown(null);
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     // Initial reveal state
@@ -42,14 +66,25 @@ export default function Navbar() {
       window.removeEventListener('reveal-navbar', handleReveal);
       window.removeEventListener('hide-navbar', handleHide);
       window.removeEventListener('scroll', handleScroll);
+      if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
     };
   }, [isHomePage]);
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { label: "Welcome", to: "/" },
     { label: "Experience the Story", to: "/about" },
     { label: "Who We Are", to: "/who-we-are" },
-    { label: "How We Serve", to: "/how-we-serve" },
+    { 
+      label: "How We Serve", 
+      to: "/how-we-serve",
+      children: [
+        { label: "A Place of the Table", to: "/how-we-serve#place-at-the-table" },
+        { label: "You Matter", to: "/how-we-serve#you-matter" },
+        { label: "Stories That Save Lives", to: "/how-we-serve#stories-that-save-lives" },
+        { label: "Welcome Home", to: "/how-we-serve#welcome-home" },
+        { label: "Serve Beside Us", to: "/how-we-serve#serve-beside-us" },
+      ]
+    },
     { label: "Join the Movement", to: "/movement" },
     { label: "Meet Us", to: "/meet-us" },
   ];
@@ -102,29 +137,101 @@ export default function Navbar() {
           }`}>
             {navItems.map((item) => {
               const isActive = location.pathname === item.to;
+              const hasDropdown = Boolean(item.children && item.children.length > 0);
+              const isDropdownOpen = openDropdown === item.label;
 
               return (
-                <Link 
+                <div
                   key={item.label}
-                  to={item.to} 
-                  className={`relative py-1.5 whitespace-nowrap transition-colors font-normal text-[16px] leading-[24px] ${
-                    isDarkTheme
-                      ? isActive
-                        ? 'text-[#F97316] font-medium'
-                        : 'text-white/80 hover:text-white'
-                      : isActive 
-                        ? 'text-[#ea580c] font-medium' 
-                        : 'text-[#746343] hover:text-[#ea580c]'
-                  }`}
+                  className="relative"
+                  onMouseEnter={() => hasDropdown && handleMouseEnter(item.label)}
+                  onMouseLeave={() => hasDropdown && handleMouseLeave()}
                 >
-                  <span className="whitespace-nowrap">{item.label}</span>
-                  {isActive && (
-                    <motion.span 
-                      layoutId="activeNavDot"
-                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F97316] shadow-[0_0_8px_1.5px_rgba(249,115,22,0.6)]" 
-                    />
-                  )}
-                </Link>
+                  <Link 
+                    to={item.to} 
+                    className={`group/nav relative py-1.5 flex items-center gap-1.5 whitespace-nowrap transition-colors font-normal text-[16px] leading-[24px] ${
+                      isDarkTheme
+                        ? isActive
+                          ? 'text-[#F97316] font-medium'
+                          : 'text-white/80 hover:text-white'
+                        : isActive 
+                          ? 'text-[#ea580c] font-medium' 
+                          : 'text-[#746343] hover:text-[#ea580c]'
+                    }`}
+                  >
+                    <span className="whitespace-nowrap">{item.label}</span>
+                    {hasDropdown && (
+                      <ChevronDown 
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          isDropdownOpen ? 'rotate-180' : 'rotate-0'
+                        } ${
+                          isDarkTheme 
+                            ? isActive ? 'text-[#F97316]' : 'text-white/60 group-hover/nav:text-white' 
+                            : isActive ? 'text-[#ea580c]' : 'text-[#746343]/70 group-hover/nav:text-[#ea580c]'
+                        }`} 
+                      />
+                    )}
+                    {isActive && (
+                      <motion.span 
+                        layoutId="activeNavDot"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F97316] shadow-[0_0_8px_1.5px_rgba(249,115,22,0.6)]" 
+                      />
+                    )}
+                  </Link>
+
+                  {/* Dropdown Menu */}
+                  <AnimatePresence>
+                    {hasDropdown && isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.96 }}
+                        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 pt-2.5 z-50 pointer-events-auto"
+                      >
+                        <div className={`w-[245px] rounded-2xl p-2 border shadow-2xl ${
+                          isDarkTheme
+                            ? 'bg-[#0E0D12]/95 backdrop-blur-xl border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)]'
+                            : 'bg-[#FAF4E6]/95 backdrop-blur-xl border-[#e9dcbe] shadow-[0_20px_45px_rgba(116,99,67,0.18)]'
+                        }`}>
+                          <div className="flex flex-col space-y-0.5">
+                            {item.children?.map((child) => {
+                              const isChildActive = location.pathname === '/how-we-serve' && location.hash === child.to.split('#')[1];
+
+                              return (
+                                <Link
+                                  key={child.label}
+                                  to={child.to}
+                                  onClick={() => setOpenDropdown(null)}
+                                  className={`group/child relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] leading-snug transition-all duration-150 ${
+                                    isDarkTheme
+                                      ? isChildActive
+                                        ? 'bg-white/10 text-[#F97316] font-medium'
+                                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                                      : isChildActive
+                                        ? 'bg-[#F2E5CA] text-[#ea580c] font-medium'
+                                        : 'text-[#746343] hover:text-[#ea580c] hover:bg-[#F3E7CD]'
+                                  }`}
+                                >
+                                  <span className="whitespace-nowrap font-normal group-hover/child:font-medium transition-all">
+                                    {child.label}
+                                  </span>
+                                  <span 
+                                    className={`w-1.5 h-1.5 rounded-full transition-all duration-150 ${
+                                      isChildActive
+                                        ? 'bg-[#F97316] opacity-100 scale-100'
+                                        : 'bg-[#F97316] opacity-0 group-hover/child:opacity-50 scale-75 group-hover/child:scale-100'
+                                    }`} 
+                                  />
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               );
             })}
           </div>

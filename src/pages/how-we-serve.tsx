@@ -20,23 +20,23 @@ export default function HowWeServePage() {
         {/* ─── Section 1: Cinematic Dining / Table Hero Video ─── */}
         <HowWeServeHero />
 
-        {/* ─── Section 2: A Place at the Table ─── */}
-        <PlaceAtTheTableSection />
+        {/* ─── Section 2: A Place of the Table ─── */}
+        <PlaceAtTheTableSection id="place-at-the-table" />
 
-        {/* ─── Section 3: No one should have to wonder (5 Step Cards) ─── */}
-        <APlaceForThemSection />
+        {/* ─── Section 3: You Matter (5 Step Cards) ─── */}
+        <APlaceForThemSection id="you-matter" />
 
-        {/* ─── Section 4: Serving Our Community Together (Partners & Network Map) ─── */}
-        <ServingCommunityTogetherSection />
+        {/* ─── Section 4: Welcome Home (Partners & Network Map) ─── */}
+        <ServingCommunityTogetherSection id="welcome-home" />
 
         {/* ─── Section 5: Pure photography, quiet moments, zero staged gloss. (Interactive Gallery) ─── */}
         <PurePhotographySection />
 
-        {/* ─── Section 6: Stories From the Table (Testimonial Carousel) ─── */}
-        <StoriesFromTheTableSection />
+        {/* ─── Section 6: Stories That Save Lives (Testimonial Carousel) ─── */}
+        <StoriesFromTheTableSection id="stories-that-save-lives" />
 
-        {/* ─── Section 7: There Is Always Another Seat Waiting (Action Cards) ─── */}
-        <AnotherSeatWaitingSection />
+        {/* ─── Section 7: Serve Beside Us (Action Cards) ─── */}
+        <AnotherSeatWaitingSection id="serve-beside-us" />
 
         {/* ─── Section 8: What's Coming Up Next (Showdown Event & Auditions) ─── */}
         <ShowdownSection id="what-coming-up-next" />
@@ -44,4 +44,3 @@ export default function HowWeServePage() {
     </>
   );
 }
-
