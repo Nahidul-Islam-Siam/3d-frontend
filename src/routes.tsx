@@ -13,6 +13,7 @@ import Dashboard from "./pages/dashboard";
 import Contact from "./pages/contact";
 import Donate from "./pages/donate";
 import YouMatter from "./pages/you-matter";
+import StoriesThatSaveLives from "./pages/stories-that-save-lives";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -75,6 +76,14 @@ export const router = createBrowserRouter([
       {
         path: "/you-matter",
         element: <YouMatter />,
+      },
+      {
+        path: "/how-we-serve/stories-that-save-lives",
+        element: <StoriesThatSaveLives />,
+      },
+      {
+        path: "/stories-that-save-lives",
+        element: <StoriesThatSaveLives />,
       },
       {
         path: "/meet-us",

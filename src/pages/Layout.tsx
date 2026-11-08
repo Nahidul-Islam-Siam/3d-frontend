@@ -9,7 +9,8 @@ export default function RootLayout() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || isYouMatterPage;
+  const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || isYouMatterPage || isStoriesPage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function RootLayout() {
     }
   }, [location.pathname, location.hash]);
 
-  const isDarkPage = location.pathname === '/donate';
+  const isDarkPage = location.pathname === '/donate' || isStoriesPage;
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkPage ? 'bg-[#08070B] text-white' : 'bg-[#FAF4E6] text-stone-900'} ${isDarkPage ? 'overflow-x-clip' : 'overflow-x-hidden'} selection:bg-[#F97316] selection:text-white`}>

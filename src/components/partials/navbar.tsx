@@ -24,9 +24,10 @@ export default function Navbar() {
   const isHomePage = location.pathname === '/';
   const isDonatePage = location.pathname === '/donate';
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage;
+  const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage || isStoriesPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
-  const isDarkScrolled = isDonatePage && hasScrolled;
+  const isDarkScrolled = (isDonatePage || isStoriesPage) && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
@@ -81,7 +82,7 @@ export default function Navbar() {
       children: [
         { label: "A Place of the Table", to: "/how-we-serve" },
         { label: "You Matter", to: "/how-we-serve/you-matter" },
-        { label: "Stories That Save Lives", to: "/how-we-serve#stories-that-save-lives" },
+        { label: "Stories That Save Lives", to: "/how-we-serve/stories-that-save-lives" },
         { label: "Welcome Home", to: "/how-we-serve#welcome-home" },
         { label: "Serve Beside Us", to: "/how-we-serve#serve-beside-us" },
       ]
