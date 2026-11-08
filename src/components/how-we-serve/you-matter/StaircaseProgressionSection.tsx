@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const steps = [
@@ -30,153 +29,131 @@ const steps = [
 ];
 
 export default function StaircaseProgressionSection() {
-  const [activeStep, setActiveStep] = useState<number>(0);
-
   return (
     <section 
       id="staircase-progression"
-      className="relative w-full min-h-screen bg-[#08070B] text-white flex flex-col justify-center py-24 sm:py-28 lg:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full min-h-screen bg-[#08070B] text-white flex flex-col justify-between py-16 sm:py-20 lg:py-24 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
     >
       {/* ─── Ambient Glow ─── */}
       <div 
-        className="absolute bottom-10 right-1/4 w-[800px] h-[800px] rounded-full pointer-events-none"
+        className="absolute top-1/3 left-10 w-[700px] h-[700px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(249, 115, 22, 0.14) 0%, transparent 65%)',
-          filter: 'blur(90px)',
+          background: 'radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 65%)',
+          filter: 'blur(100px)',
         }}
         aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto space-y-14 sm:space-y-16">
+      <div className="relative z-10 w-full max-w-[1720px] mx-auto flex-1 flex flex-col justify-between">
         
-        {/* ─── Header: Main Proposition ─── */}
-        <div className="max-w-5xl space-y-6">
+        {/* ─── Header: Proposition (Figma 1:1 Scale) ─── */}
+        <div className="max-w-4xl space-y-4 sm:space-y-5">
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-white leading-[1.08]"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-bold tracking-tight text-white leading-[1.25] max-w-3xl"
           >
             Our children and young adults are the future of our families, our communities, and our world.
           </motion.h2>
 
-          {/* Dotted Double Divider */}
-          <div className="w-full max-w-[720px] flex flex-col gap-1.5 pt-2">
-            <div className="w-full border-t border-dotted border-white/20" />
-            <div className="w-full border-t border-dotted border-white/20" />
+          {/* Dotted Single Divider (Figma 1:1) */}
+          <div className="w-full max-w-[620px] pt-1 pb-1">
+            <div className="w-full border-t border-dotted border-white/25" />
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.85, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="text-stone-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans max-w-4xl"
+            transition={{ duration: 0.85, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className="text-stone-300 text-sm sm:text-base leading-relaxed font-sans max-w-3xl"
           >
             One of the greatest gifts we can give them is the opportunity to understand their value before the world tries to define it for them. When young people recognize that they are valuable, they begin to value themselves. When they value themselves, they are more likely to value others.
           </motion.p>
         </div>
 
-        {/* ─── Interactive 5-Step Descending Staircase (Full Width Spread) ─── */}
-        <div className="w-full pt-8 sm:pt-14">
+        {/* ─── 5-Step Descending Diagonal Staircase (Clean Typography, No Boxes) ─── */}
+        <div className="w-full py-10 sm:py-14 my-auto">
           {/* Desktop/Tablet Diagonal Staircase Grid */}
-          <div className="hidden md:grid grid-cols-5 gap-6 lg:gap-8 items-start relative">
-            
-            {/* Subtle Connecting Guideline */}
-            <div className="absolute top-[36px] left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-orange-500/10 via-orange-500/40 to-orange-500/10 pointer-events-none" />
-
-            {steps.map((step, idx) => {
-              const isActive = activeStep === idx;
-              const topOffsetClass = idx === 0 ? 'mt-0' : idx === 1 ? 'mt-14' : idx === 2 ? 'mt-28' : idx === 3 ? 'mt-42' : 'mt-56';
-
-              return (
-                <motion.div
-                  key={step.number}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.7, delay: idx * 0.12 }}
-                  onMouseEnter={() => setActiveStep(idx)}
-                  className={`group relative ${topOffsetClass} cursor-pointer p-6 rounded-3xl transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-white/[0.05] border border-[#F97316]/50 shadow-[0_12px_45px_rgba(249,115,22,0.2)]' 
-                      : 'border border-transparent hover:border-white/10 hover:bg-white/[0.02]'
-                  }`}
+          <div className="hidden md:grid grid-cols-5 gap-6 lg:gap-8 items-start">
+            {steps.map((step, idx) => (
+              <motion.div
+                key={step.number}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.65, delay: idx * 0.1 }}
+                style={{ marginTop: `${idx * 55}px` }}
+                className="group relative select-text"
+              >
+                {/* Step Number */}
+                <span 
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="block text-xs font-semibold tracking-widest text-stone-500 transition-colors group-hover:text-[#F97316]"
                 >
-                  <span 
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className={`block text-sm font-semibold tracking-widest transition-colors ${
-                      isActive ? 'text-[#F97316]' : 'text-stone-500 group-hover:text-stone-300'
-                    }`}
-                  >
-                    {step.number}
-                  </span>
+                  {step.number}
+                </span>
 
-                  <h3
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className={`mt-3 text-2xl lg:text-3xl font-bold tracking-tight uppercase transition-colors ${
-                      isActive ? 'text-white' : 'text-stone-300 group-hover:text-white'
-                    }`}
-                  >
-                    {step.title}
-                  </h3>
+                {/* Step Title */}
+                <h3
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="mt-2 text-xl lg:text-2xl font-bold tracking-tight uppercase text-white transition-colors group-hover:text-amber-200"
+                >
+                  {step.title}
+                </h3>
 
-                  <p className="mt-3 text-sm sm:text-base leading-relaxed text-stone-400 group-hover:text-stone-200 font-sans transition-colors">
-                    {step.desc}
-                  </p>
+                {/* Step Description */}
+                <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-stone-400 group-hover:text-stone-300 font-sans transition-colors max-w-[220px]">
+                  {step.desc}
+                </p>
 
-                  <div className={`mt-5 h-0.5 rounded-full transition-all duration-300 ${
-                    isActive ? 'w-16 bg-[#F97316]' : 'w-6 bg-white/20 group-hover:w-10 group-hover:bg-white/40'
-                  }`} />
-                </motion.div>
-              );
-            })}
+                {/* Subtle indicator bar */}
+                <div className="mt-4 w-6 h-[2px] bg-white/20 transition-all duration-300 group-hover:w-10 group-hover:bg-[#F97316]" />
+              </motion.div>
+            ))}
           </div>
 
-          {/* Mobile Vertical Stack */}
+          {/* Mobile Vertical Cascade */}
           <div className="md:hidden flex flex-col space-y-6">
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2.5"
+                className="pl-4 border-l-2 border-white/15 space-y-1.5"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-serif font-bold text-[#F97316] tracking-widest">
-                    {step.number}
-                  </span>
-                  <h3
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-xl font-bold text-white uppercase"
-                  >
-                    {step.title}
-                  </h3>
-                </div>
-                <p className="text-sm text-stone-300 font-sans leading-relaxed">
+                <span className="text-xs font-serif font-bold text-[#F97316] tracking-widest">
+                  {step.number}
+                </span>
+                <h3
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-lg font-bold text-white uppercase"
+                >
+                  {step.title}
+                </h3>
+                <p className="text-xs text-stone-400 font-sans leading-relaxed">
                   {step.desc}
                 </p>
               </div>
             ))}
           </div>
-
-          {/* ─── Staircase Conclusion Footnote ─── */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, delay: 0.5 }}
-            className="w-full text-center pt-20 sm:pt-28"
-          >
-            <span 
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[#F97316] text-lg sm:text-xl lg:text-2xl font-medium tracking-wide uppercase italic"
-            >
-              Strong foundations are built.
-            </span>
-          </motion.div>
-
         </div>
+
+        {/* ─── Bottom Center Conclusion Footnote (Figma 1:1) ─── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, delay: 0.4 }}
+          className="w-full text-center pb-2"
+        >
+          <span 
+            className="text-[#F97316] text-sm sm:text-base font-sans font-medium tracking-wide"
+          >
+            Strong foundations are built.
+          </span>
+        </motion.div>
 
       </div>
     </section>
