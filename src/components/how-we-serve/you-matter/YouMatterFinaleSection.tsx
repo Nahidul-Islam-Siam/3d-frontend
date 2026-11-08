@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import FigmaButton from '@/components/common/FigmaButton';
 
 export default function YouMatterFinaleSection() {
-  const navigate = useNavigate();
 
   return (
     <section 
@@ -72,6 +70,7 @@ export default function YouMatterFinaleSection() {
         </div>
 
         {/* ─── 4 Capsule CTA Buttons (Title Case, Figma 1:1) ─── */}
+        {/* ─── Action Buttons using reusable FigmaButton ─── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -79,61 +78,21 @@ export default function YouMatterFinaleSection() {
           transition={{ duration: 0.85, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-3"
         >
-          {/* Button 1: Partner With Us (Solid Orange Capsule) */}
-          <button
-            type="button"
-            onClick={() => navigate('/contact#partner')}
-            className="group inline-flex items-center gap-2.5 pl-5 pr-3 py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 shadow-[0_6px_25px_rgba(249,115,22,0.35)] cursor-pointer"
-          >
-            <span className="font-sans font-medium text-[13px] sm:text-[14px] text-white leading-none whitespace-nowrap">
-              Partner With Us
-            </span>
-            <span className="w-6 h-6 rounded-full border border-white/40 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </span>
-          </button>
+          <FigmaButton to="/contact#partner" variant="primary" size="md">
+            Partner With Us
+          </FigmaButton>
 
-          {/* Button 2: Learn More (Outline Glass Capsule) */}
-          <button
-            type="button"
-            onClick={() => navigate('/about')}
-            className="group inline-flex items-center gap-2.5 pl-5 pr-3 py-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.1] border border-white/15 hover:border-white/40 text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 cursor-pointer backdrop-blur-sm"
-          >
-            <span className="font-sans font-medium text-[13px] sm:text-[14px] text-white leading-none whitespace-nowrap">
-              Learn More
-            </span>
-            <span className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </span>
-          </button>
+          <FigmaButton to="/about" variant="outline-white" size="md">
+            Learn More
+          </FigmaButton>
 
-          {/* Button 3: Volunteer (Outline Glass Capsule) */}
-          <button
-            type="button"
-            onClick={() => navigate('/contact')}
-            className="group inline-flex items-center gap-2.5 pl-5 pr-3 py-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.1] border border-white/15 hover:border-white/40 text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 cursor-pointer backdrop-blur-sm"
-          >
-            <span className="font-sans font-medium text-[13px] sm:text-[14px] text-white leading-none whitespace-nowrap">
-              Volunteer
-            </span>
-            <span className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </span>
-          </button>
+          <FigmaButton to="/contact" variant="outline-white" size="md">
+            Volunteer
+          </FigmaButton>
 
-          {/* Button 4: Return to the Hallway (Outline Glass Capsule) */}
-          <button
-            type="button"
-            onClick={() => navigate('/how-we-serve')}
-            className="group inline-flex items-center gap-2.5 pl-5 pr-3 py-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.1] border border-white/15 hover:border-white/40 text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 cursor-pointer backdrop-blur-sm"
-          >
-            <span className="font-sans font-medium text-[13px] sm:text-[14px] text-white leading-none whitespace-nowrap">
-              Return to the Hallway
-            </span>
-            <span className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </span>
-          </button>
+          <FigmaButton to="/how-we-serve" variant="outline-white" size="md">
+            Return to the Hallway
+          </FigmaButton>
         </motion.div>
 
       </div>
