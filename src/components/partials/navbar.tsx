@@ -26,7 +26,7 @@ export default function Navbar() {
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
-  const isDarkScrolled = (isDonatePage || isYouMatterPage) && hasScrolled;
+  const isDarkScrolled = isDonatePage && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 

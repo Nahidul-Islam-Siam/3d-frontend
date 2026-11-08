@@ -138,25 +138,25 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          FRAME 2: 100% FULL-PAGE CINEMATIC TITLE CARD (Figma Frame 2)
+          FRAME 2: 100% FULL-PAGE CINEMATIC TITLE CARD (Warm Ivory Theme)
       ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="you-matter-title-stage"
-        className="relative w-full min-h-screen bg-[#08070B] text-white flex flex-col justify-between overflow-hidden select-none"
+        className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] flex flex-col justify-between overflow-hidden select-none"
       >
         {/* Ambient Warm Golden Halo Glow */}
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.22) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 75%)',
-            filter: 'blur(80px)',
+            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.16) 0%, rgba(217, 119, 6, 0.05) 50%, transparent 75%)',
+            filter: 'blur(90px)',
           }}
           aria-hidden="true"
         />
 
         <div className="pt-24 sm:pt-28" />
 
-        {/* Center Title: YOU MATTER (Exact Figma Frame 2) */}
+        {/* Center Title: YOU MATTER */}
         <div className="relative z-10 w-full px-6 sm:px-12 lg:px-20 xl:px-28 flex flex-col items-center justify-center text-center my-auto">
           <motion.h1
             initial={{ opacity: 0, y: 25, scale: 0.95 }}
@@ -164,7 +164,7 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
             viewport={{ once: true }}
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-6xl sm:text-8xl md:text-9xl lg:text-[128px] xl:text-[144px] font-bold text-white tracking-tight leading-none uppercase drop-shadow-[0_12px_45px_rgba(0,0,0,0.9)]"
+            className="text-6xl sm:text-8xl md:text-9xl lg:text-[128px] xl:text-[144px] font-bold text-[#F97316] tracking-tight leading-none uppercase drop-shadow-[0_8px_30px_rgba(249,115,22,0.2)]"
           >
             YOU MATTER
           </motion.h1>
@@ -175,14 +175,14 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
           <button
             type="button"
             onClick={onScrollClick}
-            className="inline-flex items-center gap-2.5 text-white/80 hover:text-white transition-colors cursor-pointer group"
+            className="inline-flex items-center gap-2.5 text-[#746343] hover:text-[#F97316] transition-colors cursor-pointer group"
           >
-            <span className="w-6 h-6 rounded-full border border-white/70 group-hover:border-white flex items-center justify-center transition-colors">
-              <ArrowDown className="w-3 h-3 text-white group-hover:translate-y-0.5 transition-transform" />
+            <span className="w-6 h-6 rounded-full border border-[#746343]/50 group-hover:border-[#F97316] flex items-center justify-center transition-colors">
+              <ArrowDown className="w-3 h-3 text-[#746343] group-hover:text-[#F97316] group-hover:translate-y-0.5 transition-transform" />
             </span>
             <span 
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[12px] uppercase tracking-[0.22em] text-white font-medium"
+              className="text-[12px] uppercase tracking-[0.22em] text-[#746343] group-hover:text-[#F97316] font-medium"
             >
               SCROLL
             </span>

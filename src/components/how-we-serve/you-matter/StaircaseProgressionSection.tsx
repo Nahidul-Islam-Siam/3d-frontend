@@ -56,11 +56,11 @@ export default function StaircaseProgressionSection() {
         // Initial resting states
         stepCardRefs.current.forEach((card, idx) => {
           if (!card) return;
-          gsap.set(card, { autoAlpha: 0.18, y: 30 });
-          if (numberRefs.current[idx]) gsap.set(numberRefs.current[idx], { color: '#57534E' });
-          if (titleRefs.current[idx]) gsap.set(titleRefs.current[idx], { color: '#78716C' });
-          if (descRefs.current[idx]) gsap.set(descRefs.current[idx], { autoAlpha: 0.35 });
-          if (lineRefs.current[idx]) gsap.set(lineRefs.current[idx], { width: 0, backgroundColor: '#57534E' });
+          gsap.set(card, { autoAlpha: 0.25, y: 30 });
+          if (numberRefs.current[idx]) gsap.set(numberRefs.current[idx], { color: '#A89878' });
+          if (titleRefs.current[idx]) gsap.set(titleRefs.current[idx], { color: '#8C7D64' });
+          if (descRefs.current[idx]) gsap.set(descRefs.current[idx], { autoAlpha: 0.4 });
+          if (lineRefs.current[idx]) gsap.set(lineRefs.current[idx], { width: 0, backgroundColor: '#D4C3A3' });
         });
 
         if (taglineRef.current) {
@@ -121,7 +121,7 @@ export default function StaircaseProgressionSection() {
             tl.to(
               title,
               {
-                color: '#FFFFFF',
+                color: '#2C261E',
                 duration: stepDuration,
                 ease: 'power2.out',
               },
@@ -134,7 +134,7 @@ export default function StaircaseProgressionSection() {
               desc,
               {
                 autoAlpha: 1,
-                color: '#D6D3D1',
+                color: '#574D3B',
                 duration: stepDuration,
                 ease: 'power2.out',
               },
@@ -220,7 +220,7 @@ export default function StaircaseProgressionSection() {
     <div
       ref={containerRef}
       id="staircase-progression"
-      className="relative w-full bg-[#08070B] text-white"
+      className="relative w-full bg-[#FAF4E6] text-[#2C261E]"
     >
       {/* ─── Pinned Stage Viewport ─── */}
       <section
@@ -231,7 +231,7 @@ export default function StaircaseProgressionSection() {
         <div 
           className="absolute top-1/4 left-10 w-[750px] h-[750px] rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 65%)',
+            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 65%)',
             filter: 'blur(100px)',
           }}
           aria-hidden="true"
@@ -243,17 +243,17 @@ export default function StaircaseProgressionSection() {
           <div ref={headerRef} className="max-w-4xl space-y-3.5 sm:space-y-4">
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-bold tracking-tight text-white leading-[1.25] max-w-3xl"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-bold tracking-tight text-[#2C261E] leading-[1.25] max-w-3xl"
             >
               Our children and young adults are the future of our families, our communities, and our world.
             </h2>
 
             {/* Dotted Single Divider (Figma 1:1) */}
             <div className="w-full max-w-[620px] pt-1 pb-1">
-              <div className="w-full border-t border-dotted border-white/25" />
+              <div className="w-full border-t border-dotted border-[#D4C3A3]" />
             </div>
 
-            <p className="text-stone-300 text-xs sm:text-sm lg:text-base leading-relaxed font-sans max-w-3xl">
+            <p className="text-[#574D3B] text-xs sm:text-sm lg:text-base leading-relaxed font-sans max-w-3xl">
               One of the greatest gifts we can give them is the opportunity to understand their value before the world tries to define it for them. When young people recognize that they are valuable, they begin to value themselves. When they value themselves, they are more likely to value others.
             </p>
           </div>
@@ -277,7 +277,7 @@ export default function StaircaseProgressionSection() {
                       numberRefs.current[idx] = el;
                     }}
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="block text-xs font-semibold tracking-widest text-[#57534E] transition-colors"
+                    className="block text-xs font-semibold tracking-widest text-[#A89878] transition-colors"
                   >
                     {step.number}
                   </span>
@@ -288,7 +288,7 @@ export default function StaircaseProgressionSection() {
                       titleRefs.current[idx] = el;
                     }}
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="mt-2 text-xl lg:text-2xl font-bold tracking-tight uppercase text-stone-400 transition-colors"
+                    className="mt-2 text-xl lg:text-2xl font-bold tracking-tight uppercase text-[#8C7D64] transition-colors"
                   >
                     {step.title}
                   </h3>
@@ -298,7 +298,7 @@ export default function StaircaseProgressionSection() {
                     ref={(el) => {
                       descRefs.current[idx] = el;
                     }}
-                    className="mt-2 text-xs sm:text-sm leading-relaxed text-stone-500 font-sans transition-colors max-w-[220px]"
+                    className="mt-2 text-xs sm:text-sm leading-relaxed text-[#574D3B] font-sans transition-colors max-w-[220px]"
                   >
                     {step.desc}
                   </p>
@@ -308,7 +308,7 @@ export default function StaircaseProgressionSection() {
                     ref={(el) => {
                       lineRefs.current[idx] = el;
                     }}
-                    className="mt-3.5 h-[2px] rounded-full transition-all duration-300" 
+                    className="mt-3.5 h-[2px] rounded-full transition-all duration-300 bg-[#D4C3A3]" 
                   />
                 </div>
               ))}

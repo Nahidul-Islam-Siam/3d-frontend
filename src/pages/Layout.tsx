@@ -49,7 +49,7 @@ export default function RootLayout() {
     }
   }, [location.pathname, location.hash]);
 
-  const isDarkPage = location.pathname === '/donate' || isYouMatterPage;
+  const isDarkPage = location.pathname === '/donate';
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkPage ? 'bg-[#08070B] text-white' : 'bg-[#FAF4E6] text-stone-900'} ${isDarkPage ? 'overflow-x-clip' : 'overflow-x-hidden'} selection:bg-[#F97316] selection:text-white`}>

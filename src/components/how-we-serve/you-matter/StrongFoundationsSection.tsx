@@ -46,7 +46,7 @@ export default function StrongFoundationsSection() {
   return (
     <section
       id="strong-foundations"
-      className="relative w-full min-h-screen bg-[#08070B] text-white flex items-center overflow-hidden select-none"
+      className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] flex items-center overflow-hidden select-none"
     >
       {/* ─── Embedded Keyframe Animations ─── */}
       <style>{`
@@ -97,7 +97,7 @@ export default function StrongFoundationsSection() {
 
       {/* ─── Left Blend Veil (Ensures Text Stays 100% Legible on All Screens) ─── */}
       <div
-        className="absolute inset-y-0 left-0 w-full lg:w-[48%] bg-gradient-to-r from-[#08070B] via-[#08070B]/95 to-transparent z-15 pointer-events-none"
+        className="absolute inset-y-0 left-0 w-full lg:w-[48%] bg-gradient-to-r from-[#FAF4E6] via-[#FAF4E6]/95 to-transparent z-15 pointer-events-none"
         aria-hidden="true"
       />
 
@@ -114,24 +114,24 @@ export default function StrongFoundationsSection() {
           <div className="space-y-2.5">
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-[78px] xl:text-[84px] font-bold tracking-tight text-white leading-none uppercase"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-[78px] xl:text-[84px] font-bold tracking-tight text-[#2C261E] leading-none uppercase"
             >
               YOU MATTER
             </h2>
-            <p className="text-stone-400 text-sm sm:text-base lg:text-lg font-sans tracking-widest uppercase font-medium">
+            <p className="text-[#746343] text-sm sm:text-base lg:text-lg font-sans tracking-widest uppercase font-medium">
               Strong Foundations
             </p>
           </div>
 
           {/* Dotted Single Divider (Figma 1:1) */}
           <div className="w-full max-w-[420px] pt-1 pb-1">
-            <div className="w-full border-t border-dotted border-white/25" />
+            <div className="w-full border-t border-dotted border-[#D4C3A3]" />
           </div>
 
           {/* Italic Quote */}
           <p
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-stone-200 text-xl sm:text-2xl lg:text-[27px] font-normal leading-relaxed italic max-w-xl"
+            className="text-[#574D3B] text-xl sm:text-2xl lg:text-[27px] font-normal leading-relaxed italic max-w-xl"
           >
             “Sometimes hope begins when someone discovers their worth.”
           </p>
@@ -226,9 +226,9 @@ export default function StrongFoundationsSection() {
       </div>
 
       {/* ─── Bottom-Right Floating Subtle Scroll Badge (Figma 1:1) ─── */}
-      <div className="absolute bottom-6 right-8 lg:bottom-10 lg:right-14 z-30 pointer-events-none hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-white/70 text-xs tracking-widest uppercase shadow-lg">
-        <ArrowDown className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
-        <span className="font-sans font-medium text-[11px]">SCROLL</span>
+      <div className="absolute bottom-6 right-8 lg:bottom-10 lg:right-14 z-30 pointer-events-none hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-[#D4C3A3] text-[#2C261E] text-xs tracking-widest uppercase shadow-md">
+        <ArrowDown className="w-3.5 h-3.5 text-[#F97316] animate-bounce" />
+        <span className="font-sans font-medium text-[11px] text-[#746343]">SCROLL</span>
       </div>
     </section>
   );

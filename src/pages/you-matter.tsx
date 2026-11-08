@@ -6,7 +6,6 @@ import StaircaseProgressionSection from '@/components/how-we-serve/you-matter/St
 import InvestingInFutureSection from '@/components/how-we-serve/you-matter/InvestingInFutureSection';
 import LeadsPartnershipSection from '@/components/how-we-serve/you-matter/LeadsPartnershipSection';
 import ChoicesFutureSection from '@/components/how-we-serve/you-matter/ChoicesFutureSection';
-import CosmicClimaxSection from '@/components/how-we-serve/you-matter/CosmicClimaxSection';
 import ClassroomMomentSection from '@/components/how-we-serve/you-matter/ClassroomMomentSection';
 import YouMatterFinaleSection from '@/components/how-we-serve/you-matter/YouMatterFinaleSection';
 
@@ -24,7 +23,7 @@ export default function YouMatterPage() {
         description="Our children and young adults are the future of our families, our communities, and our world. Discover how we partner with LEADS to build strong foundations for middle and high school students." 
       />
 
-      <div className="w-full bg-[#08070B] text-white selection:bg-[#F97316] selection:text-white">
+      <div className="w-full bg-[#FAF4E6] text-[#2C261E] selection:bg-[#F97316] selection:text-white">
         
         {/* ─── 1. HERO VIDEO & TITLE INTRO ─── */}
         <YouMatterHero onScrollClick={handleScrollClick} />
@@ -43,16 +42,13 @@ export default function YouMatterPage() {
         {/* ─── 5. LEADS PARTNERSHIP (5 CORE MODULES) ─── */}
         <LeadsPartnershipSection />
 
-        {/* ─── 6. CHOICES SHAPE OUR FUTURE (STARFIELD + 4 DECISION STEPS) ─── */}
+        {/* ─── 6. COSMIC STAGE: CHOICES SHAPE OUR FUTURE -> CLIMAX ("YOU MATTER.") ─── */}
         <ChoicesFutureSection />
 
-        {/* ─── 7. COSMIC CLIMAX ("YOU MATTER.") ─── */}
-        <CosmicClimaxSection />
-
-        {/* ─── 8. DIRECT CLASSROOM MOMENT VISUAL ─── */}
+        {/* ─── 7. DIRECT CLASSROOM MOMENT VISUAL ─── */}
         <ClassroomMomentSection />
 
-        {/* ─── 9. FINALE CALL TO ACTION ─── */}
+        {/* ─── 8. FINALE CALL TO ACTION ─── */}
         <YouMatterFinaleSection />
 
       </div>
