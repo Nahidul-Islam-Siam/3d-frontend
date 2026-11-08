@@ -12,6 +12,7 @@ import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import Contact from "./pages/contact";
 import Donate from "./pages/donate";
+import YouMatter from "./pages/you-matter";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -66,6 +67,14 @@ export const router = createBrowserRouter([
       {
         path: "/how-we-serve",
         element: <HowWeServe />,
+      },
+      {
+        path: "/how-we-serve/you-matter",
+        element: <YouMatter />,
+      },
+      {
+        path: "/you-matter",
+        element: <YouMatter />,
       },
       {
         path: "/meet-us",

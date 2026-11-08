@@ -23,9 +23,10 @@ export default function Navbar() {
 
   const isHomePage = location.pathname === '/';
   const isDonatePage = location.pathname === '/donate';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage;
+  const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
-  const isDarkScrolled = isDonatePage && hasScrolled;
+  const isDarkScrolled = (isDonatePage || isYouMatterPage) && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
@@ -78,8 +79,8 @@ export default function Navbar() {
       label: "How We Serve", 
       to: "/how-we-serve",
       children: [
-        { label: "A Place of the Table", to: "/how-we-serve#place-at-the-table" },
-        { label: "You Matter", to: "/how-we-serve#you-matter" },
+        { label: "A Place of the Table", to: "/how-we-serve" },
+        { label: "You Matter", to: "/how-we-serve/you-matter" },
         { label: "Stories That Save Lives", to: "/how-we-serve#stories-that-save-lives" },
         { label: "Welcome Home", to: "/how-we-serve#welcome-home" },
         { label: "Serve Beside Us", to: "/how-we-serve#serve-beside-us" },
@@ -196,7 +197,9 @@ export default function Navbar() {
                         }`}>
                           <div className="flex flex-col space-y-0.5">
                             {item.children?.map((child) => {
-                              const isChildActive = location.pathname === '/how-we-serve' && location.hash === child.to.split('#')[1];
+                              const isChildActive = child.to.includes('#')
+                                ? location.pathname === child.to.split('#')[0] && location.hash === `#${child.to.split('#')[1]}`
+                                : location.pathname === child.to;
 
                               return (
                                 <Link

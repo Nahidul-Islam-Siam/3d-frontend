@@ -34,8 +34,8 @@ const navSections = [
   {
     title: "How We Serve (The 5 Doors)",
     items: [
-      { to: "/how-we-serve#place-at-the-table", label: "A Place of the Table", icon: Utensils },
-      { to: "/how-we-serve#you-matter", label: "You Matter", icon: Heart },
+      { to: "/how-we-serve", label: "A Place of the Table", icon: Utensils },
+      { to: "/how-we-serve/you-matter", label: "You Matter", icon: Heart },
       { to: "/how-we-serve#stories-that-save-lives", label: "Stories That Save Lives", icon: BookHeart },
       { to: "/how-we-serve#welcome-home", label: "Welcome Home", icon: HomeIcon },
       { to: "/how-we-serve#serve-beside-us", label: "Serve Beside Us", icon: HandHeart },
