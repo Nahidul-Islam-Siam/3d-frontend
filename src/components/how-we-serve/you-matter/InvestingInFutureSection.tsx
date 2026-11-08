@@ -32,66 +32,66 @@ export default function InvestingInFutureSection() {
   return (
     <section 
       id="investing-in-future"
-      className="relative w-full min-h-screen bg-[#08070B] text-white flex flex-col justify-center py-24 sm:py-28 lg:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full min-h-screen bg-[#08070B] text-white flex flex-col justify-between py-16 sm:py-20 lg:py-24 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
     >
       {/* ─── Ambient Glow ─── */}
       <div 
         className="absolute top-1/3 left-1/3 w-[800px] h-[800px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(249, 115, 22, 0.14) 0%, transparent 70%)',
-          filter: 'blur(90px)',
+          background: 'radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%)',
+          filter: 'blur(100px)',
         }}
         aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto space-y-16 sm:space-y-20">
+      <div className="relative z-10 w-full max-w-[1720px] mx-auto flex-1 flex flex-col justify-between space-y-10 sm:space-y-12">
         
-        {/* ─── Header: 2 Expansive Columns ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end">
+        {/* ─── Header: 2 Balanced Columns (Figma 1:1) ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
           
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 space-y-5"
+            className="lg:col-span-7 space-y-4"
           >
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-bold tracking-tight text-white leading-[1.08]"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight"
             >
               Investing in the Future
             </h2>
 
-            {/* Dotted Divider */}
-            <div className="w-full max-w-[480px] flex flex-col gap-1.5 py-1">
-              <div className="w-full border-t border-dotted border-white/20" />
-              <div className="w-full border-t border-dotted border-white/20" />
+            {/* Dotted Single Divider (Figma 1:1) */}
+            <div className="w-full max-w-[480px] pt-1 pb-1">
+              <div className="w-full border-t border-dotted border-white/25" />
             </div>
 
-            <p className="text-stone-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans max-w-xl">
+            <p className="text-stone-300 text-sm sm:text-base leading-relaxed font-sans max-w-xl">
               At Live Achieve Believe, we believe investing in the mental and emotional well-being of young people is one of the greatest investments we can make.
             </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.85, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex lg:justify-end"
+            transition={{ duration: 0.85, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 flex lg:justify-end pt-2"
           >
-            <p className="text-stone-400 text-base sm:text-lg leading-relaxed font-sans max-w-md">
+            <p className="text-stone-400 text-xs sm:text-sm leading-relaxed font-sans max-w-sm">
               Life is full of highs and lows. Challenges come to everyone. The question is not whether life will be difficult.
             </p>
           </motion.div>
 
         </div>
 
-        {/* ─── 4 Frosted Glass Pillar Cards (Full Width Spread) ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 pt-4">
+        {/* ─── 4 Pillar Cards (Figma Exact 336px x 272px with Stagger) ─── */}
+        <div className="flex flex-wrap lg:flex-nowrap justify-center items-start gap-5 sm:gap-6 lg:gap-8 my-auto w-full">
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
+            const isStaggered = idx % 2 === 1;
 
             return (
               <motion.div
@@ -100,48 +100,42 @@ export default function InvestingInFutureSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: idx * 0.1 }}
-                whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="group relative p-7 sm:p-8 lg:p-9 rounded-3xl bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/10 hover:border-[#F97316]/50 shadow-[0_16px_50px_rgba(0,0,0,0.6)] transition-all duration-300 flex flex-col justify-between min-h-[340px]"
+                className={`group relative w-full sm:w-[336px] h-auto sm:h-[272px] p-6 rounded-[24px] border border-[#272624] bg-[#0E0D12]/40 hover:border-[#F97316]/60 hover:bg-[#0E0D12]/80 backdrop-blur-sm transition-all duration-300 flex flex-col justify-center items-start gap-4 select-text ${
+                  isStaggered ? 'lg:mt-16' : 'lg:mt-0'
+                }`}
               >
-                {/* Glow Aura on Hover */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-                <div className="relative z-10 space-y-5">
-                  <div className="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-[#F97316] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#F97316] group-hover:text-white transition-all duration-300">
-                    <Icon className="w-7 h-7" />
-                  </div>
-
-                  <h3
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F97316] group-hover:text-white transition-colors uppercase"
-                  >
-                    {pillar.title}
-                  </h3>
-
-                  <p className="text-stone-300 text-sm sm:text-base leading-relaxed font-sans">
-                    {pillar.desc}
-                  </p>
+                {/* Bare Orange Icon */}
+                <div>
+                  <Icon className="w-7 h-7 text-[#F97316] stroke-[1.6] transition-transform duration-300 group-hover:scale-110" />
                 </div>
 
-                <div className="relative z-10 pt-6">
-                  <div className="w-10 h-0.5 rounded-full bg-white/20 group-hover:w-20 group-hover:bg-[#F97316] transition-all duration-300" />
-                </div>
+                {/* Pillar Title */}
+                <h3
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-xl sm:text-2xl font-bold tracking-tight text-[#F97316] group-hover:text-white transition-colors uppercase leading-none"
+                >
+                  {pillar.title}
+                </h3>
+
+                {/* Pillar Description */}
+                <p className="text-stone-400 group-hover:text-stone-300 text-xs sm:text-[13px] leading-relaxed font-sans transition-colors">
+                  {pillar.desc}
+                </p>
               </motion.div>
             );
           })}
         </div>
 
-        {/* ─── Footer Highlight Statement ─── */}
+        {/* ─── Footer Statement (Figma 1:1) ─── */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.85, delay: 0.4 }}
-          className="text-center pt-10 sm:pt-14"
+          transition={{ duration: 0.85, delay: 0.3 }}
+          className="text-center pb-2"
         >
           <p 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-[#F97316] text-lg sm:text-xl lg:text-2xl font-medium tracking-wide uppercase italic"
+            className="text-[#F97316] text-xs sm:text-sm lg:text-base font-sans font-medium tracking-wide"
           >
             We want to help them build those tools before life asks them to use them.
           </p>
