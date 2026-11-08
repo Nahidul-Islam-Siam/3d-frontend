@@ -162,9 +162,12 @@ function ScrollCoinCanvas({ progressRef, className = '' }: {
       tiltX += (pointerY * Math.PI / 18 - tiltX) * damping;
       tiltY += (pointerX * Math.PI / 18 - tiltY) * damping;
       const p = THREE.MathUtils.clamp(progressRef.current, 0, 1);
-      // Hold heads, turn through the edge at 0.5, then settle on tails.
-      const turn = THREE.MathUtils.smoothstep(p, 0.28, 0.72);
-      coin.rotation.set(0.07 + tiltX, turn * Math.PI + tiltY, -0.035);
+      // Continuous scroll turn: 0 = Heads, 0.5 = Edge, 1.0 = Tails
+      // Spins smoothly around its Y axis as the user scrolls
+      const scrollTurn = p * Math.PI;
+      const idleSpin = Math.sin(time * 0.0016) * 0.04;
+      const idleTilt = Math.cos(time * 0.0012) * 0.02;
+      coin.rotation.set(0.08 + tiltX + idleTilt, scrollTurn + tiltY + idleSpin, -0.035);
       renderer.render(scene, camera);
       frame = requestAnimationFrame(render);
     };

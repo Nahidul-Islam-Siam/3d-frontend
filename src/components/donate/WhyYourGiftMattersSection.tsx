@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { useScroll, useSpring } from 'framer-motion';
 import Coin3DCanvas from './Coin3DCanvas';
 import story1 from '@/assets/donate/story-1-living-room.png';
 import story2 from '@/assets/donate/story-2-woodworking.png';
@@ -47,8 +47,8 @@ export default function WhyYourGiftMattersSection() {
 
   // Butter-smooth spring damping for realistic coin rotation
   const smoothed = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 26,
+    stiffness: 100,
+    damping: 24,
     restDelta: 0.0001,
   });
 
@@ -63,7 +63,7 @@ export default function WhyYourGiftMattersSection() {
     <section
       ref={sectionRef}
       id="why-your-gift-matters"
-      className="relative w-full bg-[#08070B] text-white py-16 sm:py-20 lg:py-28 px-6 sm:px-10 lg:px-16 xl:px-24 overflow-hidden select-none"
+      className="relative w-full bg-[#08070B] text-white py-16 sm:py-20 lg:py-28 px-6 sm:px-10 lg:px-16 xl:px-24 select-none"
       aria-label="Why Your Gift Matters Stories"
     >
       {/* ─── Ambient Warm Golden Atmosphere (Matching Figma Glow) ─── */}
@@ -105,15 +105,42 @@ export default function WhyYourGiftMattersSection() {
         {/* ─── Main Stories Container with Sticky 3D Coin ─── */}
         <div ref={storiesTrackRef} className="relative w-full">
           
+          {/* ─── Sticky 3D Floating Coin (Centered between columns) ─── */}
+          <div className="hidden lg:block absolute inset-0 pointer-events-none z-20">
+            <div className="sticky top-1/2 -translate-y-1/2 w-full flex items-center justify-center pointer-events-none">
+              <div className="w-full grid grid-cols-12 items-center pointer-events-none">
+                <div className="col-start-6 col-span-2 flex items-center justify-center -ml-3 xl:-ml-5">
+                  <div className="relative flex items-center justify-center">
+                    {/* Warm Ambient Radial Glow Halo */}
+                    <div
+                      className="absolute w-[280px] h-[280px] rounded-full pointer-events-none"
+                      style={{
+                        background:
+                          'radial-gradient(circle, rgba(249, 115, 22, 0.45) 0%, rgba(217, 119, 6, 0.15) 45%, transparent 70%)',
+                        filter: 'blur(35px)',
+                      }}
+                      aria-hidden="true"
+                    />
+                    
+                    {/* 3D WebGL Coin Canvas */}
+                    <div className="relative w-44 h-44 xl:w-52 xl:h-52 pointer-events-auto">
+                      <Coin3DCanvas progressRef={progressRef} className="w-full h-full" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Vertical Stack of 3 Stories */}
           <div className="w-full flex flex-col divide-y divide-white/15">
-            {stories.map((story, index) => (
+            {stories.map((story) => (
               <article
                 key={story.id}
-                className="w-full py-12 sm:py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
+                className="w-full min-h-[60vh] lg:min-h-[75vh] py-16 sm:py-20 lg:py-28 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
               >
                 {/* Left Column: Title & Subtitle */}
-                <div className="lg:col-span-6 space-y-4 max-w-xl pr-0 lg:pr-8">
+                <div className="lg:col-span-6 space-y-4 max-w-xl pr-0 lg:pr-12">
                   <h3
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                     className="text-white text-2xl sm:text-3xl lg:text-[34px] font-normal leading-[1.18]"
@@ -137,27 +164,6 @@ export default function WhyYourGiftMattersSection() {
                 </div>
               </article>
             ))}
-          </div>
-
-          {/* ─── Sticky 3D Floating Coin (Centered between columns) ─── */}
-          <div className="hidden lg:flex absolute left-[50%] xl:left-[52%] top-0 bottom-0 -translate-x-1/2 pointer-events-none flex-col justify-start">
-            <div className="sticky top-1/2 -translate-y-1/2 flex items-center justify-center">
-              {/* Warm Ambient Radial Glow Halo */}
-              <div
-                className="absolute w-[260px] h-[260px] rounded-full pointer-events-none"
-                style={{
-                  background:
-                    'radial-gradient(circle, rgba(249, 115, 22, 0.45) 0%, rgba(217, 119, 6, 0.15) 45%, transparent 70%)',
-                  filter: 'blur(35px)',
-                }}
-                aria-hidden="true"
-              />
-              
-              {/* 3D WebGL Coin Canvas */}
-              <div className="relative w-36 h-36 lg:w-44 lg:h-44 xl:w-48 xl:h-48 pointer-events-auto">
-                <Coin3DCanvas progressRef={progressRef} className="w-full h-full" />
-              </div>
-            </div>
           </div>
 
         </div>

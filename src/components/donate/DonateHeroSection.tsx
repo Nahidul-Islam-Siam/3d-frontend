@@ -21,7 +21,7 @@ export default function DonateHeroSection({
   return (
     <section 
       id="donate-hero-banner"
-      className="relative w-full min-h-screen bg-black text-white flex flex-col justify-between overflow-hidden select-none"
+      className="relative w-full min-h-screen bg-[#08070B] text-white flex flex-col justify-between overflow-hidden select-none"
     >
       {/* ─── Background Art Layer: Rectangle 57.png (Hand dropping coin into Charity Jar) ─── */}
       <div 
@@ -32,13 +32,13 @@ export default function DonateHeroSection({
 
       {/* ─── Mobile / Tablet Gradient Protection ─── */}
       <div 
-        className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent lg:hidden pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-[#08070B] via-[#08070B]/50 to-transparent lg:hidden pointer-events-none"
         aria-hidden="true"
       />
 
       {/* ─── Bottom Fade Gradient: Blends Jar Seamlessly into Section 2 ─── */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-10"
+        className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#08070B] via-[#08070B]/85 to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 
