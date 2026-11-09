@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Seo from '@/components/Seo';
 import ThreeHallway from '@/components/cinematic/ThreeHallway';
 import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
@@ -12,6 +13,19 @@ import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function HowWeServePage() {
   const overviewRef = useRef<HTMLDivElement | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 350);
+    }
+  }, [location.hash]);
 
   const handleScrollToOverview = () => {
     if (overviewRef.current) {

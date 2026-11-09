@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import doorsSectionImg from '@/assets/welcome/doors-section.png';
 import ThreeHallway from '@/components/cinematic/ThreeHallway';
 
@@ -97,9 +98,16 @@ export default function FourDoorsSection({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [is3DHallwayOpen]);
 
-  // Clicking any door on landing page launches the natural 3D Three.js Door Hallway
-  const handleDoorClick = (_door: DoorDefinition) => {
-    setIs3DHallwayOpen(true);
+  const navigate = useNavigate();
+
+  // ONLY "How We Serve" launches the 3D Three.js Door Hallway;
+  // the other 3 doors navigate directly to their respective pages.
+  const handleDoorClick = (door: DoorDefinition) => {
+    if (door.id === 'serve') {
+      setIs3DHallwayOpen(true);
+    } else {
+      navigate(door.path);
+    }
   };
 
   return (

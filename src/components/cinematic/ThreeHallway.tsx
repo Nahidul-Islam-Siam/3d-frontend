@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import * as THREE from "three";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { X } from "lucide-react";
 
 export interface ThreeDoorData {
@@ -15,6 +15,7 @@ export interface ThreeDoorData {
   color: number;
 }
 
+// 5 Dedicated Doors matching the 5 pages of the "How We Serve" dropdown
 export const THREE_DOORS: ThreeDoorData[] = [
   {
     id: "door-1",
@@ -34,8 +35,8 @@ export const THREE_DOORS: ThreeDoorData[] = [
     subtitle: "Youth mentoring, school partnerships, and healthy relationship skills",
     quote: "Sometimes hope begins\nwith guidance.",
     href: "/how-we-serve/you-matter",
-    side: "left",
-    zPos: -16,
+    side: "right",
+    zPos: -14,
     color: 0x160f09,
   },
   {
@@ -45,8 +46,8 @@ export const THREE_DOORS: ThreeDoorData[] = [
     subtitle: "Letters to Etcetera, suicide awareness stage production, and honest dialogues",
     quote: "Sometimes hope begins\nwith one conversation.",
     href: "/how-we-serve/stories-that-save-lives",
-    side: "right",
-    zPos: -32,
+    side: "left",
+    zPos: -28,
     color: 0x1a120c,
   },
   {
@@ -56,42 +57,20 @@ export const THREE_DOORS: ThreeDoorData[] = [
     subtitle: "Dignified housing, moving assistance, and deep honor for our veterans",
     quote: "Sometimes hope begins\nwith a key.",
     href: "/how-we-serve#welcome-home",
-    side: "left",
-    zPos: -48,
+    side: "right",
+    zPos: -42,
     color: 0x140e08,
   },
   {
     id: "door-5",
     number: 5,
-    title: "A New Beginning",
-    subtitle: "Turning cold, empty spaces into warm, fully furnished homes",
-    quote: "Sometimes hope begins with\na clean bed and warm kitchen.",
-    href: "/how-we-serve#a-new-beginning",
-    side: "right",
-    zPos: -64,
-    color: 0x18100a,
-  },
-  {
-    id: "door-6",
-    number: 6,
     title: "Serve Beside Us",
     subtitle: "The volunteer family, joyful teamwork, and saving a seat",
     quote: "Sometimes purpose begins\nwith saying yes.",
     href: "/how-we-serve#serve-beside-us",
     side: "left",
-    zPos: -80,
+    zPos: -56,
     color: 0x170f09,
-  },
-  {
-    id: "door-7",
-    number: 7,
-    title: "Your Story",
-    subtitle: "Discover how your life weaves into the unfolding movement",
-    quote: "Every story has the power\nto change another.",
-    href: "/movement",
-    side: "right",
-    zPos: -96,
-    color: 0x160e08,
   },
 ];
 
@@ -103,33 +82,36 @@ export interface ThreeHallwayProps {
 export default function ThreeHallway({ onClose }: ThreeHallwayProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeDoorIndex, setActiveDoorIndex] = useState<number>(0);
   const [hoveredDoor, setHoveredDoor] = useState<ThreeDoorData | null>(null);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
   const hoveredDoorRef = useRef<ThreeDoorData | null>(null);
-  // Natural corridor entrance view (standing at entrance looking down the hallway)
-  const targetZRef = useRef<number>(2.5);
+  // Natural corridor entrance view (starts at the beginning of hallway looking forward)
+  const targetZRef = useRef<number>(5.5);
 
   const enterRoom = useCallback((door: ThreeDoorData) => {
     setIsTransitioning(true);
-    targetZRef.current = door.zPos + 1.2;
+    targetZRef.current = door.zPos + 0.8;
     setTimeout(() => {
       if (door.href.startsWith("/how-we-serve#")) {
         const hash = door.href.split("#")[1];
-        const el = document.getElementById(hash);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-          setIsTransitioning(false);
-          if (onClose) onClose();
-          return;
+        if (location.pathname === "/how-we-serve") {
+          const el = document.getElementById(hash);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            setIsTransitioning(false);
+            if (onClose) onClose();
+            return;
+          }
         }
       }
       navigate(door.href);
       setIsTransitioning(false);
       if (onClose) onClose();
-    }, 800);
-  }, [navigate, onClose]);
+    }, 700);
+  }, [navigate, onClose, location.pathname]);
 
   const enterRoomRef = useRef(enterRoom);
   enterRoomRef.current = enterRoom;
@@ -301,10 +283,10 @@ export default function ThreeHallway({ onClose }: ThreeHallwayProps) {
     const ambientLight = new THREE.AmbientLight(0xfff1de, 0.45);
     scene.add(ambientLight);
 
-    // Hallway Dimensions
+    // Hallway Dimensions (5 Doors corridor)
     const hallWidth = 6.4;
     const hallHeight = 4.8;
-    const hallLength = 125;
+    const hallLength = 90;
 
     // Walnut Plank Wood Floor
     const floorGeo = new THREE.PlaneGeometry(hallWidth, hallLength);
@@ -559,7 +541,7 @@ export default function ThreeHallway({ onClose }: ThreeHallwayProps) {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       const delta = e.deltaY * 0.032;
-      targetZRef.current = Math.max(-108, Math.min(8, targetZRef.current - delta));
+      targetZRef.current = Math.max(-64, Math.min(5.8, targetZRef.current - delta));
     };
 
     container.addEventListener("mousemove", onMouseMove);
