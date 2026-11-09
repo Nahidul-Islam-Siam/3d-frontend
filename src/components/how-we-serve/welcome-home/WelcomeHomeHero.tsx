@@ -54,13 +54,6 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none" />
       </div>
 
-      {/* ─── Top-Left Breadcrumb (Matches Screenshot "WELCOME HOME") ─── */}
-      <div className="absolute top-7 left-7 z-20 pointer-events-none flex items-center gap-3">
-        <span className="text-white/80 text-xs tracking-[0.28em] font-serif uppercase font-medium">
-          WELCOME HOME
-        </span>
-      </div>
-
       {/* ─── Top-Right Video Controls ─── */}
       <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-24 sm:pt-28 flex justify-end gap-3 pointer-events-auto">
         <button

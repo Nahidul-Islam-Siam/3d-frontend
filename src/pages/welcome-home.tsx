@@ -3,17 +3,20 @@ import { Link } from 'react-router-dom';
 import { Shield, Footprints, Heart, Key, Home, Sparkles } from 'lucide-react';
 import Seo from '@/components/Seo';
 import WelcomeHomeHero from '@/components/how-we-serve/welcome-home/WelcomeHomeHero';
+import WelcomeHomeTitleStage from '@/components/how-we-serve/welcome-home/WelcomeHomeTitleStage';
+import HopeBeginsWithKeySection from '@/components/how-we-serve/welcome-home/HopeBeginsWithKeySection';
+import JourneyHomeSection from '@/components/how-we-serve/welcome-home/JourneyHomeSection';
 import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
 
 import housePhoto1 from '@/assets/how-we-serve/welcome-home/image.png';
-import housePhoto2 from '@/assets/how-we-serve/welcome-home/image copy.png';
-import housePhoto3 from '@/assets/how-we-serve/welcome-home/image copy 2.png';
+import housePhoto2 from '@/assets/how-we-serve/welcome-home/image copy 2.png';
+import housePhoto3 from '@/assets/how-we-serve/welcome-home/image copy 3.png';
 
 export default function WelcomeHomePage() {
-  const narrativeRef = useRef<HTMLDivElement | null>(null);
+  const titleStageRef = useRef<HTMLDivElement | null>(null);
 
   const handleScrollClick = () => {
-    narrativeRef.current?.scrollIntoView({ behavior: 'smooth' });
+    titleStageRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const feelings = [
@@ -35,8 +38,19 @@ export default function WelcomeHomePage() {
         {/* ─── 1. FULLSCREEN PORCH VIDEO HERO (Matches User Screenshot 1:1) ─── */}
         <WelcomeHomeHero onScrollClick={handleScrollClick} />
 
-        {/* ─── 2. CORE NARRATIVE: HONOR & RESTORATION ─── */}
-        <div ref={narrativeRef} className="max-w-6xl mx-auto px-6 py-20 lg:py-28 space-y-20">
+        {/* ─── 2. THEATRICAL TITLE STAGE (Matches User Screenshot 1:1) ─── */}
+        <div ref={titleStageRef}>
+          <WelcomeHomeTitleStage />
+        </div>
+
+        {/* ─── 3. SOMETIMES HOPE BEGINS WITH A KEY (Matches User Screenshot 1:1) ─── */}
+        <HopeBeginsWithKeySection />
+
+        {/* ─── 4. THE JOURNEY HOME (Matches User Screenshot 1:1) ─── */}
+        <JourneyHomeSection />
+
+        {/* ─── 3. CORE NARRATIVE: HONOR & RESTORATION ─── */}
+        <div className="max-w-6xl mx-auto px-6 py-20 lg:py-28 space-y-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="space-y-6">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#c89d5c]/15 border border-[#c89d5c]/30 text-[#8f6629] text-xs font-semibold uppercase tracking-widest">
