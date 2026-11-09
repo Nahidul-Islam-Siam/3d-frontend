@@ -14,6 +14,7 @@ import Contact from "./pages/contact";
 import Donate from "./pages/donate";
 import YouMatter from "./pages/you-matter";
 import StoriesThatSaveLives from "./pages/stories-that-save-lives";
+import APlaceAtTheTable from "./pages/a-place-at-the-table";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -68,6 +69,14 @@ export const router = createBrowserRouter([
       {
         path: "/how-we-serve",
         element: <HowWeServe />,
+      },
+      {
+        path: "/how-we-serve/a-place-at-the-table",
+        element: <APlaceAtTheTable />,
+      },
+      {
+        path: "/a-place-at-the-table",
+        element: <APlaceAtTheTable />,
       },
       {
         path: "/how-we-serve/you-matter",

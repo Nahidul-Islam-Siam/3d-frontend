@@ -81,7 +81,7 @@ export default function Navbar() {
       label: "How We Serve", 
       to: "/how-we-serve",
       children: [
-        { label: "A Place of the Table", to: "/how-we-serve" },
+        { label: "A Place of the Table", to: "/how-we-serve/a-place-at-the-table" },
         { label: "You Matter", to: "/how-we-serve/you-matter" },
         { label: "Stories That Save Lives", to: "/how-we-serve/stories-that-save-lives" },
         { label: "Welcome Home", to: "/how-we-serve#welcome-home" },
