@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import * as THREE from "three";
 import { useNavigate } from "react-router-dom";
-import { Footprints, ChevronLeft, ChevronRight, Sparkles, ArrowDown, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export interface ThreeDoorData {
   id: string;
   number: number;
   title: string;
   subtitle: string;
-  plaque: string;
+  quote: string;
   href: string;
   side: "left" | "right";
   zPos: number;
@@ -21,99 +21,99 @@ export const THREE_DOORS: ThreeDoorData[] = [
     number: 1,
     title: "A Place at the Table",
     subtitle: "Sharing meals, listening, restoring human dignity",
-    plaque: "Sometimes hope begins with a meal.",
+    quote: "Sometimes hope begins\nwith a meal.",
     href: "/how-we-serve#place-at-the-table",
     side: "left",
     zPos: 0,
-    color: 0x3d271d,
+    color: 0x18100a,
   },
   {
     id: "door-2",
     number: 2,
     title: "You Matter — Strong Foundations",
     subtitle: "Youth mentoring, school partnerships, and healthy relationship skills",
-    plaque: "Sometimes hope begins when someone discovers their worth.",
+    quote: "Sometimes hope begins\nwith guidance.",
     href: "/how-we-serve/you-matter",
-    side: "right",
-    zPos: -14,
-    color: 0x2b382d,
+    side: "left",
+    zPos: -16,
+    color: 0x160f09,
   },
   {
     id: "door-3",
     number: 3,
     title: "Stories That Save Lives",
     subtitle: "Letters to Etcetera, suicide awareness stage production, and honest dialogues",
-    plaque: "Sometimes hope begins with one conversation.",
+    quote: "Sometimes hope begins\nwith one conversation.",
     href: "/how-we-serve/stories-that-save-lives",
-    side: "left",
-    zPos: -28,
-    color: 0x4a2a22,
+    side: "right",
+    zPos: -32,
+    color: 0x1a120c,
   },
   {
     id: "door-4",
     number: 4,
     title: "Welcome Home",
     subtitle: "Dignified housing, moving assistance, and deep honor for our veterans",
-    plaque: "Sometimes hope begins with a key.",
+    quote: "Sometimes hope begins\nwith a key.",
     href: "/how-we-serve#welcome-home",
-    side: "right",
-    zPos: -42,
-    color: 0x1d2e42,
+    side: "left",
+    zPos: -48,
+    color: 0x140e08,
   },
   {
     id: "door-5",
     number: 5,
     title: "A New Beginning",
     subtitle: "Turning cold, empty spaces into warm, fully furnished homes",
-    plaque: "Sometimes hope begins with a clean bed and a warm kitchen.",
+    quote: "Sometimes hope begins with\na clean bed and warm kitchen.",
     href: "/how-we-serve#a-new-beginning",
-    side: "left",
-    zPos: -58,
-    color: 0x44301d,
+    side: "right",
+    zPos: -64,
+    color: 0x18100a,
   },
   {
     id: "door-6",
     number: 6,
     title: "Serve Beside Us",
     subtitle: "The volunteer family, joyful teamwork, and saving a seat",
-    plaque: "Sometimes purpose begins with saying yes.",
+    quote: "Sometimes purpose begins\nwith saying yes.",
     href: "/how-we-serve#serve-beside-us",
-    side: "right",
-    zPos: -72,
-    color: 0x422d20,
+    side: "left",
+    zPos: -80,
+    color: 0x170f09,
   },
   {
     id: "door-7",
     number: 7,
     title: "Your Story",
     subtitle: "Discover how your life weaves into the unfolding movement",
-    plaque: "Every story has the power to change another.",
+    quote: "Every story has the power\nto change another.",
     href: "/movement",
-    side: "left",
-    zPos: -84,
-    color: 0x2d1d17,
+    side: "right",
+    zPos: -96,
+    color: 0x160e08,
   },
 ];
 
 export interface ThreeHallwayProps {
   onScrollToOverview?: () => void;
   onClose?: () => void;
+  initialDoorIndex?: number;
 }
 
-export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallwayProps) {
+export default function ThreeHallway({ onClose, initialDoorIndex = 0 }: ThreeHallwayProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const [activeDoorIndex, setActiveDoorIndex] = useState<number>(0);
+  const [activeDoorIndex, setActiveDoorIndex] = useState<number>(initialDoorIndex);
   const [hoveredDoor, setHoveredDoor] = useState<ThreeDoorData | null>(null);
-  const [cameraProgress, setCameraProgress] = useState<number>(0);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
   const hoveredDoorRef = useRef<ThreeDoorData | null>(null);
-  const targetZRef = useRef<number>(0);
+  const targetZRef = useRef<number>(THREE_DOORS[initialDoorIndex]?.zPos + 4 || 4);
 
   const enterRoom = useCallback((door: ThreeDoorData) => {
     setIsTransitioning(true);
-    targetZRef.current = door.zPos + 1.5;
+    targetZRef.current = door.zPos + 1.2;
     setTimeout(() => {
       if (door.href.startsWith("/how-we-serve#")) {
         const hash = door.href.split("#")[1];
@@ -121,78 +121,135 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
           setIsTransitioning(false);
+          if (onClose) onClose();
           return;
         }
       }
       navigate(door.href);
       setIsTransitioning(false);
-    }, 850);
-  }, [navigate]);
+      if (onClose) onClose();
+    }, 800);
+  }, [navigate, onClose]);
 
   const enterRoomRef = useRef(enterRoom);
   enterRoomRef.current = enterRoom;
 
-  // References for Three.js state
+  // Three.js State References
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const currentZRef = useRef<number>(0);
-  const doorsMeshRef = useRef<{ mesh: THREE.Group; doorLeaf: THREE.Mesh; data: ThreeDoorData; light: THREE.PointLight }[]>([]);
+  const currentZRef = useRef<number>(targetZRef.current);
+  const doorsMeshRef = useRef<{
+    mesh: THREE.Group;
+    doorLeaf: THREE.Mesh;
+    data: ThreeDoorData;
+    light: THREE.PointLight;
+  }[]>([]);
   const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
   const mouseRef = useRef<THREE.Vector2>(new THREE.Vector2());
 
-  // Procedural wood floor texture
-  const createWoodTexture = () => {
+  // Procedural horizontal plank wood floor texture matching screenshot
+  const createFloorTexture = () => {
     const canvas = document.createElement("canvas");
     canvas.width = 512;
     canvas.height = 512;
     const ctx = canvas.getContext("2d");
     if (ctx) {
-      ctx.fillStyle = "#251710";
+      ctx.fillStyle = "#22160e";
       ctx.fillRect(0, 0, 512, 512);
 
-      // Draw planks
-      const plankWidth = 64;
-      for (let x = 0; x < 512; x += plankWidth) {
-        ctx.fillStyle = (x / plankWidth) % 2 === 0 ? "#2b1b13" : "#1f130d";
-        ctx.fillRect(x, 0, plankWidth, 512);
-        ctx.strokeStyle = "#140c07";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, 0, plankWidth, 512);
+      // Horizontal wood planks
+      const plankHeight = 32;
+      for (let y = 0; y < 512; y += plankHeight) {
+        ctx.fillStyle = (y / plankHeight) % 2 === 0 ? "#2a1b12" : "#1f130c";
+        ctx.fillRect(0, y, 512, plankHeight);
+        ctx.strokeStyle = "#120a06";
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(0, y, 512, plankHeight);
 
         // Wood grain streaks
-        for (let i = 0; i < 40; i++) {
-          ctx.fillStyle = "rgba(255, 230, 200, 0.025)";
-          const y = Math.random() * 512;
-          ctx.fillRect(x + 2, y, plankWidth - 4, Math.random() * 12 + 2);
+        for (let i = 0; i < 24; i++) {
+          ctx.fillStyle = "rgba(255, 230, 200, 0.03)";
+          const x = Math.random() * 512;
+          ctx.fillRect(x, y + 2, Math.random() * 30 + 8, plankHeight - 4);
         }
       }
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(2, 16);
+    texture.repeat.set(3, 20);
+    texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
   };
 
-  // Procedural brass metal canvas texture
-  const createBrassTexture = () => {
+  // Procedural Door Leaf texture with elegant engraved white serif quote matching screenshot
+  const createDoorLeafTexture = (quote: string) => {
     const canvas = document.createElement("canvas");
-    canvas.width = 256;
-    canvas.height = 128;
+    canvas.width = 512;
+    canvas.height = 1024;
     const ctx = canvas.getContext("2d");
-    if (ctx) {
-      const grad = ctx.createLinearGradient(0, 0, 256, 128);
-      grad.addColorStop(0, "#dfb978");
-      grad.addColorStop(0.5, "#c89d5c");
-      grad.addColorStop(1, "#8e6727");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 256, 128);
-      ctx.strokeStyle = "#5f4116";
-      ctx.lineWidth = 6;
-      ctx.strokeRect(4, 4, 248, 120);
+    if (!ctx) return new THREE.Texture();
+
+    // Deep rich dark espresso walnut wood
+    ctx.fillStyle = "#150d08";
+    ctx.fillRect(0, 0, 512, 1024);
+
+    // Subtle grain
+    for (let i = 0; i < 600; i++) {
+      ctx.fillStyle = Math.random() > 0.5 ? "rgba(35, 22, 14, 0.3)" : "rgba(10, 6, 3, 0.3)";
+      const x = Math.random() * 512;
+      ctx.fillRect(x, 0, Math.random() * 2 + 1, 1024);
     }
-    return new THREE.CanvasTexture(canvas);
+
+    // Outer beveled frame border
+    ctx.strokeStyle = "#24160e";
+    ctx.lineWidth = 16;
+    ctx.strokeRect(8, 8, 496, 1008);
+    ctx.strokeStyle = "#0d0704";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(18, 18, 476, 988);
+
+    // Top recessed panel
+    ctx.fillStyle = "#110a06";
+    ctx.fillRect(36, 40, 440, 440);
+    ctx.strokeStyle = "#24160e";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(36, 40, 440, 440);
+    ctx.strokeStyle = "#080402";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(40, 44, 432, 432);
+
+    // Bottom recessed panel
+    ctx.fillStyle = "#110a06";
+    ctx.fillRect(36, 520, 440, 440);
+    ctx.strokeStyle = "#24160e";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(36, 520, 440, 440);
+    ctx.strokeStyle = "#080402";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(40, 524, 432, 432);
+
+    // Beautiful centered white serif quote on the top panel (Matches user screenshot 1:1)
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "italic 32px 'Playfair Display', Georgia, serif";
+    ctx.fillStyle = "#efebe3";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 2;
+
+    const lines = quote.split("\n");
+    const centerY = 260;
+    const lineSpacing = 48;
+    const startY = centerY - ((lines.length - 1) * (lineSpacing / 2));
+    lines.forEach((line, idx) => {
+      ctx.fillText(line.trim(), 256, startY + (idx * lineSpacing));
+    });
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
   };
 
   useEffect(() => {
@@ -202,18 +259,18 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
-    // Scene
+    // Scene with deep warm atmospheric fog
     const scene = new THREE.Scene();
     sceneRef.current = scene;
-    scene.background = new THREE.Color(0x0c0704);
-    scene.fog = new THREE.FogExp2(0x140d08, 0.024);
+    scene.background = new THREE.Color(0x0a0604);
+    scene.fog = new THREE.FogExp2(0x0a0604, 0.026);
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(58, width / height, 0.1, 150);
-    camera.position.set(0, 2.2, 2);
+    // Camera at eye height (y = 2.05)
+    const camera = new THREE.PerspectiveCamera(54, width / height, 0.1, 160);
+    camera.position.set(0, 2.05, targetZRef.current);
     cameraRef.current = camera;
 
-    // Renderer
+    // High performance WebGL renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -222,134 +279,158 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
     rendererRef.current = renderer;
     container.appendChild(renderer.domElement);
 
-    // Ambient light - gentle warm tone
-    const ambientLight = new THREE.AmbientLight(0xffecd0, 0.55);
+    // Subtle warm ambient light
+    const ambientLight = new THREE.AmbientLight(0xfff1de, 0.45);
     scene.add(ambientLight);
 
-    // Main Hallway Dimensions
-    const hallWidth = 7.5;
-    const hallHeight = 5.2;
-    const hallLength = 110;
+    // Hallway Dimensions
+    const hallWidth = 6.4;
+    const hallHeight = 4.8;
+    const hallLength = 125;
 
-    // Floor (Walnut wood)
+    // Walnut Plank Wood Floor
     const floorGeo = new THREE.PlaneGeometry(hallWidth, hallLength);
     const floorMat = new THREE.MeshStandardMaterial({
-      map: createWoodTexture(),
-      roughness: 0.35,
-      metalness: 0.1,
+      map: createFloorTexture(),
+      roughness: 0.38,
+      metalness: 0.08,
     });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.set(0, 0, -hallLength / 2 + 5);
+    floor.position.set(0, 0, -hallLength / 2 + 6);
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Ceiling (Warm cream with wood beams)
+    // Dark Timber Ceiling
     const ceilingGeo = new THREE.PlaneGeometry(hallWidth, hallLength);
-    const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x22160e, roughness: 0.9 });
+    const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x140d08, roughness: 0.95 });
     const ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
     ceiling.rotation.x = Math.PI / 2;
-    ceiling.position.set(0, hallHeight, -hallLength / 2 + 5);
+    ceiling.position.set(0, hallHeight, -hallLength / 2 + 6);
     scene.add(ceiling);
 
-    // Ceiling Wooden Beams
-    for (let z = 0; z > -hallLength; z -= 6) {
-      const beamGeo = new THREE.BoxGeometry(hallWidth + 0.2, 0.4, 0.5);
-      const beamMat = new THREE.MeshStandardMaterial({ color: 0x180f08, roughness: 0.7 });
+    // Heavy Horizontal Wooden Beams spanning across ceiling (Exact screenshot match)
+    for (let z = 6; z > -hallLength; z -= 5) {
+      const beamGeo = new THREE.BoxGeometry(hallWidth + 0.2, 0.42, 0.65);
+      const beamMat = new THREE.MeshStandardMaterial({ color: 0x120a06, roughness: 0.85 });
       const beam = new THREE.Mesh(beamGeo, beamMat);
-      beam.position.set(0, hallHeight - 0.2, z);
+      beam.position.set(0, hallHeight - 0.21, z);
       scene.add(beam);
     }
 
-    // Left & Right Plaster Walls
+    // Warm Plaster Walls (Exact beige/linen tone from screenshot)
     const wallGeo = new THREE.PlaneGeometry(hallLength, hallHeight);
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0xf3ece0, roughness: 0.85 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xd8d1c5, roughness: 0.82 });
 
     const leftWall = new THREE.Mesh(wallGeo, wallMat);
     leftWall.rotation.y = Math.PI / 2;
-    leftWall.position.set(-hallWidth / 2, hallHeight / 2, -hallLength / 2 + 5);
+    leftWall.position.set(-hallWidth / 2, hallHeight / 2, -hallLength / 2 + 6);
+    leftWall.receiveShadow = true;
     scene.add(leftWall);
 
     const rightWall = new THREE.Mesh(wallGeo, wallMat);
     rightWall.rotation.y = -Math.PI / 2;
-    rightWall.position.set(hallWidth / 2, hallHeight / 2, -hallLength / 2 + 5);
+    rightWall.position.set(hallWidth / 2, hallHeight / 2, -hallLength / 2 + 6);
+    rightWall.receiveShadow = true;
     scene.add(rightWall);
 
-    // Baseboards along walls
-    const baseboardMat = new THREE.MeshStandardMaterial({ color: 0x1b110b, roughness: 0.5 });
-    const leftBase = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.4, hallLength), baseboardMat);
-    leftBase.position.set(-hallWidth / 2 + 0.08, 0.2, -hallLength / 2 + 5);
+    // Dark Walnut Baseboards along floor line
+    const baseboardMat = new THREE.MeshStandardMaterial({ color: 0x120a06, roughness: 0.6 });
+    const leftBase = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, hallLength), baseboardMat);
+    leftBase.position.set(-hallWidth / 2 + 0.06, 0.21, -hallLength / 2 + 6);
     scene.add(leftBase);
 
-    const rightBase = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.4, hallLength), baseboardMat);
-    rightBase.position.set(hallWidth / 2 - 0.08, 0.2, -hallLength / 2 + 5);
+    const rightBase = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, hallLength), baseboardMat);
+    rightBase.position.set(hallWidth / 2 - 0.06, 0.21, -hallLength / 2 + 6);
     scene.add(rightBase);
 
-    // Build the 7 3D Doors & Wall Sconces
+    // Build the 7 3D Doors & Upward Tulip Sconces
     doorsMeshRef.current = [];
-    const brassMat = new THREE.MeshStandardMaterial({
-      map: createBrassTexture(),
-      roughness: 0.25,
-      metalness: 0.8,
-    });
 
     THREE_DOORS.forEach((doorData) => {
       const doorGroup = new THREE.Group();
       const isLeft = doorData.side === "left";
-      const xPos = isLeft ? -hallWidth / 2 + 0.05 : hallWidth / 2 - 0.05;
+      const xPos = isLeft ? -hallWidth / 2 + 0.04 : hallWidth / 2 - 0.04;
 
-      // Heavy Door Frame
-      const frameGeo = new THREE.BoxGeometry(0.25, 3.8, 2.2);
-      const frameMat = new THREE.MeshStandardMaterial({ color: 0x180e07, roughness: 0.6 });
+      // Heavy Dark Door Frame Molding
+      const frameGeo = new THREE.BoxGeometry(0.2, 3.65, 2.05);
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x110a06, roughness: 0.7 });
       const frame = new THREE.Mesh(frameGeo, frameMat);
       doorGroup.add(frame);
 
-      // Door Leaf (Pivoting Mesh)
-      const doorLeafGeo = new THREE.BoxGeometry(0.1, 3.5, 1.8);
+      // Door Leaf with Painted White Quote (Texture)
+      const doorLeafGeo = new THREE.BoxGeometry(0.08, 3.45, 1.8);
+      const doorTexture = createDoorLeafTexture(doorData.quote);
       const doorLeafMat = new THREE.MeshStandardMaterial({
-        color: doorData.color,
+        map: doorTexture,
         roughness: 0.35,
-        metalness: 0.15,
+        metalness: 0.08,
       });
       const doorLeaf = new THREE.Mesh(doorLeafGeo, doorLeafMat);
-      // Pivot offset
+      // Center position
       doorLeaf.position.set(0, 0, 0);
       (doorLeaf as unknown as { doorData: ThreeDoorData }).doorData = doorData;
       doorGroup.add(doorLeaf);
 
-      // Brass Plaque on Door
-      const plaqueGeo = new THREE.BoxGeometry(0.12, 0.45, 1.1);
-      const plaqueMesh = new THREE.Mesh(plaqueGeo, brassMat);
-      plaqueMesh.position.set(isLeft ? 0.04 : -0.04, 0.6, 0);
-      doorGroup.add(plaqueMesh);
+      // Brass Doorknob with Rose Backplate
+      const knobPlateGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.02, 16);
+      const knobMat = new THREE.MeshStandardMaterial({ color: 0xc89d5c, metalness: 0.85, roughness: 0.2 });
+      const knobPlate = new THREE.Mesh(knobPlateGeo, knobMat);
+      knobPlate.rotation.z = Math.PI / 2;
+      knobPlate.position.set(isLeft ? 0.05 : -0.05, -0.15, isLeft ? 0.68 : -0.68);
+      doorGroup.add(knobPlate);
 
-      // Brass Knob / Handle
-      const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.22, 16);
-      const handle = new THREE.Mesh(handleGeo, brassMat);
-      handle.rotation.z = Math.PI / 2;
-      handle.position.set(isLeft ? 0.08 : -0.08, -0.1, isLeft ? 0.65 : -0.65);
-      doorGroup.add(handle);
+      const knobBallGeo = new THREE.SphereGeometry(0.045, 16, 16);
+      const knobBall = new THREE.Mesh(knobBallGeo, knobMat);
+      knobBall.position.set(isLeft ? 0.09 : -0.09, -0.15, isLeft ? 0.68 : -0.68);
+      doorGroup.add(knobBall);
 
-      // Brass Wall Sconce above Door
-      const sconceArm = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.03, 0.03, 0.4, 8),
-        brassMat
+      // ─── Upward Tulip Wall Sconce (Matches Screenshot 1:1) ───
+      const sconceGroup = new THREE.Group();
+      
+      // Brass Wall Backplate
+      const sconcePlate = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.06, 0.02, 16),
+        knobMat
       );
-      sconceArm.rotation.z = isLeft ? -Math.PI / 4 : Math.PI / 4;
-      sconceArm.position.set(0, 2.25, 0);
-      doorGroup.add(sconceArm);
+      sconcePlate.rotation.z = Math.PI / 2;
+      sconcePlate.position.set(isLeft ? 0.02 : -0.02, 2.15, isLeft ? -0.3 : 0.3);
+      sconceGroup.add(sconcePlate);
 
-      const sconceLight = new THREE.PointLight(0xffca7a, 1.8, 8, 1.6);
-      sconceLight.position.set(isLeft ? 0.4 : -0.4, 2.4, 0);
+      // Curved Brass Arm
+      const sconceArm = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.025, 0.18, 12),
+        knobMat
+      );
+      sconceArm.position.set(isLeft ? 0.08 : -0.08, 2.12, isLeft ? -0.3 : 0.3);
+      sconceGroup.add(sconceArm);
+
+      // Upward Frosted Glass Tulip Shade
+      const shadeGeo = new THREE.CylinderGeometry(0.09, 0.045, 0.18, 16);
+      const shadeMat = new THREE.MeshStandardMaterial({
+        color: 0xffe8ba,
+        emissive: 0xffaa44,
+        emissiveIntensity: 0.95,
+        roughness: 0.2,
+      });
+      const shade = new THREE.Mesh(shadeGeo, shadeMat);
+      shade.position.set(isLeft ? 0.12 : -0.12, 2.22, isLeft ? -0.3 : 0.3);
+      sconceGroup.add(shade);
+
+      // Warm Sconce Light Illuminating Wall & Corridor
+      const sconceLight = new THREE.PointLight(0xffbe6b, 2.8, 8.5, 1.7);
+      sconceLight.position.set(isLeft ? 0.2 : -0.2, 2.32, isLeft ? -0.3 : 0.3);
       sconceLight.castShadow = true;
-      doorGroup.add(sconceLight);
+      sconceGroup.add(sconceLight);
 
-      // Amber Room Interior Glow behind Door
-      const roomGlow = new THREE.PointLight(0xffaa44, 0.2, 7, 2);
+      doorGroup.add(sconceGroup);
+
+      // Ambient Warm Room Interior Spill
+      const roomGlow = new THREE.PointLight(0xff9933, 0.25, 7, 2);
       roomGlow.position.set(isLeft ? -1.5 : 1.5, 1.5, 0);
       doorGroup.add(roomGlow);
 
-      doorGroup.position.set(xPos, 1.8, doorData.zPos);
+      doorGroup.position.set(xPos, 1.75, doorData.zPos);
       if (!isLeft) {
         doorGroup.rotation.y = Math.PI;
       }
@@ -363,33 +444,32 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
       });
     });
 
-    // Floating Warm Dust Motes Particles in Hallway
-    const particlesCount = 350;
+    // Golden Floating Dust Motes (Matches Screenshot Atmosphere)
+    const particlesCount = 260;
     const particleGeo = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particlesCount * 3);
     for (let i = 0; i < particlesCount; i++) {
-      particlePositions[i * 3] = (Math.random() - 0.5) * (hallWidth - 1);
-      particlePositions[i * 3 + 1] = Math.random() * hallHeight;
-      particlePositions[i * 3 + 2] = -Math.random() * hallLength;
+      particlePositions[i * 3] = (Math.random() - 0.5) * (hallWidth - 0.8);
+      particlePositions[i * 3 + 1] = Math.random() * (hallHeight - 0.5) + 0.3;
+      particlePositions[i * 3 + 2] = -Math.random() * hallLength + 8;
     }
     particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
     const particleMat = new THREE.PointsMaterial({
-      color: 0xdfb978,
-      size: 0.05,
+      color: 0xe8c17e,
+      size: 0.045,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.65,
       blending: THREE.AdditiveBlending,
     });
     const dust = new THREE.Points(particleGeo, particleMat);
     scene.add(dust);
 
-    // Mouse Move Parallax & Raycasting
+    // Mouse Move Parallax & Door Raycasting
     const onMouseMove = (event: MouseEvent) => {
       const rect = container.getBoundingClientRect();
       mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-      // Raycast against doors
       raycasterRef.current.setFromCamera(mouseRef.current, camera);
       const interactiveLeaves = doorsMeshRef.current.map((d) => d.doorLeaf);
       const intersects = raycasterRef.current.intersectObjects(interactiveLeaves);
@@ -408,31 +488,25 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
       }
     };
 
-    // Click on Door to Enter
+    // Click on Door to Enter Room
     const onClick = () => {
       if (hoveredDoorRef.current) {
         enterRoomRef.current(hoveredDoorRef.current);
       }
     };
 
-    // Scroll to walk down hallway
+    // Smooth scroll to walk forward/back down corridor
     const onWheel = (e: WheelEvent) => {
-      // If we are at the top and wheeling up, or if user is trying to scroll past
-      const delta = e.deltaY * 0.035;
-      const nextZ = targetZRef.current - delta;
-      
-      // Stop wheel from bubbling only when navigating within corridor bounds
-      if ((delta > 0 && targetZRef.current > -92) || (delta < 0 && targetZRef.current < 2)) {
-        e.preventDefault();
-        targetZRef.current = Math.max(-92, Math.min(2, nextZ));
-      }
+      e.preventDefault();
+      const delta = e.deltaY * 0.032;
+      targetZRef.current = Math.max(-108, Math.min(8, targetZRef.current - delta));
     };
 
     container.addEventListener("mousemove", onMouseMove);
     container.addEventListener("click", onClick);
     container.addEventListener("wheel", onWheel, { passive: false });
 
-    // Resize handler
+    // Window Resize
     const onResize = () => {
       if (!container || !rendererRef.current || !cameraRef.current) return;
       const w = container.clientWidth;
@@ -444,49 +518,44 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
     window.addEventListener("resize", onResize);
 
     // Animation Loop
-    let animationFrameId: number;
+    let animId: number;
     const clock = new THREE.Clock();
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth camera translation
-      currentZRef.current += (targetZRef.current - currentZRef.current) * 0.08;
+      // Smooth camera interpolation
+      currentZRef.current += (targetZRef.current - currentZRef.current) * 0.075;
       camera.position.z = currentZRef.current;
 
-      // Calculate progress (0 to 100%)
-      const progress = Math.max(0, Math.min(1, -currentZRef.current / 86));
-      setCameraProgress(Math.round(progress * 100));
-
-      // Active door tracking based on camera Z
+      // Active door tracking based on closest distance
       let closestIdx = 0;
-      let minDistance = 999;
+      let minDist = 999;
       THREE_DOORS.forEach((door, idx) => {
-        const dist = Math.abs(currentZRef.current - door.zPos);
-        if (dist < minDistance) {
-          minDistance = dist;
+        const dist = Math.abs(currentZRef.current - (door.zPos + 4));
+        if (dist < minDist) {
+          minDist = dist;
           closestIdx = idx;
         }
       });
       setActiveDoorIndex(closestIdx);
 
-      // Subtle breath / natural head-bobbing
-      camera.position.y = 2.2 + Math.sin(elapsedTime * 1.5) * 0.03;
-      // Mouse camera tilt
-      camera.rotation.y = -mouseRef.current.x * 0.12;
-      camera.rotation.x = mouseRef.current.y * 0.08;
+      // Subtle human breathing movement
+      camera.position.y = 2.05 + Math.sin(elapsedTime * 1.4) * 0.02;
+      camera.rotation.y = -mouseRef.current.x * 0.08;
+      camera.rotation.x = mouseRef.current.y * 0.05;
 
-      // Animate doors opening when hovered
+      // Animate doors opening smoothly on hover
       doorsMeshRef.current.forEach((doorItem) => {
         const isHovered = hoveredDoorRef.current?.id === doorItem.data.id;
-        const targetRot = isHovered ? (doorItem.data.side === "left" ? 0.9 : -0.9) : 0;
-        doorItem.doorLeaf.rotation.y += (targetRot - doorItem.doorLeaf.rotation.y) * 0.1;
-        doorItem.light.intensity += ((isHovered ? 2.5 : 0.2) - doorItem.light.intensity) * 0.1;
+        const targetAngle = isHovered ? (doorItem.data.side === "left" ? 0.78 : -0.78) : 0;
+        doorItem.doorLeaf.rotation.y += (targetAngle - doorItem.doorLeaf.rotation.y) * 0.09;
+        doorItem.light.intensity += ((isHovered ? 2.8 : 0.25) - doorItem.light.intensity) * 0.09;
       });
 
-      // Animate dust motes drift
-      dust.rotation.y = elapsedTime * 0.015;
+      // Dust motes drift
+      dust.rotation.y = elapsedTime * 0.012;
 
       renderer.render(scene, camera);
     };
@@ -494,7 +563,7 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
     animate();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animId);
       window.removeEventListener("resize", onResize);
       container.removeEventListener("mousemove", onMouseMove);
       container.removeEventListener("click", onClick);
@@ -506,165 +575,61 @@ export default function ThreeHallway({ onScrollToOverview, onClose }: ThreeHallw
     };
   }, []);
 
-  const walkToDoor = (index: number) => {
-    const door = THREE_DOORS[index];
-    if (door) {
-      targetZRef.current = door.zPos + 3.5;
-    }
-  };
-
   return (
-    <div className="relative w-full min-h-screen bg-[#0d0805] text-stone-200 overflow-hidden flex flex-col justify-between">
-      {/* Cinematic HUD Header */}
-      <div className="relative z-20 pt-24 sm:pt-28 px-4 sm:px-6 max-w-7xl mx-auto w-full pointer-events-none">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c89d5c]/20 border border-[#c89d5c]/40 text-[#dfb978] text-xs font-semibold uppercase tracking-widest backdrop-blur-md mb-2">
-              <Footprints className="w-3.5 h-3.5" />
-              <span>Realtime 3D Sanctuary Corridor</span>
-            </div>
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight drop-shadow-lg">
-              The 3D Hallway
-            </h1>
-            <p className="text-xs sm:text-sm text-stone-300 font-serif italic mt-1 max-w-lg">
-              Scroll or use arrows to walk down the walnut floor. Hover over any door to see it open, or click to enter the room.
-            </p>
-          </div>
-
-          {/* Quick HUD Navigation Dots & Overview Link */}
-          <div className="pointer-events-auto flex flex-wrap items-center gap-2 bg-black/60 backdrop-blur-md p-2 rounded-2xl border border-white/10 shadow-xl">
-            {THREE_DOORS.map((door, idx) => (
-              <button
-                key={door.id}
-                onClick={() => walkToDoor(idx)}
-                className={`group relative px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  activeDoorIndex === idx
-                    ? "bg-[#c89d5c] text-[#140d08] shadow-lg shadow-[#c89d5c]/40 font-bold scale-105"
-                    : "text-stone-400 hover:text-white hover:bg-white/10"
-                }`}
-                title={`Walk to Door ${door.number}: ${door.title}`}
-              >
-                <span>D{door.number}</span>
-              </button>
-            ))}
-
-            {onScrollToOverview && (
-              <button
-                onClick={onScrollToOverview}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#dfb978] bg-[#c89d5c]/10 hover:bg-[#c89d5c]/20 border border-[#c89d5c]/30 transition-all cursor-pointer ml-1"
-                title="Scroll down to page overview"
-              >
-                <span>Overview</span>
-                <ArrowDown className="w-3 h-3" />
-              </button>
-            )}
-
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-300 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all cursor-pointer ml-1"
-                title="Exit 3D Hallway"
-              >
-                <X className="w-3.5 h-3.5" />
-                <span>Exit 3D View</span>
-              </button>
-            )}
-          </div>
-        </div>
+    <div className="relative w-full h-full min-h-screen bg-[#0a0604] text-stone-200 overflow-hidden select-none">
+      {/* ─── Top-Left Breadcrumb (Matches Screenshot "YOU MATTER") ─── */}
+      <div className="absolute top-7 left-7 z-20 pointer-events-none flex items-center gap-3">
+        <span className="text-stone-400/80 text-xs tracking-[0.28em] font-serif uppercase font-medium">
+          {THREE_DOORS[activeDoorIndex]?.title.includes("You Matter") ? "YOU MATTER" : "HOW WE SERVE"}
+        </span>
       </div>
 
-      {/* Main Three.js Canvas Container */}
+      {/* ─── Optional Top-Right Close Button ─── */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          type="button"
+          aria-label="Exit 3D Hallway"
+          className="absolute top-6 right-6 z-30 p-2.5 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-stone-300 hover:text-white transition-all cursor-pointer backdrop-blur-md"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* ─── Main Three.js Canvas Container ─── */}
       <div
         ref={containerRef}
-        className="absolute inset-0 z-10 w-full h-full"
+        className="absolute inset-0 z-10 w-full h-full cursor-default"
         style={{ touchAction: "none" }}
       />
 
-      {/* Dark Vignette Overlay */}
-      <div className="pointer-events-none absolute inset-0 z-15 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(10,5,3,0.75)_95%)]" />
+      {/* ─── Dark Vignette Overlay ─── */}
+      <div className="pointer-events-none absolute inset-0 z-15 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(8,5,3,0.85)_95%)]" />
 
-      {/* Transition Door-Opening Flare Overlay */}
+      {/* ─── Bottom-Right Sparkle Diamond Icon (Exact Screenshot Match) ─── */}
+      <div className="absolute bottom-8 right-8 z-20 pointer-events-none opacity-70">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="#dfb978" className="animate-pulse drop-shadow-[0_0_12px_rgba(223,185,120,0.6)]">
+          <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
+        </svg>
+      </div>
+
+      {/* ─── Seamless Door-Entering Flare ─── */}
       {isTransitioning && (
-        <div className="absolute inset-0 z-50 bg-[#dfb978] animate-[pulse_0.9s_ease-out_forwards] flex items-center justify-center">
-          <div className="text-center text-[#140d08]">
-            <Sparkles className="w-10 h-10 mx-auto animate-spin" />
-            <h3 className="font-serif text-2xl font-bold mt-2">Entering Room...</h3>
-          </div>
+        <div className="absolute inset-0 z-50 bg-[#dfb978]/90 animate-[pulse_0.8s_ease-out_forwards] flex items-center justify-center">
+          <p className="font-serif text-3xl font-bold text-[#140d08] tracking-wider animate-pulse">
+            Entering Room...
+          </p>
         </div>
       )}
 
-      {/* Floating Bottom HUD with Active Door Details & Controls */}
-      <div className="relative z-20 pb-8 sm:pb-10 px-4 sm:px-6 max-w-4xl mx-auto w-full">
-        {hoveredDoor || THREE_DOORS[activeDoorIndex] ? (
-          <div className="bg-[#1c130d]/90 backdrop-blur-xl rounded-3xl border border-[#c89d5c]/40 p-5 sm:p-6 shadow-2xl transition-all duration-300">
-            {(() => {
-              const current = hoveredDoor || THREE_DOORS[activeDoorIndex];
-              return (
-                <div className="flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
-                  <div className="space-y-1 text-center md:text-left">
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-[#c89d5c]/20 text-[#dfb978] border border-[#c89d5c]/40">
-                        Door {current.number} • {current.side === "left" ? "Left Wing" : "Right Wing"}
-                      </span>
-                      <span className="text-xs text-stone-400">
-                        Plaque: &ldquo;{current.plaque}&rdquo;
-                      </span>
-                    </div>
-                    <h2 className="font-serif text-xl sm:text-2xl font-bold text-white">
-                      {current.title}
-                    </h2>
-                    <p className="text-xs sm:text-sm text-stone-300 max-w-xl">
-                      {current.subtitle}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-3 shrink-0">
-                    <button
-                      onClick={() => walkToDoor(Math.max(0, activeDoorIndex - 1))}
-                      disabled={activeDoorIndex === 0}
-                      className="p-3 rounded-full bg-white/5 border border-white/10 text-stone-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                      title="Walk Back"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-
-                    <button
-                      onClick={() => enterRoom(current)}
-                      className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-full text-xs font-semibold uppercase tracking-wider text-[#140d08] bg-gradient-to-r from-[#dfb978] via-[#c89d5c] to-[#b88a44] shadow-lg hover:brightness-110 transition-all hover:scale-105 cursor-pointer"
-                    >
-                      <Sparkles className="w-4 h-4 fill-[#140d08]" />
-                      <span>Step Through Door</span>
-                    </button>
-
-                    <button
-                      onClick={() => walkToDoor(Math.min(THREE_DOORS.length - 1, activeDoorIndex + 1))}
-                      disabled={activeDoorIndex === THREE_DOORS.length - 1}
-                      className="p-3 rounded-full bg-white/5 border border-white/10 text-stone-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                      title="Walk Forward"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
+      {/* ─── Minimalist Floating Hint (Fades Out Naturally) ─── */}
+      {hoveredDoor && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-center">
+          <div className="px-5 py-2 rounded-full bg-black/60 border border-[#dfb978]/30 backdrop-blur-md text-xs tracking-widest uppercase text-[#dfb978]">
+            Click to enter {hoveredDoor.title}
           </div>
-        ) : null}
-
-        {/* Corridor Distance Tracker */}
-        <div className="mt-4 flex items-center justify-between text-[11px] text-stone-400 uppercase tracking-widest font-mono">
-          <span>Sanctuary Entrance</span>
-          <div className="flex-1 mx-4 h-1 bg-white/10 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-[#c89d5c] to-[#dfb978] transition-all duration-300"
-              style={{ width: `${cameraProgress}%` }}
-            />
-          </div>
-          <span>Corridor Progress {cameraProgress}%</span>
         </div>
-      </div>
+      )}
     </div>
   );
 }
-

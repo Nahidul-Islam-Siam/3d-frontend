@@ -85,6 +85,7 @@ export default function FourDoorsSection({
 }: FourDoorsSectionProps) {
   const [hoveredDoor, setHoveredDoor] = useState<string | null>(null);
   const [is3DHallwayOpen, setIs3DHallwayOpen] = useState<boolean>(false);
+  const [selectedDoorIndex, setSelectedDoorIndex] = useState<number>(1);
 
   // Close 3D overlay with Escape key
   useEffect(() => {
@@ -98,7 +99,9 @@ export default function FourDoorsSection({
   }, [is3DHallwayOpen]);
 
   // Clicking any door on landing page launches the 3D Three.js Door Hallway
-  const handleDoorClick = (_door: DoorDefinition) => {
+  const handleDoorClick = (door: DoorDefinition) => {
+    const idx = door.id === 'serve' ? 1 : door.id === 'story' ? 0 : door.id === 'movement' ? 2 : 3;
+    setSelectedDoorIndex(idx);
     setIs3DHallwayOpen(true);
   };
 
@@ -199,8 +202,11 @@ export default function FourDoorsSection({
 
       {/* ─── Realtime 3D Three.js Door Hallway View (Opens on Landing Page Door Click) ─── */}
       {is3DHallwayOpen && (
-        <div className="fixed inset-0 z-[100] w-full h-full bg-[#0d0805] animate-fade-in flex flex-col">
-          <ThreeHallway onClose={() => setIs3DHallwayOpen(false)} />
+        <div className="fixed inset-0 z-[100] w-full h-full bg-[#0a0604] animate-fade-in flex flex-col">
+          <ThreeHallway 
+            initialDoorIndex={selectedDoorIndex}
+            onClose={() => setIs3DHallwayOpen(false)} 
+          />
         </div>
       )}
     </>
