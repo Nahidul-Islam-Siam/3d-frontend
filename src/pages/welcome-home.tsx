@@ -1,11 +1,12 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Footprints, Heart, Key, Home, Sparkles } from 'lucide-react';
+import { Footprints, Key } from 'lucide-react';
 import Seo from '@/components/Seo';
 import WelcomeHomeHero from '@/components/how-we-serve/welcome-home/WelcomeHomeHero';
 import WelcomeHomeTitleStage from '@/components/how-we-serve/welcome-home/WelcomeHomeTitleStage';
 import HopeBeginsWithKeySection from '@/components/how-we-serve/welcome-home/HopeBeginsWithKeySection';
 import JourneyHomeSection from '@/components/how-we-serve/welcome-home/JourneyHomeSection';
+import WhatVeteransFeelSection from '@/components/how-we-serve/welcome-home/WhatVeteransFeelSection';
 import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
 
 import housePhoto1 from '@/assets/how-we-serve/welcome-home/image.png';
@@ -14,18 +15,15 @@ import housePhoto3 from '@/assets/how-we-serve/welcome-home/image copy 3.png';
 
 export default function WelcomeHomePage() {
   const titleStageRef = useRef<HTMLDivElement | null>(null);
+  const narrativeRef = useRef<HTMLDivElement | null>(null);
 
   const handleScrollClick = () => {
     titleStageRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const feelings = [
-    { title: "Appreciated", icon: Heart, desc: "Recognizing sacrifice that often went unseen" },
-    { title: "Honored", icon: Shield, desc: "Dignified respect with zero staged pity" },
-    { title: "Safe", icon: Key, desc: "A private sanctuary behind a locked front door" },
-    { title: "Hopeful", icon: Sparkles, desc: "A clean pantry and peaceful place to sleep" },
-    { title: "Home", icon: Home, desc: "Not just four walls, but a real community" },
-  ];
+  const handleNarrativeScroll = () => {
+    narrativeRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -49,8 +47,11 @@ export default function WelcomeHomePage() {
         {/* ─── 4. THE JOURNEY HOME (Matches User Screenshot 1:1) ─── */}
         <JourneyHomeSection />
 
-        {/* ─── 3. CORE NARRATIVE: HONOR & RESTORATION ─── */}
-        <div className="max-w-6xl mx-auto px-6 py-20 lg:py-28 space-y-20">
+        {/* ─── 5. WHAT WE HOPE EVERY VETERAN FEELS (With Video Background 1:1) ─── */}
+        <WhatVeteransFeelSection onScrollClick={handleNarrativeScroll} />
+
+        {/* ─── 6. CORE NARRATIVE: HONOR & RESTORATION ─── */}
+        <div ref={narrativeRef} className="max-w-6xl mx-auto px-6 py-20 lg:py-28 space-y-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="space-y-6">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#c89d5c]/15 border border-[#c89d5c]/30 text-[#8f6629] text-xs font-semibold uppercase tracking-widest">
@@ -91,43 +92,6 @@ export default function WelcomeHomePage() {
                   className="w-full h-80 sm:h-96 object-cover rounded-2xl shadow-lg border border-[#e4d7c0]" 
                 />
               </div>
-            </div>
-          </div>
-
-          {/* ─── 3. 5 CORE FEELINGS WE CULTIVATE ─── */}
-          <div className="rounded-3xl bg-[#1c130d] text-stone-200 p-8 sm:p-14 shadow-2xl">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="text-xs uppercase tracking-widest font-bold text-[#dfb978]">
-                Dignity & Care
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-white mt-2">
-                What We Hope Every Veteran Feels
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-400 mt-3 font-serif italic">
-                From the moment the key turns in the lock, the atmosphere of respect speaks louder than words.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-              {feelings.map((f) => {
-                const IconComponent = f.icon;
-                return (
-                  <div
-                    key={f.title}
-                    className="p-6 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center text-center hover:border-[#dfb978]/40 transition-all hover:-translate-y-1"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-[#dfb978]/15 text-[#dfb978] flex items-center justify-center mb-4">
-                      <IconComponent className="w-5 h-5" />
-                    </div>
-                    <h4 className="font-serif text-lg font-bold text-white mb-2">
-                      {f.title}
-                    </h4>
-                    <p className="text-xs text-stone-400 leading-relaxed">
-                      {f.desc}
-                    </p>
-                  </div>
-                );
-              })}
             </div>
           </div>
 
