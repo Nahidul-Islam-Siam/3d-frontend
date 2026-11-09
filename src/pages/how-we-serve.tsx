@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import Seo from '@/components/Seo';
+import ThreeHallway from '@/components/cinematic/ThreeHallway';
 import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
 import PlaceAtTheTableSection from '@/components/how-we-serve/PlaceAtTheTableSection';
 import APlaceForThemSection from '@/components/how-we-serve/APlaceForThemSection';
@@ -9,37 +11,51 @@ import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWait
 import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function HowWeServePage() {
+  const overviewRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScrollToOverview = () => {
+    if (overviewRef.current) {
+      overviewRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <Seo 
-        title="How We Serve — Live Achieve Believe" 
-        description="Discover how Live Achieve Believe strengthens lives and builds community through food dignity, youth development, mental health awareness, and veteran housing." 
+        title="How We Serve — The Hallway | Live Achieve Believe" 
+        description="Walk the walnut corridor of Live Achieve Believe. Seven doors, seven expressions of compassion, seven ways we stand beside people in their deepest moments." 
       />
 
-      <div className="w-full bg-[#FAF4E6]">
-        {/* ─── Section 1: Cinematic Dining / Table Hero Video ─── */}
-        <HowWeServeHero />
+      <div className="w-full bg-[#0d0805]">
+        {/* ─── Realtime 3D Three.js Hallway of Hope ─── */}
+        <ThreeHallway onScrollToOverview={handleScrollToOverview} />
 
-        {/* ─── Section 2: A Place of the Table ─── */}
-        <PlaceAtTheTableSection id="place-at-the-table" />
+        {/* ─── Comprehensive Overview Sections Below Corridor ─── */}
+        <div ref={overviewRef} id="how-we-serve-overview" className="w-full bg-[#FAF4E6]">
+          {/* Section 1: Cinematic Dining / Table Hero Video */}
+          <HowWeServeHero />
 
-        {/* ─── Section 3: You Matter (5 Step Cards) ─── */}
-        <APlaceForThemSection id="you-matter" />
+          {/* Section 2: A Place at the Table */}
+          <PlaceAtTheTableSection id="place-at-the-table" />
 
-        {/* ─── Section 4: Welcome Home (Partners & Network Map) ─── */}
-        <ServingCommunityTogetherSection id="welcome-home" />
+          {/* Section 3: You Matter (5 Step Cards) */}
+          <APlaceForThemSection id="you-matter" />
 
-        {/* ─── Section 5: Pure photography, quiet moments, zero staged gloss. (Interactive Gallery) ─── */}
-        <PurePhotographySection />
+          {/* Section 4: Welcome Home (Partners & Network Map) */}
+          <ServingCommunityTogetherSection id="welcome-home" />
 
-        {/* ─── Section 6: Stories That Save Lives (Testimonial Carousel) ─── */}
-        <StoriesFromTheTableSection id="stories-that-save-lives" />
+          {/* Section 5: Pure photography, quiet moments, zero staged gloss. */}
+          <PurePhotographySection />
 
-        {/* ─── Section 7: Serve Beside Us (Action Cards) ─── */}
-        <AnotherSeatWaitingSection id="serve-beside-us" />
+          {/* Section 6: Stories That Save Lives (Testimonial Carousel) */}
+          <StoriesFromTheTableSection id="stories-that-save-lives" />
 
-        {/* ─── Section 8: What's Coming Up Next (Showdown Event & Auditions) ─── */}
-        <ShowdownSection id="what-coming-up-next" />
+          {/* Section 7: Serve Beside Us (Action Cards) */}
+          <AnotherSeatWaitingSection id="serve-beside-us" />
+
+          {/* Section 8: What's Coming Up Next (Showdown Event & Auditions) */}
+          <ShowdownSection id="what-coming-up-next" />
+        </div>
       </div>
     </>
   );

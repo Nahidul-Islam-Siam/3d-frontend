@@ -289,3 +289,60 @@ body::-webkit-scrollbar,
   color: #F97316 !important;
   font-weight: 600 !important;
 }
+
+/* ─── 3D Perspective & Hallway Transformations ─── */
+.perspective-hallway {
+  perspective: 1200px;
+  perspective-origin: 50% 45%;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.door-pivot-left {
+  transform-origin: left center;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s ease;
+}
+
+.door-pivot-right {
+  transform-origin: right center;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s ease;
+}
+
+.group:hover .door-open-left {
+  transform: rotateY(-65deg);
+  box-shadow: -15px 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.group:hover .door-open-right {
+  transform: rotateY(65deg);
+  box-shadow: 15px 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* Brass Plaque Engraving Effect */
+.brass-plaque {
+  background: linear-gradient(135deg, #d8ad69 0%, #b88a44 45%, #e2be7e 55%, #9b7233 100%);
+  border: 1px solid #7c5825;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.brass-text {
+  background: linear-gradient(135deg, #dfb978 0%, #c89d5c 50%, #997135 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Atmospheric Glows & Sconces */
+.sconce-glow {
+  background: radial-gradient(circle, rgba(240, 196, 126, 0.4) 0%, rgba(200, 157, 92, 0.15) 45%, transparent 75%);
+}
+
+.light-spill {
+  background: radial-gradient(ellipse at center, rgba(255, 235, 190, 0.85) 0%, rgba(230, 190, 120, 0.35) 45%, transparent 75%);
+}
+
+.font-serif-cinematic {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+

@@ -25,7 +25,8 @@ export default function Navbar() {
   const isDonatePage = location.pathname === '/donate';
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage || isStoriesPage;
+  const isHowWeServePage = location.pathname === '/how-we-serve';
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage || isStoriesPage || isHowWeServePage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const isDarkScrolled = (isDonatePage || isStoriesPage) && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;

@@ -10,7 +10,7 @@ export default function RootLayout() {
   const isHomePage = location.pathname === '/';
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || isYouMatterPage || isStoriesPage;
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
