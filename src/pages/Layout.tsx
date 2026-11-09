@@ -10,7 +10,8 @@ export default function RootLayout() {
   const isHomePage = location.pathname === '/';
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage;
+  const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage || isWelcomeHomePage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
@@ -31,6 +32,16 @@ export default function RootLayout() {
       window.removeEventListener('reveal-footer', handleRevealFooter);
     };
   }, []);
+
+  useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+      const lenis = (window as unknown as { __lenis?: { scrollTo: (target: number, options?: { immediate?: boolean }) => void } }).__lenis;
+      if (lenis) {
+        lenis.scrollTo(0, { immediate: true });
+      }
+    }
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     if (location.hash) {

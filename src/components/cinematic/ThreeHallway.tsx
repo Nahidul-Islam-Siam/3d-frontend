@@ -56,7 +56,7 @@ export const THREE_DOORS: ThreeDoorData[] = [
     title: "Welcome Home",
     subtitle: "Dignified housing, moving assistance, and deep honor for our veterans",
     quote: "Sometimes hope begins\nwith a key.",
-    href: "/how-we-serve#welcome-home",
+    href: "/how-we-serve/welcome-home",
     side: "right",
     zPos: -42,
     color: 0x140e08,
@@ -67,7 +67,7 @@ export const THREE_DOORS: ThreeDoorData[] = [
     title: "Serve Beside Us",
     subtitle: "The volunteer family, joyful teamwork, and saving a seat",
     quote: "Sometimes purpose begins\nwith saying yes.",
-    href: "/how-we-serve#serve-beside-us",
+    href: "/how-we-serve",
     side: "left",
     zPos: -56,
     color: 0x170f09,
@@ -79,7 +79,7 @@ export interface ThreeHallwayProps {
   onClose?: () => void;
 }
 
-export default function ThreeHallway({ onClose }: ThreeHallwayProps) {
+export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallwayProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -95,23 +95,33 @@ export default function ThreeHallway({ onClose }: ThreeHallwayProps) {
     setIsTransitioning(true);
     targetZRef.current = door.zPos + 0.8;
     setTimeout(() => {
-      if (door.href.startsWith("/how-we-serve#")) {
-        const hash = door.href.split("#")[1];
-        if (location.pathname === "/how-we-serve") {
-          const el = document.getElementById(hash);
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-            setIsTransitioning(false);
-            if (onClose) onClose();
-            return;
+      // If already on /how-we-serve, smoothly scroll to top video section (HowWeServeHero)
+      if (location.pathname === "/how-we-serve" && door.href === "/how-we-serve") {
+        if (onScrollToOverview) {
+          onScrollToOverview();
+        } else {
+          const overviewEl = document.getElementById("how-we-serve-overview");
+          if (overviewEl) {
+            overviewEl.scrollIntoView({ behavior: "smooth" });
           }
         }
+        setIsTransitioning(false);
+        if (onClose) onClose();
+        return;
       }
+
+      // Always start at top video section of destination page
+      window.scrollTo(0, 0);
+      const lenis = (window as unknown as { __lenis?: { scrollTo: (target: number, options?: { immediate?: boolean }) => void } }).__lenis;
+      if (lenis) {
+        lenis.scrollTo(0, { immediate: true });
+      }
+
       navigate(door.href);
       setIsTransitioning(false);
       if (onClose) onClose();
     }, 700);
-  }, [navigate, onClose, location.pathname]);
+  }, [navigate, onClose, location.pathname, onScrollToOverview]);
 
   const enterRoomRef = useRef(enterRoom);
   enterRoomRef.current = enterRoom;

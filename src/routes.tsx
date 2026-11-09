@@ -15,6 +15,7 @@ import Donate from "./pages/donate";
 import YouMatter from "./pages/you-matter";
 import StoriesThatSaveLives from "./pages/stories-that-save-lives";
 import APlaceAtTheTable from "./pages/a-place-at-the-table";
+import WelcomeHome from "./pages/welcome-home";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -93,6 +94,14 @@ export const router = createBrowserRouter([
       {
         path: "/stories-that-save-lives",
         element: <StoriesThatSaveLives />,
+      },
+      {
+        path: "/how-we-serve/welcome-home",
+        element: <WelcomeHome />,
+      },
+      {
+        path: "/welcome-home",
+        element: <WelcomeHome />,
       },
       {
         path: "/meet-us",
