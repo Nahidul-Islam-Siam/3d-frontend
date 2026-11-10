@@ -19,8 +19,8 @@ export default function MistyForestCanvas({
     const container = mountRef.current;
     if (!container) return;
 
-    let width = container.clientWidth || window.innerWidth;
-    let height = container.clientHeight || window.innerHeight;
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
 
     // ─── 1. Scene, Camera, Renderer ───
     const scene = new THREE.Scene();

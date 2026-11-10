@@ -7,6 +7,9 @@ import { clearSession } from '@/lib/store/slices/authSlice';
 
 const ALLOWED_ADMIN_ROLES = new Set(['admin', 'super_admin', 'editor']);
 
+// Deduplicate concurrent session checks (e.g., React StrictMode double-mount)
+let inFlightVerify: { token: string; promise: Promise<unknown> } | null = null;
+
 export interface ProtectedAdminRouteProps {
   children: ReactNode;
 }
@@ -18,32 +21,49 @@ export interface ProtectedAdminRouteProps {
 export default function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
-  const [isVerifying, setIsVerifying] = useState<boolean>(Boolean(token));
+  const { user, token, isAuthenticated, initialized } = useAppSelector((state) => state.auth);
+  const needsVerification = Boolean(token) && !(initialized && isAuthenticated && user);
+  const [isVerifying, setIsVerifying] = useState<boolean>(needsVerification);
 
   useEffect(() => {
-    let active = true;
     if (!token) {
       setIsVerifying(false);
       return;
     }
 
-    dispatch(getProfile())
-      .unwrap()
-      .catch(() => {
-        localStorage.removeItem('lab_access_token');
-        localStorage.removeItem('lab_refresh_token');
-        localStorage.removeItem('lab_user');
-        dispatch(clearSession());
-      })
-      .finally(() => {
-        if (active) setIsVerifying(false);
-      });
+    if (initialized && isAuthenticated && user) {
+      setIsVerifying(false);
+      return;
+    }
+
+    let active = true;
+    setIsVerifying(true);
+
+    if (!inFlightVerify || inFlightVerify.token !== token) {
+      const verifyPromise = dispatch(getProfile())
+        .unwrap()
+        .catch(() => {
+          localStorage.removeItem('lab_access_token');
+          localStorage.removeItem('lab_refresh_token');
+          localStorage.removeItem('lab_user');
+          dispatch(clearSession());
+        })
+        .finally(() => {
+          if (inFlightVerify?.promise === verifyPromise) {
+            inFlightVerify = null;
+          }
+        });
+      inFlightVerify = { token, promise: verifyPromise };
+    }
+
+    inFlightVerify.promise.finally(() => {
+      if (active) setIsVerifying(false);
+    });
 
     return () => {
       active = false;
     };
-  }, [dispatch, token]);
+  }, [dispatch, token, initialized, isAuthenticated, user]);
 
   if (isVerifying) {
     return (

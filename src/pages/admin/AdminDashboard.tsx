@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Layout,
@@ -63,6 +63,33 @@ import SubmissionsView, {
 
 const { Header, Sider, Content } = Layout;
 
+type AdminResource = 'videos' | 'events' | 'volunteers' | 'submissions';
+
+function readStoredJson<T>(key: string, fallback: T): T {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? (JSON.parse(saved) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStoredJson(key: string, value: unknown): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Ignore storage quota or private-browsing persistence errors
+  }
+}
+
+const TAB_RESOURCE_MAP: Record<string, AdminResource[]> = {
+  overview: ['videos', 'events', 'volunteers'],
+  videos: ['videos'],
+  events: ['events'],
+  volunteers: ['volunteers'],
+  submissions: ['submissions'],
+};
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -102,84 +129,103 @@ export default function AdminDashboard() {
   }, []);
 
   // Central Application State with LocalStorage Persistence
-  const [videos, setVideos] = useState<VideoSlot[]>(() => {
-    try {
-      const saved = localStorage.getItem('lab_admin_videos');
-      return saved ? JSON.parse(saved) : INITIAL_VIDEOS;
-    } catch {
-      return INITIAL_VIDEOS;
-    }
-  });
+  const [videos, setVideos] = useState<VideoSlot[]>(() =>
+    readStoredJson('lab_admin_videos', INITIAL_VIDEOS)
+  );
 
-  const [events, setEvents] = useState<EventItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('lab_admin_events');
-      return saved ? JSON.parse(saved) : INITIAL_EVENTS;
-    } catch {
-      return INITIAL_EVENTS;
-    }
-  });
+  const [events, setEvents] = useState<EventItem[]>(() =>
+    readStoredJson('lab_admin_events', INITIAL_EVENTS)
+  );
 
-  const [volunteers, setVolunteers] = useState<VolunteerApplication[]>(() => {
-    try {
-      const saved = localStorage.getItem('lab_admin_volunteers');
-      return saved ? JSON.parse(saved) : INITIAL_VOLUNTEERS;
-    } catch {
-      return INITIAL_VOLUNTEERS;
-    }
-  });
+  const [volunteers, setVolunteers] = useState<VolunteerApplication[]>(() =>
+    readStoredJson('lab_admin_volunteers', INITIAL_VOLUNTEERS)
+  );
 
   useEffect(() => {
-    try {
-      localStorage.setItem('lab_admin_videos', JSON.stringify(videos));
-    } catch {}
+    writeStoredJson('lab_admin_videos', videos);
   }, [videos]);
 
-  useEffect(() => {   
-    try {
-      localStorage.setItem('lab_admin_events', JSON.stringify(events));
-    } catch {}
+  useEffect(() => {
+    writeStoredJson('lab_admin_events', events);
   }, [events]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('lab_admin_volunteers', JSON.stringify(volunteers));
-    } catch {}
+    writeStoredJson('lab_admin_volunteers', volunteers);
   }, [volunteers]);
 
   const [auditions, setAuditions] = useState<AuditionItem[]>([]);
   const [sponsors, setSponsors] = useState<SponsorItem[]>([]);
   const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
 
-  const loadBackendData = useCallback(async () => {
-    try {
-      const [liveVideos, liveEvents] = await Promise.all([
-        movementService.getVideos().catch(() => null),
-        movementService.getEvents().catch(() => null),
-      ]);
-      if (liveVideos && liveVideos.length > 0) setVideos(liveVideos);
-      if (liveEvents && liveEvents.length > 0) setEvents(liveEvents);
-
-      if (token && isAuthenticated) {
-        const [liveVols, liveAuds, liveSpons, liveInqs] = await Promise.all([
-          movementService.getVolunteers().catch(() => null),
-          movementService.getAuditions().catch(() => []),
-          movementService.getSponsors().catch(() => []),
-          movementService.getInquiries().catch(() => []),
-        ]);
-        if (liveVols && liveVols.length > 0) setVolunteers(liveVols);
-        setAuditions(liveAuds);
-        setSponsors(liveSpons);
-        setInquiries(liveInqs);
-      }
-    } catch {
-      // Keep local preview fallback if API unreachable
-    }
-  }, [token, isAuthenticated]);
+  const loadedResourcesRef = useRef<Set<AdminResource>>(new Set());
+  const inFlightResourcesRef = useRef<Partial<Record<AdminResource, Promise<void>>>>({});
+  const prevAuthedRef = useRef<boolean>(Boolean(token && isAuthenticated));
 
   useEffect(() => {
-    loadBackendData();
-  }, [loadBackendData]);
+    const authed = Boolean(token && isAuthenticated);
+    if (authed && !prevAuthedRef.current) {
+      loadedResourcesRef.current.delete('volunteers');
+      loadedResourcesRef.current.delete('submissions');
+    }
+    prevAuthedRef.current = authed;
+  }, [token, isAuthenticated]);
+
+  const fetchResource = useCallback(
+    async (resource: AdminResource, force = false): Promise<void> => {
+      if (!force && loadedResourcesRef.current.has(resource)) {
+        return;
+      }
+
+      const existingRequest = inFlightResourcesRef.current[resource];
+      if (!force && existingRequest) {
+        return existingRequest;
+      }
+
+      const task = (async () => {
+        try {
+          if (resource === 'videos') {
+            const liveVideos = await movementService.getVideos();
+            if (liveVideos.length > 0) setVideos(liveVideos);
+            loadedResourcesRef.current.add('videos');
+          } else if (resource === 'events') {
+            const liveEvents = await movementService.getEvents();
+            if (liveEvents.length > 0) setEvents(liveEvents);
+            loadedResourcesRef.current.add('events');
+          } else if (resource === 'volunteers') {
+            if (!token || !isAuthenticated) return;
+            const liveVols = await movementService.getVolunteers();
+            if (liveVols.length > 0) setVolunteers(liveVols);
+            loadedResourcesRef.current.add('volunteers');
+          } else if (resource === 'submissions') {
+            if (!token || !isAuthenticated) return;
+            const [liveAuds, liveSpons, liveInqs] = await Promise.all([
+              movementService.getAuditions().catch(() => []),
+              movementService.getSponsors().catch(() => []),
+              movementService.getInquiries().catch(() => []),
+            ]);
+            setAuditions(liveAuds);
+            setSponsors(liveSpons);
+            setInquiries(liveInqs);
+            loadedResourcesRef.current.add('submissions');
+          }
+        } catch {
+          // Keep local preview fallback if API unreachable
+        } finally {
+          delete inFlightResourcesRef.current[resource];
+        }
+      })();
+
+      inFlightResourcesRef.current[resource] = task;
+      return task;
+    },
+    [token, isAuthenticated]
+  );
+
+  useEffect(() => {
+    const resources = TAB_RESOURCE_MAP[activeTab];
+    if (!resources || resources.length === 0) return;
+    void Promise.all(resources.map((resource) => fetchResource(resource)));
+  }, [activeTab, fetchResource]);
 
   // State Updaters (optimistic + live API sync when authenticated)
 
@@ -843,7 +889,7 @@ export default function AdminDashboard() {
                   sponsors={sponsors}
                   inquiries={inquiries}
                   isAuthenticated={Boolean(isAuthenticated && token)}
-                  onRefresh={loadBackendData}
+                  onRefresh={() => void fetchResource('submissions', true)}
                 />
               )}
 

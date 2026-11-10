@@ -53,6 +53,7 @@ const authSlice = createSlice({
       state.token = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
+      state.initialized = false;
       state.error = null;
     },
   },
@@ -68,6 +69,7 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.refreshToken = action.payload.refreshToken;
         state.isAuthenticated = true;
+        state.initialized = true;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -95,6 +97,7 @@ const authSlice = createSlice({
         state.token = null;
         state.refreshToken = null;
         state.isAuthenticated = false;
+        state.initialized = false;
         state.error = null;
       })
 
@@ -106,12 +109,14 @@ const authSlice = createSlice({
       .addCase(getProfile.fulfilled, (state, action: PayloadAction<AuthUser>) => {
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.initialized = true;
       })
       .addCase(getProfile.rejected, (state) => {
         state.user = null;
         state.token = null;
         state.refreshToken = null;
         state.isAuthenticated = false;
+        state.initialized = false;
       })
 
       .addCase(updateProfile.fulfilled, (state, action: PayloadAction<AuthUser>) => {

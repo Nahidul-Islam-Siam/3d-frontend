@@ -2,7 +2,7 @@
 
 *This is the exact, approved verbiage provided by the client for the entire website.*
 
----
+---   
 
 ## 1. HOW WE SERVE (Core Manifesto)
 

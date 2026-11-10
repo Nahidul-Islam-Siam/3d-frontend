@@ -20,7 +20,7 @@ export interface DoorDefinition {
   rx?: number;
 }
 
-export const doorsData: DoorDefinition[] = [
+const doorsData: DoorDefinition[] = [
   { 
     id: 'story', 
     title: 'Experience the Story', 

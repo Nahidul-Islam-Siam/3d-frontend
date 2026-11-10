@@ -25,18 +25,18 @@ interface Particle {
 export default function Particles() {
     const [particles, setParticles] = useState<Particle[]>([]);
 
-    const icons = [
-        <Code2 className="w-8 h-8" />,
-        <BarChart3 className="w-8 h-8" />,
-        <Database className="w-8 h-8" />,
-        <Cloud className="w-8 h-8" />,
-        <Shield className="w-8 h-8" />,
-        <Zap className="w-8 h-8" />,
-        <LineChart className="w-8 h-8" />,
-        <Server className="w-8 h-8" />
-    ];
-
     useEffect(() => {
+        const icons = [
+            <Code2 className="w-8 h-8" />,
+            <BarChart3 className="w-8 h-8" />,
+            <Database className="w-8 h-8" />,
+            <Cloud className="w-8 h-8" />,
+            <Shield className="w-8 h-8" />,
+            <Zap className="w-8 h-8" />,
+            <LineChart className="w-8 h-8" />,
+            <Server className="w-8 h-8" />
+        ];
+
         // Generate particles with SaaS-related icons
         const newParticles = Array.from({ length: 15 }, (_, i) => ({
             id: i,

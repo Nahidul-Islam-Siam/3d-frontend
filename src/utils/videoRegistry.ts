@@ -99,7 +99,7 @@ export function parseEmbedUrl(url?: string): { isEmbed: boolean; embedUrl?: stri
   const trimmed = url.trim();
 
   // YouTube detection
-  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/i);
   if (ytMatch && ytMatch[1]) {
     return {
       isEmbed: true,
@@ -109,7 +109,7 @@ export function parseEmbedUrl(url?: string): { isEmbed: boolean; embedUrl?: stri
   }
 
   // Vimeo detection
-  const vimeoMatch = trimmed.match(/(?:vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+))/i);
+  const vimeoMatch = trimmed.match(/(?:vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+))/i);
   if (vimeoMatch && vimeoMatch[3]) {
     return {
       isEmbed: true,

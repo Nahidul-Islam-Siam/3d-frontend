@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react';
+﻿import { useRef } from 'react';
 import docVideo from '@/assets/experience-story/experience-story-2.mp4';
 
 export interface DocumentaryVideoSectionProps {
@@ -11,18 +11,15 @@ export default function DocumentaryVideoSection({
   className = "" 
 }: DocumentaryVideoSectionProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [_isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [isMuted, _setIsMuted] = useState<boolean>(true);
 
   const togglePlay = () => {
     const video = videoRef.current;
     if (!video) return;
 
     if (video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
+      video.play().catch(() => {});
     } else {
       video.pause();
-      setIsPlaying(false);
     }
   };
 
@@ -33,14 +30,14 @@ export default function DocumentaryVideoSection({
       id={id}
       className={`relative w-full bg-[#FAF4E6] flex items-center justify-center overflow-hidden select-none ${className} py-16`}
     >
-      {/* â”€â”€â”€ 16:9 Full-Width Video Frame (Exact Figma Layout) â”€â”€â”€ */}
+      {/* ─── 16:9 Full-Width Video Frame (Exact Figma Layout) ─── */}
       <div className="relative w-full max-w-[1920px] aspect-video overflow-hidden bg-black flex items-center justify-center group">
         <video
           ref={videoRef}
           src={docVideo}
           autoPlay
           loop
-          muted={isMuted}
+          muted
           playsInline
           preload="auto"
           className="w-full h-full object-cover"

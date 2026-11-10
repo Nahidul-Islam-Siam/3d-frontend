@@ -16,7 +16,7 @@ export interface ThreeDoorData {
 }
 
 // 5 Dedicated Doors matching the 5 pages of the "How We Serve" dropdown
-export const THREE_DOORS: ThreeDoorData[] = [
+const THREE_DOORS: ThreeDoorData[] = [
   {
     id: "door-1",
     number: 1,

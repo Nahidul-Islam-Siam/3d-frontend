@@ -1,7 +1,8 @@
 {
-  "name": "live achive believe",
+  "name": "live-achieve-believe-frontend",
   "private": true,
   "version": "1.0.0",
+  "description": "Interactive 3D React, TypeScript, and Three.js web application and operations portal for Live Achieve Believe",
   "license": "MIT",
   "type": "module",
   "scripts": {

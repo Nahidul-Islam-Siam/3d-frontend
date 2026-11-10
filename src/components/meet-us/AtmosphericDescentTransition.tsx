@@ -25,8 +25,8 @@ export default function AtmosphericDescentTransition({
     const container = mountRef.current;
     if (!section || !container) return;
 
-    let width = container.clientWidth || window.innerWidth;
-    let height = container.clientHeight || window.innerHeight;
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
 
     // ─── 1. Three.js Scene, Camera, High-Precision WebGL Renderer ───
     const scene = new THREE.Scene();
