@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import youthVideo from '@/assets/how-we-serve/you-matter/Bright_hopeful_youth_communit.mp4.mp4';
+import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
+import { officialPillars } from '@/data/officialVerbiage';
 
 interface YouMatterHeroProps {
   onScrollClick?: () => void;
@@ -11,6 +13,8 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isEnded, setIsEnded] = useState<boolean>(false);
+  const content = officialPillars.strongFoundations;
 
   useEffect(() => {
     if (videoRef.current) {
@@ -24,9 +28,17 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      setIsEnded(false);
+      videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
+  };
+
+  const handleReplay = () => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = 0;
+    setIsEnded(false);
+    videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
   };
 
   const toggleMute = () => {
@@ -58,13 +70,31 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
             src={youthVideo}
             playsInline
             autoPlay
-            loop
             muted={isMuted}
-            className="w-full h-full object-cover object-center scale-[1.01]"
+            onEnded={() => {
+              setIsEnded(true);
+              setIsPlaying(false);
+            }}
+            className={`w-full h-full object-cover object-center scale-[1.01] transition-opacity duration-1000 ${
+              isEnded ? 'opacity-0' : 'opacity-100'
+            }`}
           />
           {/* Subtle Film Grain Vignette */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
         </div>
+
+        <VideoEndedVerbiageOverlay
+          visible={isEnded}
+          eyebrow={`Door 2: ${content.title}`}
+          title={content.title}
+          lead={content.lead}
+          body={`${content.intro} ${content.whatWeDo}`}
+          tagline={content.tagline}
+          ctaLabel="Support Youth Development"
+          ctaHref="/donate?category=youth-sponsor"
+          onReplay={handleReplay}
+          onScrollDown={handleScrollToTitle}
+        />
 
         {/* Top Control Bar (Pill Controls) */}
         <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-24 sm:pt-28 flex justify-end gap-3">

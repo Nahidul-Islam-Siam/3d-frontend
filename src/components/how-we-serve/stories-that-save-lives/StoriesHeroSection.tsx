@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import heroVideo from '@/assets/how-we-serve/stories-that-save-lives/Untitled design (3).mp4.mp4';
 import heroPoster from '@/assets/how-we-serve/stories-that-save-lives/image copy.png';
+import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
+import { officialPillars } from '@/data/officialVerbiage';
 
 interface StoriesHeroSectionProps {
   onScrollClick?: () => void;
@@ -12,6 +14,8 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isEnded, setIsEnded] = useState<boolean>(false);
+  const content = officialPillars.storiesThatSaveLives;
 
   useEffect(() => {
     if (videoRef.current) {
@@ -25,9 +29,17 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      setIsEnded(false);
+      videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
+  };
+
+  const handleReplay = () => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = 0;
+    setIsEnded(false);
+    videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
   };
 
   const toggleMute = () => {
@@ -64,13 +76,31 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
             poster={heroPoster}
             playsInline
             autoPlay
-            loop
             muted={isMuted}
-            className="w-full h-full object-cover object-center scale-[1.01]"
+            onEnded={() => {
+              setIsEnded(true);
+              setIsPlaying(false);
+            }}
+            className={`w-full h-full object-cover object-center scale-[1.01] transition-opacity duration-1000 ${
+              isEnded ? 'opacity-0' : 'opacity-100'
+            }`}
           />
           {/* Subtle Cinematic Vignette */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/40 pointer-events-none" />
         </div>
+
+        <VideoEndedVerbiageOverlay
+          visible={isEnded}
+          eyebrow={`Door 3: ${content.title}`}
+          title={content.title}
+          lead={content.lead}
+          body={`${content.intro} ${content.whatWeDo}`}
+          tagline={content.tagline}
+          ctaLabel="Suicide Awareness Showdown"
+          ctaHref="/suicide-awareness-showdown"
+          onReplay={handleReplay}
+          onScrollDown={handleScrollToTitle}
+        />
 
         {/* Top Control Bar (Pill Controls) */}
         <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-24 sm:pt-28 flex justify-end gap-3">

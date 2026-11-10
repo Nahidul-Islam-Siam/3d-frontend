@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import heroVideo from '@/assets/join-movement/join-movement.mp4';
+import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
+import { serveBesideUs } from '@/data/officialVerbiage';
 
 export interface MovementHeroBannerProps {
   id?: string;
@@ -16,7 +18,16 @@ export default function MovementHeroBanner({
 
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isEnded, setIsEnded] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+
+  const handleReplay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    setIsEnded(false);
+    video.play().then(() => setIsPlaying(true)).catch(() => {});
+  };
 
   // ─── Play / Pause Toggle ───
   const togglePlay = (e?: React.MouseEvent) => {
@@ -109,16 +120,33 @@ export default function MovementHeroBanner({
           onClick={() => togglePlay()}
           className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] min-h-[360px] sm:min-h-[480px] lg:min-h-[640px] max-h-[86vh] rounded-[24px] sm:rounded-[32px] md:rounded-[36px] overflow-hidden bg-black shadow-[0_20px_60px_rgba(44,36,29,0.12)] cursor-pointer group select-none"
         >
-          {/* Continuous HTML5 Video */}
+          {/* Video (Fades smoothly on completion to reveal verbiage) */}
           <video
             ref={videoRef}
             src={heroVideo}
             autoPlay
-            loop
             muted={isMuted}
             playsInline
             preload="auto"
-            className="w-full h-full object-cover"
+            onEnded={() => {
+              setIsEnded(true);
+              setIsPlaying(false);
+            }}
+            className={`w-full h-full object-cover transition-opacity duration-1000 ${
+              isEnded ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+
+          <VideoEndedVerbiageOverlay
+            visible={isEnded}
+            eyebrow={serveBesideUs.title}
+            title={serveBesideUs.lead}
+            body={`${serveBesideUs.intro} ${serveBesideUs.whatWeDo}`}
+            tagline={serveBesideUs.tagline}
+            ctaLabel="Showdown & Forms"
+            ctaHref="/suicide-awareness-showdown"
+            onReplay={handleReplay}
+            onScrollDown={handleScrollDown}
           />
 
           {/* Ambient Subtle Vignette */}

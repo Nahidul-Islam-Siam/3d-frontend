@@ -9,11 +9,13 @@ import JourneyHomeSection from '@/components/how-we-serve/welcome-home/JourneyHo
 import WhatVeteransFeelSection from '@/components/how-we-serve/welcome-home/WhatVeteransFeelSection';
 import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
 
+import { officialPillars } from '@/data/officialVerbiage';
 import housePhoto1 from '@/assets/how-we-serve/welcome-home/image.png';
 import housePhoto2 from '@/assets/how-we-serve/welcome-home/image copy 2.png';
 import housePhoto3 from '@/assets/how-we-serve/welcome-home/image copy 3.png';
 
 export default function WelcomeHomePage() {
+  const welcomeCopy = officialPillars.welcomeHome;
   const titleStageRef = useRef<HTMLDivElement | null>(null);
   const narrativeRef = useRef<HTMLDivElement | null>(null);
 
@@ -59,15 +61,19 @@ export default function WelcomeHomePage() {
               </span>
 
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-[#1c140d]">
-                Honor. Restoration. New Beginnings.
+                {welcomeCopy.intro}
               </h2>
 
               <p className="text-base sm:text-lg text-[#554637] font-serif leading-relaxed">
-                A home is more than four walls and a roof. It is where healing has room to take root. Where birthdays are celebrated, coffee is shared, and tomorrow begins to feel possible.
+                {welcomeCopy.whatWeDo}
               </p>
 
               <p className="text-sm sm:text-base text-[#6f5e4e] leading-relaxed">
-                When a veteran transitions back to civilian life, the hardest obstacle is often finding a safe, furnished, and stable foundation. We don&apos;t just hand over keys to an empty apartment—we furnish the home completely, stock the pantry, and wrap every hero in a compassionate community.
+                {welcomeCopy.howYouCanHelp}
+              </p>
+
+              <p className="text-sm font-serif italic text-[#8f6629] font-semibold">
+                {welcomeCopy.tagline}
               </p>
             </div>
 
@@ -130,16 +136,16 @@ export default function WelcomeHomePage() {
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <Link
-              to="/movement"
+              to="/contact?subject=housing-partnership"
               className="px-6 py-3 rounded-full text-xs font-semibold uppercase tracking-wider text-[#140d08] bg-[#dfb978] hover:bg-[#c89d5c] transition-all shadow-md"
             >
-              Become a Housing Partner
+              Explore a Housing Partnership
             </Link>
             <Link
-              to="/donate"
+              to="/donate?category=furnishings"
               className="px-6 py-3 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[#1c140d] hover:bg-black transition-all shadow-md"
             >
-              Furnish a Veteran&apos;s Room
+              Donate Furnishings
             </Link>
             <Link
               to="/how-we-serve"

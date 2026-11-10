@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowDown } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -32,7 +33,7 @@ const pathwayCards: PathwayCard[] = [
     image: card1Img,
     isCutout: true,
     linkText: 'Be Part of It',
-    href: '#',
+    href: '/donate',
   },
   {
     title: 'Volunteer',
@@ -40,7 +41,7 @@ const pathwayCards: PathwayCard[] = [
     image: card2Img,
     isCutout: true,
     linkText: 'Be Part of It',
-    href: '#',
+    href: '/suicide-awareness-showdown#volunteer',
   },
   {
     title: 'Become a Sponsor',
@@ -48,7 +49,7 @@ const pathwayCards: PathwayCard[] = [
     image: card3Img,
     isCutout: true,
     linkText: 'Be Part of It',
-    href: '#',
+    href: '/suicide-awareness-showdown#sponsor',
   },
   {
     title: 'Become Our Presenting Sponsor',
@@ -56,7 +57,7 @@ const pathwayCards: PathwayCard[] = [
     image: hopeImg,
     isCutout: false,
     linkText: 'Be Part of It',
-    href: '#',
+    href: '/suicide-awareness-showdown#sponsor',
   },
   {
     title: 'Audition & Share Your Gifts',
@@ -64,7 +65,7 @@ const pathwayCards: PathwayCard[] = [
     image: heardImg,
     isCutout: false,
     linkText: 'Be Part of It',
-    href: '#',
+    href: '/suicide-awareness-showdown#audition',
   },
   {
     title: 'Partner as a Church or School',
@@ -72,7 +73,7 @@ const pathwayCards: PathwayCard[] = [
     image: seenImg,
     isCutout: false,
     linkText: 'Be Part of It',
-    href: '#',
+    href: '/contact?subject=community-partner',
   },
 ];
 
@@ -203,13 +204,13 @@ export default function WhereDoYouSeeSection({
 
                   {/* Action Button */}
                   <div>
-                    <a
-                      href={card.href || '#'}
+                    <Link
+                      to={card.href || '/movement'}
                       className="inline-flex items-center gap-2 px-5 sm:px-6 py-2 sm:py-2.5 rounded-full border border-white/30 hover:border-white text-xs sm:text-[13px] text-white font-serif tracking-wider hover:bg-white/10 transition-all cursor-pointer"
                     >
                       <span>{card.linkText}</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
 

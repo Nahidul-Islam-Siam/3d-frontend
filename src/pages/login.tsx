@@ -14,7 +14,7 @@ import { addToast } from "@/lib/store/slices/uiSlice";
 
 const schema = z.object({
     email: z.string().email(),
-    password: z.string().min(6).max(20),
+    password: z.string().min(6).max(100),
 });
 
 type Inputs = z.infer<typeof schema>;

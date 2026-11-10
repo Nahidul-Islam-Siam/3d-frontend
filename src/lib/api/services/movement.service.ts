@@ -195,3 +195,4 @@ const movementService = {
 };
 
 export default movementService;
+

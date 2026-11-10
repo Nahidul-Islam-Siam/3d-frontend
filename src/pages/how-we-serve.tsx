@@ -8,6 +8,7 @@ import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCo
 import PurePhotographySection from '@/components/how-we-serve/PurePhotographySection';
 import StoriesFromTheTableSection from '@/components/how-we-serve/StoriesFromTheTableSection';
 import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWaitingSection';
+import NewBeginningSection from '@/components/how-we-serve/NewBeginningSection';
 import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function HowWeServePage() {
@@ -53,7 +54,10 @@ export default function HowWeServePage() {
           {/* Section 7: Serve Beside Us (Action Cards) */}
           <AnotherSeatWaitingSection id="serve-beside-us" />
 
-          {/* Section 8: What's Coming Up Next (Showdown Event & Auditions) */}
+          {/* Section 8: Door 5 — A New Beginning & One Mission Climax */}
+          <NewBeginningSection id="a-new-beginning" />
+
+          {/* Section 9: Suicide Awareness Showdown */}
           <ShowdownSection id="what-coming-up-next" />
         </div>
       </div>

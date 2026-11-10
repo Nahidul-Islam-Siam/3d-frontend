@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Layout,
@@ -32,9 +32,14 @@ import {
   QuestionCircleOutlined,
   SafetyCertificateOutlined,
   InfoCircleOutlined,
+  FormOutlined,
 } from '@ant-design/icons';
 
-// Import Mock Data
+import movementService from '@/lib/api/services/movement.service';
+import { useAppDispatch, useAppSelector } from '@/lib/store';
+import { logout } from '@/lib/store/thunks/auth.thunks';
+
+// Import Fallback Mock Types & Seed Data
 import {
   INITIAL_VIDEOS,
   INITIAL_EVENTS,
@@ -50,12 +55,19 @@ import VideosView from './views/VideosView';
 import EventsView from './views/EventsView';
 import VolunteersView from './views/VolunteersView';
 import SettingsView from './views/SettingsView';
+import SubmissionsView, {
+  type AuditionItem,
+  type SponsorItem,
+  type InquiryItem,
+} from './views/SubmissionsView';
 
 const { Header, Sider, Content } = Layout;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
 
   const getTabFromPath = () => {
     const parts = location.pathname.split('/').filter(Boolean);
@@ -67,7 +79,7 @@ export default function AdminDashboard() {
       }
       return 'settings-profile';
     }
-    if (sub && ['videos', 'events', 'volunteers'].includes(sub)) {
+    if (sub && ['videos', 'events', 'volunteers', 'submissions'].includes(sub)) {
       return sub;
     }
     return 'overview';
@@ -135,36 +147,77 @@ export default function AdminDashboard() {
     } catch {}
   }, [volunteers]);
 
-  // State Updaters
+  const [auditions, setAuditions] = useState<AuditionItem[]>([]);
+  const [sponsors, setSponsors] = useState<SponsorItem[]>([]);
+  const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
+
+  const loadBackendData = useCallback(async () => {
+    try {
+      const [liveVideos, liveEvents] = await Promise.all([
+        movementService.getVideos().catch(() => null),
+        movementService.getEvents().catch(() => null),
+      ]);
+      if (liveVideos && liveVideos.length > 0) setVideos(liveVideos);
+      if (liveEvents && liveEvents.length > 0) setEvents(liveEvents);
+
+      if (token && isAuthenticated) {
+        const [liveVols, liveAuds, liveSpons, liveInqs] = await Promise.all([
+          movementService.getVolunteers().catch(() => null),
+          movementService.getAuditions().catch(() => []),
+          movementService.getSponsors().catch(() => []),
+          movementService.getInquiries().catch(() => []),
+        ]);
+        if (liveVols && liveVols.length > 0) setVolunteers(liveVols);
+        setAuditions(liveAuds);
+        setSponsors(liveSpons);
+        setInquiries(liveInqs);
+      }
+    } catch {
+      // Keep local preview fallback if API unreachable
+    }
+  }, [token, isAuthenticated]);
+
+  useEffect(() => {
+    loadBackendData();
+  }, [loadBackendData]);
+
+  // State Updaters (optimistic + live API sync when authenticated)
 
   const handleUpdateVideo = (updated: VideoSlot) => {
     setVideos((prev) => prev.map((v) => (v.id === updated.id ? updated : v)));
+    if (token) movementService.updateVideo(updated.id, updated).catch(() => {});
   };
 
   const handleAddVideoSlot = (newSlot: VideoSlot) => {
     setVideos((prev) => [...prev, newSlot]);
+    if (token) movementService.createVideo(newSlot).catch(() => {});
   };
 
   const handleDeleteVideoSlot = (id: string) => {
     setVideos((prev) => prev.filter((v) => v.id !== id));
+    if (token) movementService.deleteVideo(id).catch(() => {});
   };
 
   const handleAddEvent = (newEvent: EventItem) => {
     setEvents((prev) => [newEvent, ...prev]);
+    if (token) movementService.createEvent(newEvent).catch(() => {});
   };
 
   const handleUpdateEvent = (updated: EventItem) => {
     setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+    if (token) movementService.updateEvent(updated.id, updated).catch(() => {});
   };
 
   const handleDeleteEvent = (id: string) => {
     setEvents((prev) => prev.filter((e) => e.id !== id));
+    if (token) movementService.deleteEvent(id).catch(() => {});
   };
 
   const handleUpdateVolunteerStatus = (id: string, status: VolunteerApplication['status']) => {
     setVolunteers((prev) =>
       prev.map((v) => (v.id === id ? { ...v, status } : v))
     );
+    if (token) movementService.updateVolunteerStatus(id, status).catch(() => {});
   };
 
   const handleTabChange = (key: string) => {
@@ -220,6 +273,11 @@ export default function AdminDashboard() {
       ),
     },
     {
+      key: 'submissions',
+      icon: <FormOutlined style={{ fontSize: 16 }} />,
+      label: 'Auditions & Sponsors',
+    },
+    {
       key: 'settings',
       icon: <SettingOutlined style={{ fontSize: 16 }} />,
       label: 'Settings',
@@ -259,7 +317,7 @@ export default function AdminDashboard() {
       {
         key: 'profile',
         icon: <UserOutlined />,
-        label: 'Signed in as Sarah Mitchell',
+        label: user ? `Signed in as ${user.name}` : 'Preview Mode (Not signed in)',
       },
       {
         key: 'site',
@@ -270,13 +328,23 @@ export default function AdminDashboard() {
       {
         type: 'divider' as const,
       },
-      {
-        key: 'logout',
-        icon: <LogoutOutlined />,
-        danger: true,
-        label: 'Sign Out',
-        onClick: () => navigate('/login'),
-      },
+      isAuthenticated
+        ? {
+            key: 'logout',
+            icon: <LogoutOutlined />,
+            danger: true,
+            label: 'Sign Out',
+            onClick: () => {
+              dispatch(logout());
+              navigate('/login');
+            },
+          }
+        : {
+            key: 'login',
+            icon: <UserOutlined />,
+            label: 'Sign In for Live Sync',
+            onClick: () => navigate('/login'),
+          },
     ],
   };
 
@@ -285,6 +353,7 @@ export default function AdminDashboard() {
     videos: 'Cinematic Story Reel',
     events: 'Events & Dinners',
     volunteers: 'Volunteer Family',
+    submissions: 'Auditions, Sponsors & Inquiries',
     settings: 'Personal Information',
     'settings-profile': 'Personal Information',
     'settings-password': 'Change Password',
@@ -703,15 +772,20 @@ export default function AdminDashboard() {
               <Dropdown menu={userMenuItems} placement="bottomRight" arrow>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '4px 8px', borderRadius: 8 }}>
                   <Avatar style={{ backgroundColor: '#F97316', fontWeight: 600 }} size={34}>
-                    SM
+                    {(user?.name || 'Admin')
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase()}
                   </Avatar>
                   {!isMobile && (
                     <div style={{ lineHeight: 1.2 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>
-                        Sarah Mitchell
+                        {user?.name || 'Guest Preview'}
                       </div>
                       <div style={{ fontSize: 11, color: '#64748B' }}>
-                        Executive Director
+                        {user?.role || 'Sign in to sync'}
                       </div>
                     </div>
                   )}
@@ -760,6 +834,16 @@ export default function AdminDashboard() {
                 <VolunteersView
                   volunteers={volunteers}
                   onUpdateStatus={handleUpdateVolunteerStatus}
+                />
+              )}
+
+              {activeTab === 'submissions' && (
+                <SubmissionsView
+                  auditions={auditions}
+                  sponsors={sponsors}
+                  inquiries={inquiries}
+                  isAuthenticated={Boolean(isAuthenticated && token)}
+                  onRefresh={loadBackendData}
                 />
               )}
 

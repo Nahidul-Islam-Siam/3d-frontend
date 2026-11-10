@@ -74,23 +74,18 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
                 </Link>
               </li>
               <li>
-                <Link to="/how-we-serve#volunteer" className="hover:text-[#F97316] transition-colors">
-                  Volunteer &amp; Partner
+                <Link to="/suicide-awareness-showdown" className="hover:text-[#F97316] transition-colors">
+                  Showdown Production
                 </Link>
               </li>
               <li>
-                <a 
-                  href="https://tickets.liveachievebelieve.org" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="hover:text-[#F97316] transition-colors"
-                >
+                <Link to="/donate" className="hover:text-[#F97316] transition-colors">
                   Give Hope
-                </a>
+                </Link>
               </li>
               <li>
-                <Link to="/who-we-are" className="hover:text-[#F97316] transition-colors">
-                  About Us
+                <Link to="/contact" className="hover:text-[#F97316] transition-colors">
+                  Contact Us
                 </Link>
               </li>
             </ul>
@@ -100,23 +95,25 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
           <div className="footer-col footer-event-col lg:col-span-4 xl:col-span-4">
             <div className="footer-event-box rounded-2xl border border-[#F9D3B2] bg-[#FAEAD5] p-5 sm:p-6 space-y-2.5">
               <span className="block text-[11px] font-bold tracking-wider text-[#F97316] uppercase font-sans">
-                NEXT EVENT BROADCAST
+                FEATURED PRODUCTION
               </span>
               
               <h5 
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                 className="text-lg sm:text-[19px] font-bold text-stone-900 leading-snug"
               >
-                Voices of Conviction: Annual Showcase
+                Suicide Awareness Showdown
               </h5>
 
               <p className="text-xs text-stone-600 leading-relaxed font-sans">
-                Join our global community for an evening of live retrospective stories, unscripted dialogues, and musical reflections.
+                Where Are You Now? Letters to Etcetera — storytelling, theatre, music, and dance encouraging conversations of hope.
               </p>
 
               <div className="pt-1 flex items-center gap-2 text-xs font-medium text-stone-800 font-sans">
                 <Calendar className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
-                <span>November 14, 2025 • 7:00 PM EST</span>
+                <Link to="/suicide-awareness-showdown" className="hover:text-[#F97316] underline-offset-4 hover:underline">
+                  Audition, Volunteer, Sponsor or Donate &rarr;
+                </Link>
               </div>
             </div>
           </div>
@@ -126,7 +123,7 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
         {/* Bottom Sub-Bar with thin divider (Contained inside the padded footer) */}
         <div className="footer-bottom w-full mt-10 sm:mt-12 pt-6 border-t border-[#F9D3B2]/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600 font-sans">
           <p>
-            © 2025 Live Achieve Believe (LAB) Foundation. All rights reserved.
+            © {new Date().getFullYear()} Live Achieve Believe (LAB) Foundation. All rights reserved.
           </p>
 
           <div className="flex items-center gap-6 text-stone-600 font-sans">
