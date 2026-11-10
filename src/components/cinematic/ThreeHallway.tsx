@@ -31,8 +31,8 @@ export const THREE_DOORS: ThreeDoorData[] = [
   {
     id: "door-2",
     number: 2,
-    title: "You Matter — Strong Foundations",
-    subtitle: "Youth mentoring, school partnerships, and healthy relationship skills",
+    title: "Strong Foundations",
+    subtitle: "LEADS Youth Development, communication, respect, and resilience",
     quote: "Sometimes hope begins\nwith guidance.",
     href: "/how-we-serve/you-matter",
     side: "right",
@@ -43,7 +43,7 @@ export const THREE_DOORS: ThreeDoorData[] = [
     id: "door-3",
     number: 3,
     title: "Stories That Save Lives",
-    subtitle: "Letters to Etcetera, suicide awareness stage production, and honest dialogues",
+    subtitle: "Suicide Awareness Showdown, theatre, music, and honest conversations",
     quote: "Sometimes hope begins\nwith one conversation.",
     href: "/how-we-serve/stories-that-save-lives",
     side: "left",
@@ -54,7 +54,7 @@ export const THREE_DOORS: ThreeDoorData[] = [
     id: "door-4",
     number: 4,
     title: "Welcome Home",
-    subtitle: "Dignified housing, moving assistance, and deep honor for our veterans",
+    subtitle: "Furnished housing, moving assistance, and deep honor for veterans",
     quote: "Sometimes hope begins\nwith a key.",
     href: "/how-we-serve/welcome-home",
     side: "right",
@@ -64,10 +64,10 @@ export const THREE_DOORS: ThreeDoorData[] = [
   {
     id: "door-5",
     number: 5,
-    title: "Serve Beside Us",
-    subtitle: "The volunteer family, joyful teamwork, and saving a seat",
-    quote: "Sometimes purpose begins\nwith saying yes.",
-    href: "/how-we-serve",
+    title: "A New Beginning",
+    subtitle: "Household essentials, linens, clothing, and simple new starts",
+    quote: "Sometimes hope begins\nwith the little things.",
+    href: "/how-we-serve#a-new-beginning",
     side: "left",
     zPos: -56,
     color: 0x170f09,
@@ -629,10 +629,13 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
 
   return (
     <div className="relative w-full h-full min-h-screen bg-[#0a0604] text-stone-200 overflow-hidden select-none">
-      {/* ─── Top-Left Breadcrumb (Matches Screenshot "A PLACE AT THE TABLE" or "YOU MATTER") ─── */}
-      <div className="absolute top-7 left-7 z-20 pointer-events-none flex items-center gap-3">
+      {/* ─── Top-Left Breadcrumb & Hallway Tagline (Official Client Direction) ─── */}
+      <div className="absolute top-7 left-7 z-20 pointer-events-none flex flex-col gap-1 max-w-md">
         <span className="text-stone-400/80 text-xs tracking-[0.28em] font-serif uppercase font-medium">
           {THREE_DOORS[activeDoorIndex]?.title.toUpperCase()}
+        </span>
+        <span className="text-stone-400/50 text-[11px] font-serif italic tracking-wide hidden sm:inline">
+          One Mission. Many Expressions. Every door opens because someone matters.
         </span>
       </div>
 

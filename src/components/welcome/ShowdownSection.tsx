@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowRight,
@@ -10,7 +11,7 @@ import {
   Globe,
   Info,
   ChevronDown,
-  Ticket
+  HeartHandshake
 } from 'lucide-react';
 import FigmaButton from '@/components/common/FigmaButton';
 import auditionBanner from '@/assets/welcome/audition_banner.png';
@@ -66,30 +67,31 @@ export default function ShowdownSection({
       className="w-full space-y-4 sm:space-y-6 px-4 sm:px-6 mx-auto flex flex-col items-center"
       style={{ width: isStandaloneSection ? 'min(1240px, 94vw)' : 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' }}
     >
-      {/* ─── 1. TOP HEADER: FIGMA BUTTON & AUDITION TRIGGER ─── */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-3 shrink-0">
-        <div className="space-y-1 text-left">
+      {/* ─── 1. TOP HEADER: SUICIDE AWARENESS SHOWDOWN HIGHLIGHT ─── */}
+      <div className="w-full flex flex-col lg:flex-row lg:items-end justify-between gap-4 shrink-0">
+        <div className="space-y-1.5 text-left max-w-2xl">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F97316]/20 border border-[#F97316]/40 text-[#F97316] text-[11px] font-semibold uppercase tracking-widest">
+            <HeartHandshake className="w-3.5 h-3.5" /> Suicide Awareness Showdown
+          </span>
           <h2 
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-white tracking-tight leading-tight"
+            className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-white tracking-tight leading-tight"
           >
-            What's Coming Up Next
+            Where Are You Now? Letters to Etcetera
           </h2>
-          <p className="text-xs sm:text-[13px] text-stone-300 font-sans leading-normal">
-            Discover our next event—an inspiring experience filled with meaningful stories, connection, and hope.
+          <p className="text-xs sm:text-[13px] text-stone-300 font-sans leading-relaxed">
+            Sometimes hope begins with one conversation. Through storytelling, theatre, music, and dance, we break the silence and remind every person that tomorrow is worth seeing.
           </p>
         </div>
 
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 w-full sm:w-auto">
-          <FigmaButton
-            href="https://tickets.liveachievebelieve.org"
-            target="_blank"
-            variant="primary"
-            size="sm"
-            rightIcon={<Ticket className="w-3.5 h-3.5 text-white" />}
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 w-full lg:w-auto">
+          <Link
+            to="/suicide-awareness-showdown"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 hover:scale-[1.02]"
           >
-            TICKETS OPEN NOW
-          </FigmaButton>
+            <span>Explore Dedicated Page & Forms</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
           <FigmaButton
             onClick={openModal}
             variant="outline-white"
@@ -97,7 +99,7 @@ export default function ShowdownSection({
             showArrow={true}
             className="!border-white/30 !text-white !bg-white/10 hover:!bg-white/20"
           >
-            Audition
+            Audition Details
           </FigmaButton>
         </div>
       </div>

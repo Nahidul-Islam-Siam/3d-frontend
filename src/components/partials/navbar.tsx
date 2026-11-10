@@ -26,10 +26,11 @@ export default function Navbar() {
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
   const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
+  const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
   const isHowWeServePage = location.pathname === '/how-we-serve';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage || isStoriesPage || isHowWeServePage || isWelcomeHomePage;
+  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage || isStoriesPage || isHowWeServePage || isWelcomeHomePage || isShowdownPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
-  const isDarkScrolled = (isDonatePage || isStoriesPage) && hasScrolled;
+  const isDarkScrolled = (isDonatePage || isStoriesPage || isShowdownPage) && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
@@ -82,11 +83,11 @@ export default function Navbar() {
       label: "How We Serve", 
       to: "/how-we-serve",
       children: [
-        { label: "A Place of the Table", to: "/how-we-serve/a-place-at-the-table" },
-        { label: "You Matter", to: "/how-we-serve/you-matter" },
-        { label: "Stories That Save Lives", to: "/how-we-serve/stories-that-save-lives" },
+        { label: "A Place at the Table", to: "/how-we-serve/a-place-at-the-table" },
+        { label: "Strong Foundations (You Matter)", to: "/how-we-serve/you-matter" },
+        { label: "Stories That Save Lives (Showdown)", to: "/how-we-serve/stories-that-save-lives" },
         { label: "Welcome Home", to: "/how-we-serve/welcome-home" },
-        { label: "Serve Beside Us", to: "/how-we-serve#serve-beside-us" },
+        { label: "A New Beginning", to: "/how-we-serve#a-new-beginning" },
       ]
     },
     { label: "Join the Movement", to: "/movement" },

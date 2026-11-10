@@ -11,7 +11,8 @@ export default function RootLayout() {
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
   const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage || isWelcomeHomePage;
+  const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage || isWelcomeHomePage || isShowdownPage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
 
   useEffect(() => {
