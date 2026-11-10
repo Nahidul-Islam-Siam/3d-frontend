@@ -10,6 +10,7 @@ import MeetUs from "./pages/meet-us";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
+import ProtectedAdminRoute from "./components/auth/ProtectedAdminRoute";
 import Contact from "./pages/contact";
 import Donate from "./pages/donate";
 import YouMatter from "./pages/you-matter";
@@ -23,19 +24,43 @@ export const router = createBrowserRouter([
   // â”€â”€â”€ Dedicated Ant Design Admin Dashboard (Matches lab-admin-flow.base44.app) â”€â”€â”€
   {
     path: "/admin/*",
-    element: <Dashboard />,
+    element: (
+      <ProtectedAdminRoute>
+        <Dashboard />
+      </ProtectedAdminRoute>
+    ),
   },
   {
     path: "/admin",
-    element: <Dashboard />,
+    element: (
+      <ProtectedAdminRoute>
+        <Dashboard />
+      </ProtectedAdminRoute>
+    ),
   },
   {
     path: "/dashboard/*",
-    element: <Dashboard />,
+    element: (
+      <ProtectedAdminRoute>
+        <Dashboard />
+      </ProtectedAdminRoute>
+    ),
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <ProtectedAdminRoute>
+        <Dashboard />
+      </ProtectedAdminRoute>
+    ),
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <Signup />,
   },
 
 
@@ -115,14 +140,6 @@ export const router = createBrowserRouter([
       {
         path: "/meet-us",
         element: <MeetUs />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/signup",
-        element: <Signup />,
       },
       {
         path: "/contact",
