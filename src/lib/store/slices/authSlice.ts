@@ -1,17 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { login, register, logout, refreshToken, getProfile, updateProfile } from '../thunks/auth.thunks';
-import { AuthResponse } from '@/lib/api/services/auth.service';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'user' | 'admin';
-  avatar?: string;
-}
+import type { AuthResponse, AuthUser } from '@/lib/api/services/auth.service';
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   token: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
@@ -20,11 +12,27 @@ interface AuthState {
   initialized: boolean;
 }
 
+function readStoredAuth(): Pick<AuthState, 'user' | 'token' | 'refreshToken' | 'isAuthenticated'> {
+  try {
+    const token = localStorage.getItem('lab_access_token');
+    const refreshToken = localStorage.getItem('lab_refresh_token');
+    const rawUser = localStorage.getItem('lab_user');
+    const user = rawUser ? (JSON.parse(rawUser) as AuthUser) : null;
+    if (token && user) {
+      return { user, token, refreshToken, isAuthenticated: true };
+    }
+  } catch {
+    // Ignore invalid storage JSON
+  }
+  return { user: null, token: null, refreshToken: null, isAuthenticated: false };
+}
+
+const stored = typeof window !== 'undefined'
+  ? readStoredAuth()
+  : { user: null, token: null, refreshToken: null, isAuthenticated: false };
+
 const initialState: AuthState = {
-  user: null,
-  token: null,
-  refreshToken: null,
-  isAuthenticated: false,
+  ...stored,
   loading: false,
   error: null,
   initialized: false,
@@ -40,9 +48,15 @@ const authSlice = createSlice({
     setInitialized: (state) => {
       state.initialized = true;
     },
+    clearSession: (state) => {
+      state.user = null;
+      state.token = null;
+      state.refreshToken = null;
+      state.isAuthenticated = false;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
-    // Login
     builder
       .addCase(login.pending, (state) => {
         state.loading = true;
@@ -57,53 +71,48 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) || action.error.message || 'Login failed';
       })
 
-    // Register
-    .addCase(register.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(register.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.refreshToken = action.payload.refreshToken;
-      state.isAuthenticated = true;
-    })
-    .addCase(register.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    })
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token || null;
+        state.refreshToken = action.payload.refreshToken || null;
+        state.isAuthenticated = Boolean(action.payload.token);
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = (action.payload as string) || action.error.message || 'Registration failed';
+      })
 
-    // Logout
-    .addCase(logout.fulfilled, (state) => {
-      state.user = null;
-      state.token = null;
-      state.refreshToken = null;
-      state.isAuthenticated = false;
-      state.error = null;
-    })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
+        state.refreshToken = null;
+        state.isAuthenticated = false;
+        state.error = null;
+      })
 
-    // Refresh Token
-    .addCase(refreshToken.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-      state.token = action.payload.token;
-      state.refreshToken = action.payload.refreshToken;
-    })
+      .addCase(refreshToken.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+      })
 
-    // Get Profile
-    .addCase(getProfile.fulfilled, (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-      state.isAuthenticated = true;
-    })
+      .addCase(getProfile.fulfilled, (state, action: PayloadAction<AuthUser>) => {
+        state.user = action.payload;
+        state.isAuthenticated = true;
+      })
 
-    // Update Profile
-    .addCase(updateProfile.fulfilled, (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-    });
+      .addCase(updateProfile.fulfilled, (state, action: PayloadAction<AuthUser>) => {
+        state.user = action.payload;
+      });
   },
 });
 
-export const { clearError, setInitialized } = authSlice.actions;
-export default authSlice.reducer; 
+export const { clearError, setInitialized, clearSession } = authSlice.actions;
+export default authSlice.reducer;

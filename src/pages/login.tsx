@@ -49,7 +49,7 @@ export default function Login() {
 
     return (
         <>
-            <Seo title="Login | SaaSify" description="Login to your SaaSify account." />
+            <Seo title="Sign In | Live Achieve Believe" description="Sign in to the Live Achieve Believe operations and community portal." />
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="w-full md:flex md:min-h-screen">
                     {/* Left side - Text content */}
@@ -60,12 +60,12 @@ export default function Login() {
                         className="hidden md:flex md:w-1/2 bg-primary/5 items-center justify-center p-8"
                     >
                         <div className="max-w-md text-center">
-                            <Text label="SaaSify" className="text-4xl font-bold text-primary mb-6" />
+                            <Text label="Live Achieve Believe" className="text-4xl font-bold text-primary mb-6" />
                             <h2 className="text-3xl font-semibold text-foreground mb-4">
-                                Welcome back to SaaSify
+                                Welcome back
                             </h2>
                             <p className="text-muted-foreground text-lg">
-                                Your all-in-one solution for managing your business. Sign in to access your dashboard and continue your journey.
+                                Sign in to manage community meals, volunteer applications, cinematic slots, and upcoming events.
                             </p>
                         </div>
                     </motion.div>
@@ -80,7 +80,7 @@ export default function Login() {
                         <div className="w-full max-w-md">
                             <div className="text-center mb-8 md:hidden">
                                 <Link to="/">
-                                    <Text label="SaaSify" className="text-3xl font-bold text-primary mb-2" />
+                                    <Text label="Live Achieve Believe" className="text-3xl font-bold text-primary mb-2" />
                                 </Link>
                                 <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
                                 <p className="text-muted-foreground mt-2">Sign in to your account</p>
@@ -202,26 +202,6 @@ export default function Login() {
                                     >
                                         {loading ? 'Signing in...' : 'Sign in'}
                                     </Button>
-
-                                    <div className="relative my-6">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-border"></div>
-                                        </div>
-                                        <div className="relative flex justify-center text-sm">
-                                            <span className="px-2 bg-card text-muted-foreground">
-                                                Or continue with
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Button variant="outline" className="w-full">
-                                            Google
-                                        </Button>
-                                        <Button variant="outline" className="w-full">
-                                            GitHub
-                                        </Button>
-                                    </div>
                                 </form>
 
                                 <p className="mt-6 text-center text-sm text-muted-foreground">

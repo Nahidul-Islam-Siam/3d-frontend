@@ -133,6 +133,9 @@ export default function ZAxisStage() {
 
   const handleVideoEnded = () => {
     setIsVideoFinished(true);
+    if (typeof window !== 'undefined' && window.scrollY < 100) {
+      handleScrollToStory();
+    }
   };
 
   // Video starts when preloader completes

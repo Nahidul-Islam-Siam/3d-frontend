@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import welcomeHomeVideo from '@/assets/how-we-serve/welcome-home/gemini_generated_video_b330336e.mp4.mp4';
+import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
+import { officialPillars } from '@/data/officialVerbiage';
 
 interface WelcomeHomeHeroProps {
   onScrollClick?: () => void;
@@ -10,6 +12,8 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isEnded, setIsEnded] = useState<boolean>(false);
+  const content = officialPillars.welcomeHome;
 
   useEffect(() => {
     if (videoRef.current) {
@@ -23,7 +27,8 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      setIsEnded(false);
+      videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
   };
@@ -34,8 +39,23 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
     setIsMuted(!isMuted);
   };
 
+  const handleReplay = () => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = 0;
+    setIsEnded(false);
+    videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+  };
+
+  const handleContinue = () => {
+    if (onScrollClick) {
+      onScrollClick();
+    } else {
+      window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section 
+    <section
       id="welcome-home-video-hero"
       className="relative w-full min-h-screen bg-black text-white flex flex-col justify-between overflow-hidden select-none"
     >
@@ -46,13 +66,31 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
           src={welcomeHomeVideo}
           playsInline
           autoPlay
-          loop
           muted={isMuted}
-          className="w-full h-full object-cover object-center scale-[1.01]"
+          onEnded={() => {
+            setIsEnded(true);
+            setIsPlaying(false);
+          }}
+          className={`w-full h-full object-cover object-center scale-[1.01] transition-opacity duration-1000 ${
+            isEnded ? 'opacity-0' : 'opacity-100'
+          }`}
         />
-        {/* Subtle Dark Vignette Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 pointer-events-none" />
       </div>
+
+      {/* ─── Fade-In Official Verbiage Stage on Video Completion ─── */}
+      <VideoEndedVerbiageOverlay
+        visible={isEnded}
+        eyebrow={`Door 4: ${content.title}`}
+        title={content.title}
+        lead={content.lead}
+        body={`${content.intro} ${content.whatWeDo}`}
+        tagline={content.tagline}
+        ctaLabel="Explore a Housing Partnership"
+        ctaHref="/contact?subject=housing-partnership"
+        onReplay={handleReplay}
+        onScrollDown={handleContinue}
+      />
 
       {/* ─── Top-Right Video Controls ─── */}
       <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-24 sm:pt-28 flex justify-end gap-3 pointer-events-auto">
@@ -77,11 +115,11 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
         </button>
       </div>
 
-      {/* ─── Bottom Center "SCROLL TO CONTINUE" Pill (Exact Screenshot Match) ─── */}
+      {/* ─── Bottom Center "SCROLL TO CONTINUE" Pill ─── */}
       <div className="relative z-20 pb-8 flex justify-center w-full">
         <button
           type="button"
-          onClick={onScrollClick}
+          onClick={handleContinue}
           className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-black/45 hover:bg-black/75 backdrop-blur-md border border-white/25 text-white/90 hover:text-white transition-all cursor-pointer text-[11px] font-serif tracking-[0.2em] uppercase shadow-lg"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -94,4 +132,3 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
     </section>
   );
 }
-

@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   HeartHandshake, 
   Calendar, 
   MapPin, 
   CheckCircle2, 
+  AlertCircle,
   Send, 
   Users, 
   Mic, 
@@ -14,13 +16,37 @@ import {
 } from 'lucide-react';
 import Seo from '@/components/Seo';
 import auditionBanner from '@/assets/welcome/audition_banner.png';
+import movementService from '@/lib/api/services/movement.service';
 
 type TabType = 'volunteer' | 'audition' | 'sponsor' | 'donate';
 
+const SQUARE_DONATION_URL = 'https://square.link/u/D9O5AJW0';
+
 export default function SuicideAwarenessShowdownPage() {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>('audition');
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedMessage, setSubmittedMessage] = useState<string>('');
+
+  // Sync deep link hash or ?tab= query to active tab
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const paramTab = params.get('tab') || location.hash.replace('#', '');
+    if (
+      paramTab === 'volunteer' ||
+      paramTab === 'audition' ||
+      paramTab === 'sponsor' ||
+      paramTab === 'donate'
+    ) {
+      setActiveTab(paramTab);
+      const formsEl = document.getElementById('forms-section');
+      if (formsEl) {
+        setTimeout(() => formsEl.scrollIntoView({ behavior: 'smooth' }), 150);
+      }
+    }
+  }, [location.hash, location.search]);
 
   // Form States
   const [volunteerData, setVolunteerData] = useState({
@@ -37,7 +63,7 @@ export default function SuicideAwarenessShowdownPage() {
     email: '',
     phone: '',
     ageGroup: '18-29',
-    talentType: 'acting',
+    talentType: 'acting' as 'acting' | 'singing' | 'dance' | 'spoken-word' | 'instrumental',
     mediaLink: '',
     experience: '',
     confirmRehearsals: true,
@@ -48,7 +74,7 @@ export default function SuicideAwarenessShowdownPage() {
     contactName: '',
     email: '',
     phone: '',
-    tier: 'gold',
+    tier: 'gold' as 'presenting' | 'platinum' | 'gold' | 'community' | 'custom',
     notes: '',
   });
 
@@ -60,28 +86,76 @@ export default function SuicideAwarenessShowdownPage() {
     dedication: '',
   });
 
-  const handleVolunteerSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmittedMessage('Thank you for volunteering! Our production team will contact you shortly with schedules and orientation details.');
-    setIsSubmitted(true);
+  const extractError = (err: unknown): string => {
+    if (err && typeof err === 'object' && 'response' in err) {
+      const resp = (err as { response?: { data?: { message?: string } } }).response;
+      if (resp?.data?.message) return resp.data.message;
+    }
+    if (err instanceof Error && err.message) return err.message;
+    return 'Unable to submit right now. Please try again.';
   };
 
-  const handleAuditionSubmit = (e: React.FormEvent) => {
+  const handleVolunteerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmittedMessage('Your audition registration has been received! Our casting director will review your details and reach out with audition time slots.');
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await movementService.applyVolunteer({
+        full_name: volunteerData.name,
+        email: volunteerData.email,
+        phone: volunteerData.phone,
+        interests: [volunteerData.role, 'Suicide Awareness Showdown'],
+        availability: volunteerData.availability,
+        bio: volunteerData.message,
+      });
+      setSubmittedMessage('Thank you for volunteering! Our production team will contact you shortly with schedules and orientation details.');
+      setIsSubmitted(true);
+    } catch (err) {
+      setSubmitError(extractError(err));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSponsorSubmit = (e: React.FormEvent) => {
+  const handleAuditionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmittedMessage('Thank you for your sponsorship interest! Our partnership director will reach out within 24 hours with package details and invoicing.');
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await movementService.applyAudition(auditionData);
+      setSubmittedMessage('Your audition registration has been received! Our casting director will review your details and reach out with audition time slots.');
+      setIsSubmitted(true);
+    } catch (err) {
+      setSubmitError(extractError(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSponsorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await movementService.applySponsor({
+        ...sponsorData,
+        program: 'Suicide Awareness Showdown',
+      });
+      setSubmittedMessage('Thank you for your sponsorship interest! Our partnership director will reach out within 24 hours with package details and invoicing.');
+      setIsSubmitted(true);
+    } catch (err) {
+      setSubmitError(extractError(err));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDonateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     const finalAmount = donateData.customAmount || donateData.amount;
-    setSubmittedMessage(`Thank you for donating $${finalAmount}! Your generosity directly powers life-saving creative mental health dialogues.`);
+    window.open(SQUARE_DONATION_URL, '_blank', 'noopener,noreferrer');
+    setSubmittedMessage(`Thank you! Our secure Square checkout opened for your $${finalAmount} gift powering Suicide Awareness Showdown.`);
     setIsSubmitted(true);
   };
 
@@ -197,7 +271,7 @@ export default function SuicideAwarenessShowdownPage() {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-1.5 rounded-2xl bg-black/40 border border-white/10 max-w-2xl mx-auto">
               <button
                 type="button"
-                onClick={() => { setActiveTab('audition'); setIsSubmitted(false); }}
+                onClick={() => { setActiveTab('audition'); setIsSubmitted(false); setSubmitError(null); }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                   activeTab === 'audition'
                     ? 'bg-[#F97316] text-white shadow-lg'
@@ -210,7 +284,7 @@ export default function SuicideAwarenessShowdownPage() {
 
               <button
                 type="button"
-                onClick={() => { setActiveTab('volunteer'); setIsSubmitted(false); }}
+                onClick={() => { setActiveTab('volunteer'); setIsSubmitted(false); setSubmitError(null); }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                   activeTab === 'volunteer'
                     ? 'bg-[#F97316] text-white shadow-lg'
@@ -223,7 +297,7 @@ export default function SuicideAwarenessShowdownPage() {
 
               <button
                 type="button"
-                onClick={() => { setActiveTab('sponsor'); setIsSubmitted(false); }}
+                onClick={() => { setActiveTab('sponsor'); setIsSubmitted(false); setSubmitError(null); }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                   activeTab === 'sponsor'
                     ? 'bg-[#F97316] text-white shadow-lg'
@@ -236,7 +310,7 @@ export default function SuicideAwarenessShowdownPage() {
 
               <button
                 type="button"
-                onClick={() => { setActiveTab('donate'); setIsSubmitted(false); }}
+                onClick={() => { setActiveTab('donate'); setIsSubmitted(false); setSubmitError(null); }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                   activeTab === 'donate'
                     ? 'bg-[#F97316] text-white shadow-lg'
@@ -247,6 +321,14 @@ export default function SuicideAwarenessShowdownPage() {
                 <span>Donate</span>
               </button>
             </div>
+
+            {/* Error Alert */}
+            {submitError && (
+              <div className="max-w-xl mx-auto p-4 rounded-2xl bg-red-950/60 border border-red-500/40 text-red-200 text-center flex items-center justify-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                <p className="text-xs sm:text-sm font-medium">{submitError}</p>
+              </div>
+            )}
 
             {/* Success Submission Alert */}
             <AnimatePresence>
@@ -309,7 +391,12 @@ export default function SuicideAwarenessShowdownPage() {
                     <label className="text-xs font-semibold text-stone-300 uppercase tracking-wider">Talent Discipline *</label>
                     <select
                       value={auditionData.talentType}
-                      onChange={(e) => setAuditionData({ ...auditionData, talentType: e.target.value })}
+                      onChange={(e) =>
+                        setAuditionData({
+                          ...auditionData,
+                          talentType: e.target.value as typeof auditionData.talentType,
+                        })
+                      }
                       className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-sm focus:border-[#F97316] focus:outline-none"
                     >
                       <option value="acting">Acting / Monologue</option>
@@ -358,10 +445,11 @@ export default function SuicideAwarenessShowdownPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 cursor-pointer flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] disabled:opacity-60 text-white font-semibold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Submit Audition Registration</span>
+                  <span>{isSubmitting ? 'Submitting...' : 'Submit Audition Registration'}</span>
                 </button>
               </form>
             )}
@@ -437,10 +525,11 @@ export default function SuicideAwarenessShowdownPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 cursor-pointer flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] disabled:opacity-60 text-white font-semibold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Join As Event Volunteer</span>
+                  <span>{isSubmitting ? 'Submitting...' : 'Join As Event Volunteer'}</span>
                 </button>
               </form>
             )}
@@ -504,7 +593,12 @@ export default function SuicideAwarenessShowdownPage() {
                   <label className="text-xs font-semibold text-stone-300 uppercase tracking-wider">Sponsorship Tier *</label>
                   <select
                     value={sponsorData.tier}
-                    onChange={(e) => setSponsorData({ ...sponsorData, tier: e.target.value })}
+                    onChange={(e) =>
+                      setSponsorData({
+                        ...sponsorData,
+                        tier: e.target.value as typeof sponsorData.tier,
+                      })
+                    }
                     className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-sm focus:border-[#F97316] focus:outline-none"
                   >
                     <option value="presenting">Presenting Title Partner ($10,000)</option>
@@ -528,10 +622,11 @@ export default function SuicideAwarenessShowdownPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 cursor-pointer flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#ea580c] disabled:opacity-60 text-white font-semibold text-sm uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Submit Sponsorship Inquiry</span>
+                  <span>{isSubmitting ? 'Submitting...' : 'Submit Sponsorship Inquiry'}</span>
                 </button>
               </form>
             )}
@@ -585,10 +680,9 @@ export default function SuicideAwarenessShowdownPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-stone-300 uppercase tracking-wider">Email For Receipt *</label>
+                    <label className="text-xs font-semibold text-stone-300 uppercase tracking-wider">Email For Receipt (Optional)</label>
                     <input
                       type="email"
-                      required
                       value={donateData.email}
                       onChange={(e) => setDonateData({ ...donateData, email: e.target.value })}
                       placeholder="donor@example.com"
