@@ -3,6 +3,7 @@ import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import welcomeHomeVideo from '@/assets/how-we-serve/welcome-home/gemini_generated_video_b330336e.mp4.mp4';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { officialPillars } from '@/data/officialVerbiage';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 interface WelcomeHomeHeroProps {
   onScrollClick?: () => void;
@@ -14,6 +15,12 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const content = officialPillars.welcomeHome;
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve/welcome-home', '/welcome-home'],
+    slotMatchers: ['hero', 'welcome-home', 'porch', 'key'],
+    slotIndex: 0,
+    fallbackUrl: welcomeHomeVideo,
+  });
 
   useEffect(() => {
     if (videoRef.current) {
@@ -63,7 +70,8 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <video
           ref={videoRef}
-          src={welcomeHomeVideo}
+          src={liveVideo.videoUrl}
+          poster={liveVideo.posterUrl}
           playsInline
           autoPlay
           muted={isMuted}

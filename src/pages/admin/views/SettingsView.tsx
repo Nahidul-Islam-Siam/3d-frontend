@@ -24,6 +24,7 @@ import RichTextEditor from '@/components/common/RichTextEditor';
 import SafeHtmlContent from '@/components/common/SafeHtmlContent';
 import authService from '@/lib/api/services/auth.service';
 import movementService from '@/lib/api/services/movement.service';
+import { invalidatePublicSettingCache } from '@/lib/hooks/usePublicCms';
 import { useAppDispatch, useAppSelector } from '@/lib/store';
 import { getProfile, updateProfile } from '@/lib/store/thunks/auth.thunks';
 
@@ -195,6 +196,7 @@ function CmsSettingSection({ config, isAuthenticated, onBack }: CmsSettingSectio
       const updated = await movementService.updateSettingPage(config.slug, {
         htmlContent: trimmedHtml,
       });
+      invalidatePublicSettingCache(config.slug);
       const nextHtml = updated?.htmlContent ?? trimmedHtml;
       setSavedHtml(nextHtml);
       setDraftHtml(nextHtml);

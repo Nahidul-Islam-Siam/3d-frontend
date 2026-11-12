@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import storyVideo3 from '@/assets/join-movement/join-the-movement-3.mp4';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface MovementThirdVideoProps {
   id?: string;
@@ -12,6 +13,12 @@ export default function MovementThirdVideo({
 }: MovementThirdVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [, setIsPlaying] = useState<boolean>(true);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/join-the-movement', '/movement'],
+    slotMatchers: ['movement 3', 'third', 'showcase 3', 'together'],
+    slotIndex: 2,
+    fallbackUrl: storyVideo3,
+  });
 
   // Toggle play/pause on click with sound always enabled
   const togglePlay = () => {
@@ -74,7 +81,8 @@ export default function MovementThirdVideo({
       >
         <video
           ref={videoRef}
-          src={storyVideo3}
+          src={liveVideo.videoUrl}
+          poster={liveVideo.posterUrl}
           autoPlay
           loop
           playsInline

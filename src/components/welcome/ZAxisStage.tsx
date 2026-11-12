@@ -18,6 +18,7 @@ import mentorIcon from '@/assets/icons/utensils3.png';
 import storiesIcon from '@/assets/icons/utensils2.png';
 import partnersIcon from '@/assets/icons/utensils.png';
 import FigmaButton from '@/components/common/FigmaButton';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 import Footer from '@/components/partials/footer';
 import SpotlightCanvas from './SpotlightCanvas';
 import FourDoorsSection from './FourDoorsSection';
@@ -68,6 +69,12 @@ export default function ZAxisStage() {
   const [isVideoFinished, setIsVideoFinished] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isReducedMotion, setIsReducedMotion] = useState<boolean>(false);
+
+  const liveWelcomeVideo = usePublicVideoSlot({
+    pagePaths: ['/', '/ (Homepage)'],
+    slotMatchers: ['welcome', 'hero'],
+    fallbackUrl: welcomeVideo,
+  });
 
   const navbarRevealedRef = useRef<boolean>(false);
   const hasStartedPlaybackRef = useRef<boolean>(false);
@@ -317,7 +324,8 @@ export default function ZAxisStage() {
         <section className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
           <video
             ref={videoRef}
-            src={welcomeVideo}
+            src={liveWelcomeVideo.videoUrl}
+            poster={liveWelcomeVideo.posterUrl}
             playsInline
             controls
             preload="auto"
@@ -479,7 +487,8 @@ export default function ZAxisStage() {
           >
             <video
               ref={videoRef}
-              src={welcomeVideo}
+              src={liveWelcomeVideo.videoUrl}
+              poster={liveWelcomeVideo.posterUrl}
               playsInline
               preload="auto"
               muted={isMuted}
@@ -704,7 +713,7 @@ export default function ZAxisStage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <FigmaButton to="/about" variant="primary">
+            <FigmaButton to="/experience-the-story" variant="primary">
               Explore Our Story
             </FigmaButton>
             <FigmaButton to="/movement" variant="outline">

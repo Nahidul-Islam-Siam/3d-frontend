@@ -82,7 +82,7 @@ export default function YouMatterFinaleSection() {
             Partner With Us
           </FigmaButton>
 
-          <FigmaButton to="/about" variant="outline-white" size="md">
+          <FigmaButton to="/experience-the-story" variant="outline-white" size="md">
             Learn More
           </FigmaButton>
 

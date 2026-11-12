@@ -4,6 +4,7 @@ import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import youthVideo from '@/assets/how-we-serve/you-matter/Bright_hopeful_youth_communit.mp4.mp4';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { officialPillars } from '@/data/officialVerbiage';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 interface YouMatterHeroProps {
   onScrollClick?: () => void;
@@ -15,6 +16,12 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const content = officialPillars.strongFoundations;
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve/you-matter', '/you-matter'],
+    slotMatchers: ['hero', 'you-matter', 'youth', 'foundations'],
+    slotIndex: 0,
+    fallbackUrl: youthVideo,
+  });
 
   useEffect(() => {
     if (videoRef.current) {
@@ -67,7 +74,8 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <video
             ref={videoRef}
-            src={youthVideo}
+            src={liveVideo.videoUrl}
+            poster={liveVideo.posterUrl}
             playsInline
             autoPlay
             muted={isMuted}

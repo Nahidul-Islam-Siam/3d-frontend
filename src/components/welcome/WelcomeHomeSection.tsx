@@ -34,7 +34,7 @@ export default function WelcomeHomeSection({
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-          <FigmaButton to="/about" variant="primary">
+          <FigmaButton to="/experience-the-story" variant="primary">
             Explore Our Story
           </FigmaButton>
           <FigmaButton to="/movement" variant="outline">

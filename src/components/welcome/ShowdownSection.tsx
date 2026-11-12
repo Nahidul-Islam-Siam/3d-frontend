@@ -14,6 +14,7 @@ import {
   HeartHandshake
 } from 'lucide-react';
 import FigmaButton from '@/components/common/FigmaButton';
+import PublicUpcomingEventsStrip from '@/components/events/PublicUpcomingEventsStrip';
 import auditionBanner from '@/assets/welcome/audition_banner.png';
 import showdownPoster from '@/assets/welcome/showdown-poster.png';
 
@@ -121,6 +122,8 @@ export default function ShowdownSection({
           </div>
         </div>
       </div>
+
+      {isStandaloneSection && <PublicUpcomingEventsStrip compact className="pt-2" />}
     </div>
   );
 

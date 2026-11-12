@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Home from "./pages/home";
 import RootLayout from "./pages/Layout";
 import NotFound from "./pages/not-found";
@@ -18,6 +18,7 @@ import StoriesThatSaveLives from "./pages/stories-that-save-lives";
 import APlaceAtTheTable from "./pages/a-place-at-the-table";
 import WelcomeHome from "./pages/welcome-home";
 import SuicideAwarenessShowdown from "./pages/suicide-awareness-showdown";
+import CmsSettingPublicPage from "./pages/legal-cms";
 import ErrorPage from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -74,12 +75,16 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/about",
+        path: "/experience-the-story",
         element: <About />,
       },
       {
-        path: "/experience-the-story",
-        element: <About />,
+        path: "/experience-story",
+        element: <Navigate to="/experience-the-story" replace />,
+      },
+      {
+        path: "/about",
+        element: <Navigate to="/experience-the-story" replace />,
       },
       {
         path: "/movement",
@@ -152,6 +157,48 @@ export const router = createBrowserRouter([
       {
         path: "/give-hope",
         element: <Donate />,
+      },
+      {
+        path: "/privacy",
+        element: (
+          <CmsSettingPublicPage
+            slug="privacy-policy"
+            defaultTitle="Privacy Policy"
+            description="Learn how Live Achieve Believe protects your privacy and handles contact, RSVP, volunteer, and audition submissions."
+          />
+        ),
+      },
+      {
+        path: "/privacy-policy",
+        element: <Navigate to="/privacy" replace />,
+      },
+      {
+        path: "/terms",
+        element: (
+          <CmsSettingPublicPage
+            slug="terms-and-conditions"
+            defaultTitle="Terms and Conditions"
+            description="Community participation guidelines and terms of service for Live Achieve Believe."
+          />
+        ),
+      },
+      {
+        path: "/terms-and-conditions",
+        element: <Navigate to="/terms" replace />,
+      },
+      {
+        path: "/terms-and-condition",
+        element: <Navigate to="/terms" replace />,
+      },
+      {
+        path: "/about-us",
+        element: (
+          <CmsSettingPublicPage
+            slug="about-us"
+            defaultTitle="About Us"
+            description="Learn about Live Achieve Believe, Inc. (LAB), our mission, and compassionate community outreach."
+          />
+        ),
       },
       {
         path: "*",

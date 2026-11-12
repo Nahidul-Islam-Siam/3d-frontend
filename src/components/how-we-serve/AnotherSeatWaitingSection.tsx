@@ -106,7 +106,7 @@ export default function AnotherSeatWaitingSection({
             className="w-full mt-0 md:mt-10 lg:mt-14"
           >
             <Link
-              to="/movement#volunteer"
+              to="/suicide-awareness-showdown#volunteer"
               className="group flex flex-col justify-between bg-white rounded-[22px] p-6 sm:p-8 min-h-[290px] sm:min-h-[310px] shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_45px_rgba(249,115,22,0.12)] border border-[#F2EDE0] hover:border-[#F97316]/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
             >
               <div>

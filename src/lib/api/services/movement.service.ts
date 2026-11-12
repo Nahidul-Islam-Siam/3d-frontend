@@ -3,7 +3,7 @@ import type {
   VideoSlot,
   EventItem,
   VolunteerApplication,
-} from '@/pages/admin/mockData';
+} from '@/pages/admin/types';
 
 export interface VolunteerApplyPayload {
   full_name: string;
@@ -55,6 +55,65 @@ export interface RsvpPayload {
   guest_phone?: string;
   tickets?: number;
   notes?: string;
+}
+
+export interface EventRsvpItem {
+  id: string;
+  guest_name: string;
+  guest_email: string;
+  guest_phone?: string;
+  tickets: number;
+  rsvp_date?: string;
+  notes?: string;
+}
+
+export interface AdminOverviewMetrics {
+  totalVolunteers: number;
+  pendingVolunteers: number;
+  pendingAuditions: number;
+  pendingSponsors: number;
+  openInquiries: number;
+  upcomingEvents: number;
+  activeVideos: number;
+  totalRsvps: number;
+  totalCapacity: number;
+}
+
+export interface AdminOverviewData {
+  metrics: AdminOverviewMetrics;
+  recentVolunteers: Array<{
+    id: string;
+    full_name: string;
+    email: string;
+    phone: string;
+    interests: string[];
+    applied_date: string;
+    status: VolunteerApplication['status'];
+  }>;
+  upcomingEventsList: Array<{
+    id: string;
+    title: string;
+    category: string;
+    event_date: string;
+    start_time: string;
+    end_time: string;
+    location: string;
+    capacity: number;
+    rsvps_count: number;
+    status: EventItem['status'];
+  }>;
+}
+
+export interface AdminNotificationItem {
+  id: string;
+  type: 'volunteer_application' | 'event_rsvp' | 'capacity_alert' | 'system_alert';
+  title: string;
+  message: string;
+  priority: 'info' | 'warning' | 'critical';
+  actionHref?: string;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt?: string;
 }
 
 function normalizeDoc<T extends { _id?: string; id?: string }>(doc: T): T & { id: string } {
@@ -133,11 +192,96 @@ const movementService = {
     await apiClient.delete(`/events/${id}`);
   },
 
+  getEventRsvps: async (eventId: string): Promise<EventRsvpItem[]> => {
+    const res = await apiClient.get(`/events/${eventId}/rsvps`);
+    const list = res.data?.data ?? res.data ?? [];
+    return Array.isArray(list) ? list.map(normalizeDoc) : [];
+  },
+
+  submitEventRsvp: async (
+    eventId: string,
+    payload: {
+      guest_name: string;
+      guest_email: string;
+      guest_phone?: string;
+      tickets: number;
+      notes?: string;
+    }
+  ): Promise<EventRsvpItem> => {
+    const res = await apiClient.post(`/events/${eventId}/rsvp`, payload);
+    return normalizeDoc(res.data?.data ?? res.data);
+  },
+
+  // Admin Overview & Notifications
+  getAdminOverview: async (): Promise<AdminOverviewData> => {
+    const res = await apiClient.get('/admin/overview');
+    const payload = res.data?.data ?? res.data;
+    return {
+      metrics: payload?.metrics ?? {
+        totalVolunteers: 0,
+        pendingVolunteers: 0,
+        pendingAuditions: 0,
+        pendingSponsors: 0,
+        openInquiries: 0,
+        upcomingEvents: 0,
+        activeVideos: 0,
+        totalRsvps: 0,
+        totalCapacity: 0,
+      },
+      recentVolunteers: Array.isArray(payload?.recentVolunteers)
+        ? payload.recentVolunteers.map((v: { _id?: string; id?: string; applied_date?: string }) => ({
+            ...normalizeDoc(v),
+            applied_date: v.applied_date ? String(v.applied_date) : '',
+          }))
+        : [],
+      upcomingEventsList: Array.isArray(payload?.upcomingEventsList)
+        ? payload.upcomingEventsList.map(normalizeDoc)
+        : [],
+    };
+  },
+
+  getNotifications: async (params?: {
+    unreadOnly?: boolean;
+    limit?: number;
+  }): Promise<{ items: AdminNotificationItem[]; unreadCount: number; total: number }> => {
+    const res = await apiClient.get('/notifications', { params });
+    const list = res.data?.data ?? [];
+    const meta = res.data?.meta ?? {};
+    return {
+      items: Array.isArray(list) ? list.map(normalizeDoc) : [],
+      unreadCount: typeof meta.unreadCount === 'number' ? meta.unreadCount : 0,
+      total: typeof meta.total === 'number' ? meta.total : 0,
+    };
+  },
+
+  getUnreadNotificationCount: async (): Promise<number> => {
+    const res = await apiClient.get('/notifications/unread-count');
+    const payload = res.data?.data ?? res.data;
+    return typeof payload?.unreadCount === 'number' ? payload.unreadCount : 0;
+  },
+
+  markNotificationRead: async (id: string): Promise<void> => {
+    await apiClient.patch(`/notifications/${id}/read`);
+  },
+
+  markAllNotificationsRead: async (): Promise<void> => {
+    await apiClient.patch('/notifications/mark-all-read');
+  },
+
   // Volunteer Admin Operations
   getVolunteers: async (): Promise<VolunteerApplication[]> => {
     const res = await apiClient.get('/volunteers');
     const list = res.data?.data ?? res.data ?? [];
-    return Array.isArray(list) ? list.map(normalizeDoc) : [];
+    if (!Array.isArray(list)) return [];
+    return list.map((item) => {
+      const normalized = normalizeDoc(item as VolunteerApplication & { _id?: string; createdAt?: string });
+      return {
+        ...normalized,
+        interests: Array.isArray(normalized.interests) ? normalized.interests : [],
+        applied_date: normalized.applied_date || normalized.createdAt || '',
+        bio: normalized.bio || '',
+      };
+    });
   },
 
   updateVolunteerStatus: async (
@@ -147,6 +291,10 @@ const movementService = {
   ): Promise<VolunteerApplication> => {
     const res = await apiClient.patch(`/volunteers/${id}/status`, { status, admin_notes });
     return normalizeDoc(res.data?.data ?? res.data);
+  },
+
+  deleteVolunteer: async (id: string): Promise<void> => {
+    await apiClient.delete(`/volunteers/${id}`);
   },
 
   // Static Setting Pages
@@ -164,15 +312,27 @@ const movementService = {
   },
 
   // Cloudinary Upload
-  uploadMedia: async (files: File[]): Promise<Array<{ url: string; publicId: string }>> => {
+  uploadMedia: async (
+    files: File[],
+    onProgress?: (percent: number) => void
+  ): Promise<Array<{ url: string; publicId: string }>> => {
     const formData = new FormData();
     files.forEach((f) => formData.append('files', f));
-    const res = await apiClient.post('/upload', formData);
+    const res = await apiClient.post('/upload', formData, {
+      timeout: 180000,
+      onUploadProgress: (evt) => {
+        if (onProgress && evt.total) {
+          const pct = Math.min(99, Math.round((evt.loaded * 100) / evt.total));
+          onProgress(pct);
+        }
+      },
+    });
+    if (onProgress) onProgress(100);
     const data = res.data?.data ?? res.data;
     return Array.isArray(data) ? data : [data];
   },
 
-  // Auditions / Sponsors / Inquiries Admin Listings
+  // Auditions / Sponsors / Inquiries Admin Listings & Triage
   getAuditions: async () => {
     const res = await apiClient.get('/auditions');
     const list = res.data?.data ?? res.data ?? [];
@@ -189,6 +349,25 @@ const movementService = {
     const res = await apiClient.get('/inquiries');
     const list = res.data?.data ?? res.data ?? [];
     return Array.isArray(list) ? list.map(normalizeDoc) : [];
+  },
+
+  updateSubmissionStatus: async (
+    endpoint: 'auditions' | 'sponsors' | 'inquiries',
+    id: string,
+    status: string,
+    admin_notes?: string
+  ) => {
+    const payload =
+      admin_notes !== undefined ? { status, admin_notes } : { status };
+    const res = await apiClient.patch(`/${endpoint}/${id}/status`, payload);
+    return normalizeDoc(res.data?.data ?? res.data);
+  },
+
+  deleteSubmission: async (
+    endpoint: 'auditions' | 'sponsors' | 'inquiries',
+    id: string
+  ): Promise<void> => {
+    await apiClient.delete(`/${endpoint}/${id}`);
   },
 };
 

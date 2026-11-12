@@ -1,7 +1,16 @@
 import heroVideo from '@/assets/how-we-serve/stories-that-save-lives/Untitled design (3).mp4.mp4';
 import heroPoster from '@/assets/how-we-serve/stories-that-save-lives/image copy.png';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export default function DocumentaryInterludeSection() {
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve/stories-that-save-lives', '/stories-that-save-lives'],
+    slotMatchers: ['interlude', 'documentary', 'second'],
+    slotIndex: 1,
+    fallbackUrl: heroVideo,
+    fallbackPoster: heroPoster,
+  });
+
   return (
     <section 
       id="documentary-interlude"
@@ -10,8 +19,8 @@ export default function DocumentaryInterludeSection() {
       {/* ─── Full-Bleed Edge-to-Edge Documentary Video ─── */}
       <div className="relative w-full h-full overflow-hidden bg-black">
         <video
-          src={heroVideo}
-          poster={heroPoster}
+          src={liveVideo.videoUrl}
+          poster={liveVideo.posterUrl}
           autoPlay
           loop
           muted

@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import {
+  Alert,
   Table,
   Button,
   Input,
@@ -11,30 +12,99 @@ import {
   Popconfirm,
   message,
   Dropdown,
+  Empty,
 } from 'antd';
 import {
   CheckOutlined,
   CloseOutlined,
+  DeleteOutlined,
   EyeOutlined,
   MoreOutlined,
+  ReloadOutlined,
   UserOutlined,
   TeamOutlined,
   MailOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import type { VolunteerApplication } from '../mockData';
+import type { VolunteerApplication } from '../types';
+import { confirmDelete } from '@/utils/confirmDelete';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
 interface VolunteersViewProps {
   volunteers: VolunteerApplication[];
-  onUpdateStatus: (id: string, status: VolunteerApplication['status']) => void;
+  loading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
+  onUpdateStatus: (id: string, status: VolunteerApplication['status']) => Promise<boolean> | boolean;
+  onDelete?: (id: string) => Promise<boolean> | boolean;
+}
+
+const STATUS_BADGE_MAP: Record<VolunteerApplication['status'], { bg: string; color: string; border: string; label: string }> = {
+  Approved: {
+    bg: '#ECFDF5',
+    color: '#059669',
+    border: '#A7F3D0',
+    label: 'Approved',
+  },
+  Pending: {
+    bg: '#FFFBEB',
+    color: '#D97706',
+    border: '#FDE68A',
+    label: 'Pending',
+  },
+  Declined: {
+    bg: '#FFF1F2',
+    color: '#E11D48',
+    border: '#FECDD3',
+    label: 'Declined',
+  },
+};
+
+function renderStatusBadge(status: VolunteerApplication['status']) {
+  const token = STATUS_BADGE_MAP[status] || STATUS_BADGE_MAP.Pending;
+  const style: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4px 14px',
+    borderRadius: 9999,
+    fontSize: 12,
+    fontWeight: 600,
+    backgroundColor: token.bg,
+    color: token.color,
+    border: `1px solid ${token.border}`,
+  };
+  return <span style={style}>{token.label}</span>;
+}
+
+function formatAppliedDate(raw: string): { dateLabel: string; timeLabel: string | null } {
+  if (!raw) return { dateLabel: '—', timeLabel: null };
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) {
+    return { dateLabel: raw, timeLabel: null };
+  }
+  const hasClock = raw.includes('T') || raw.includes(':');
+  return {
+    dateLabel: parsed.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+    timeLabel: hasClock
+      ? parsed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      : null,
+  };
 }
 
 export default function VolunteersView({
   volunteers,
+  loading = false,
+  error = null,
+  onRefresh,
   onUpdateStatus,
+  onDelete,
 }: VolunteersViewProps) {
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Declined'>('All');
   const [searchText, setSearchText] = useState('');
@@ -45,29 +115,51 @@ export default function VolunteersView({
   const declinedCount = volunteers.filter((v) => v.status === 'Declined').length;
 
   const filteredVolunteers = useMemo(() => {
+    const query = searchText.trim().toLowerCase();
     return volunteers.filter((v) => {
       const matchesStatus = statusFilter === 'All' || v.status === statusFilter;
       const matchesSearch =
-        v.full_name.toLowerCase().includes(searchText.toLowerCase()) ||
-        v.email.toLowerCase().includes(searchText.toLowerCase()) ||
-        v.interests.some((i) => i.toLowerCase().includes(searchText.toLowerCase()));
+        !query ||
+        v.full_name.toLowerCase().includes(query) ||
+        v.email.toLowerCase().includes(query) ||
+        v.interests.some((i) => i.toLowerCase().includes(query));
       return matchesStatus && matchesSearch;
     });
   }, [volunteers, statusFilter, searchText]);
 
-  const handleApprove = (volunteer: VolunteerApplication) => {
-    onUpdateStatus(volunteer.id, 'Approved');
-    message.success(`Approved ${volunteer.full_name}. Welcome email dispatched.`);
+  const handleStatusChange = async (
+    volunteer: VolunteerApplication,
+    nextStatus: VolunteerApplication['status'],
+    successMsg: string
+  ) => {
+    const ok = await onUpdateStatus(volunteer.id, nextStatus);
+    if (!ok) {
+      message.error(`Could not update status for ${volunteer.full_name}.`);
+      return;
+    }
+    message.success(successMsg);
     if (selectedVolunteer && selectedVolunteer.id === volunteer.id) {
-      setSelectedVolunteer({ ...volunteer, status: 'Approved' });
+      setSelectedVolunteer({ ...volunteer, status: nextStatus });
     }
   };
 
-  const handleDecline = (volunteer: VolunteerApplication) => {
-    onUpdateStatus(volunteer.id, 'Declined');
-    message.info(`Declined application for ${volunteer.full_name}.`);
+  const handleDelete = async (volunteer: VolunteerApplication) => {
+    if (!onDelete) return;
+    const confirmed = await confirmDelete({
+      title: 'Delete volunteer application?',
+      itemName: volunteer.full_name,
+      text: 'This permanently removes the volunteer application record.',
+    });
+    if (!confirmed) return;
+
+    const ok = await onDelete(volunteer.id);
+    if (!ok) {
+      message.error(`Could not delete ${volunteer.full_name}.`);
+      return;
+    }
+    message.success(`Removed application for ${volunteer.full_name}.`);
     if (selectedVolunteer && selectedVolunteer.id === volunteer.id) {
-      setSelectedVolunteer({ ...volunteer, status: 'Declined' });
+      setSelectedVolunteer(null);
     }
   };
 
@@ -76,16 +168,16 @@ export default function VolunteersView({
       title: 'ID',
       key: 'id',
       width: 130,
-      render: (_: unknown, __: VolunteerApplication, index: number) => {
+      render: (_: unknown, record: VolunteerApplication, index: number) => {
         const shortNum = (index + 1).toString().padStart(4, '0');
-        const codeNum = (3200 + index * 115).toString();
+        const shortRef = record.id ? record.id.slice(-6).toUpperCase() : shortNum;
         return (
           <div>
             <div style={{ fontWeight: 700, color: '#0F172A', fontSize: 13.5, letterSpacing: '-0.2px' }}>
               #{shortNum}
             </div>
             <div style={{ color: '#94A3B8', fontSize: 11, fontWeight: 500, marginTop: 2 }}>
-              VOL-2026-{codeNum}
+              REF-{shortRef}
             </div>
           </div>
         );
@@ -95,14 +187,14 @@ export default function VolunteersView({
       title: 'Volunteer',
       dataIndex: 'full_name',
       key: 'full_name',
-      width: 220,
+      width: 230,
       sorter: (a: VolunteerApplication, b: VolunteerApplication) => a.full_name.localeCompare(b.full_name),
       render: (name: string, record: VolunteerApplication) => (
         <div>
           <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 13.5 }}>
             {name}
           </div>
-          <div style={{ color: '#94A3B8', fontSize: 11.5, marginTop: 2 }}>
+          <div style={{ color: '#64748B', fontSize: 12, marginTop: 2 }}>
             {record.email}
           </div>
         </div>
@@ -112,49 +204,44 @@ export default function VolunteersView({
       title: 'Service Interests',
       dataIndex: 'interests',
       key: 'interests',
-      width: 220,
+      width: 230,
       render: (interests: string[]) => {
-        const primary = interests[0] || 'Community Service';
+        const primary = interests[0] || 'General Volunteer';
         return (
           <div>
             <div style={{ fontWeight: 600, color: '#1E293B', fontSize: 13 }}>
               {primary}
             </div>
-            <div style={{ marginTop: 4 }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '2px 8px',
-                  borderRadius: 9999,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  backgroundColor: '#FFF7ED',
-                  color: '#EA580C',
-                  border: '1px solid #FFEDD5',
-                }}
-              >
-                <span>🤝</span>
-                <span>{interests.length > 1 ? `+${interests.length - 1} more fields` : 'Primary Track'}</span>
-              </span>
-            </div>
+            {interests.length > 1 && (
+              <div style={{ marginTop: 4 }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '2px 8px',
+                    borderRadius: 9999,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    backgroundColor: '#FFF7ED',
+                    color: '#EA580C',
+                    border: '1px solid #FFEDD5',
+                  }}
+                >
+                  +{interests.length - 1} more
+                </span>
+              </div>
+            )}
           </div>
         );
       },
     },
     {
-      title: 'Contact & Region',
-      key: 'contact_region',
-      width: 170,
+      title: 'Phone',
+      key: 'phone',
+      width: 165,
       render: (_: unknown, record: VolunteerApplication) => (
-        <div>
-          <div style={{ fontWeight: 500, color: '#334155', fontSize: 13 }}>
-            {record.phone}
-          </div>
-          <div style={{ color: '#94A3B8', fontSize: 11, marginTop: 2 }}>
-            Tampa Bay, FL
-          </div>
+        <div style={{ fontWeight: 500, color: '#334155', fontSize: 13 }}>
+          {record.phone || '—'}
         </div>
       ),
     },
@@ -162,15 +249,10 @@ export default function VolunteersView({
       title: 'Availability',
       dataIndex: 'availability',
       key: 'availability',
-      width: 170,
+      width: 190,
       render: (avail: string) => (
-        <div>
-          <div style={{ fontWeight: 600, color: '#334155', fontSize: 13 }}>
-            {avail}
-          </div>
-          <div style={{ color: '#94A3B8', fontSize: 11, marginTop: 2 }}>
-            Immediate Start
-          </div>
+        <div style={{ fontWeight: 500, color: '#334155', fontSize: 13 }}>
+          {avail || 'Not specified'}
         </div>
       ),
     },
@@ -178,134 +260,29 @@ export default function VolunteersView({
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: 140,
-      render: (status: VolunteerApplication['status']) => {
-        if (status === 'Approved') {
-          return (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px 14px',
-                borderRadius: 9999,
-                fontSize: 12,
-                fontWeight: 600,
-                backgroundColor: '#ECFDF5',
-                color: '#059669',
-                border: '1px solid #A7F3D0',
-              }}
-            >
-              Approved
-            </span>
-          );
-        }
-        if (status === 'Pending') {
-          return (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px 14px',
-                borderRadius: 9999,
-                fontSize: 12,
-                fontWeight: 600,
-                backgroundColor: '#EFF6FF',
-                color: '#2563EB',
-                border: '1px solid #BFDBFE',
-              }}
-            >
-              Scheduled
-            </span>
-          );
-        }
-        return (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '4px 14px',
-              borderRadius: 9999,
-              fontSize: 12,
-              fontWeight: 600,
-              backgroundColor: '#FFF1F2',
-              color: '#E11D48',
-              border: '1px solid #FECDD3',
-            }}
-          >
-            Declined
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Screening',
-      dataIndex: 'status',
-      key: 'screening',
-      width: 140,
-      render: (status: VolunteerApplication['status']) => {
-        if (status === 'Approved') {
-          return (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '3px 10px',
-                borderRadius: 9999,
-                fontSize: 11.5,
-                fontWeight: 500,
-                backgroundColor: '#F0FDF4',
-                color: '#16A34A',
-                border: '1px solid #BBF7D0',
-              }}
-            >
-              Cleared
-            </span>
-          );
-        }
-        if (status === 'Pending') {
-          return (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                padding: '3px 10px',
-                borderRadius: 9999,
-                fontSize: 11.5,
-                fontWeight: 500,
-                backgroundColor: '#FFFBEB',
-                color: '#D97706',
-                border: '1px solid #FDE68A',
-              }}
-            >
-              In Review
-            </span>
-          );
-        }
-        return (
-          <span style={{ fontSize: 12, color: '#94A3B8' }}>
-            Not applicable
-          </span>
-        );
-      },
+      width: 130,
+      render: (status: VolunteerApplication['status']) => renderStatusBadge(status),
     },
     {
       title: 'Applied Date',
       dataIndex: 'applied_date',
       key: 'applied_date',
-      width: 130,
-      render: (date: string) => (
-        <div>
-          <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 13 }}>
-            {date}
+      width: 145,
+      render: (date: string) => {
+        const { dateLabel, timeLabel } = formatAppliedDate(date);
+        return (
+          <div>
+            <div style={{ fontWeight: 600, color: '#0F172A', fontSize: 13 }}>
+              {dateLabel}
+            </div>
+            {timeLabel && (
+              <div style={{ color: '#94A3B8', fontSize: 11, marginTop: 1 }}>
+                {timeLabel}
+              </div>
+            )}
           </div>
-          <div style={{ color: '#94A3B8', fontSize: 11, marginTop: 1 }}>
-            09:30 AM
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: '',
@@ -314,11 +291,11 @@ export default function VolunteersView({
       fixed: 'right' as const,
       render: (_: unknown, record: VolunteerApplication) => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-          {/* Circular Bio / View Button */}
           <button
             type="button"
             onClick={() => setSelectedVolunteer(record)}
-            title="View Bio Profile"
+            title="View Profile"
+            aria-label={`View profile for ${record.full_name}`}
             style={{
               width: 32,
               height: 32,
@@ -328,17 +305,17 @@ export default function VolunteersView({
               justifyContent: 'center',
               backgroundColor: '#FFFFFF',
               border: '1px solid #E2E8F0',
-              color: '#94A3B8',
+              color: '#475569',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#F97316';
+              e.currentTarget.style.color = '#C2410C';
               e.currentTarget.style.borderColor = '#FED7AA';
               e.currentTarget.style.backgroundColor = '#FFF7ED';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#94A3B8';
+              e.currentTarget.style.color = '#475569';
               e.currentTarget.style.borderColor = '#E2E8F0';
               e.currentTarget.style.backgroundColor = '#FFFFFF';
             }}
@@ -346,42 +323,54 @@ export default function VolunteersView({
             <EyeOutlined style={{ fontSize: 14 }} />
           </button>
 
-          {/* Circular More Menu */}
           <Dropdown
             menu={{
               items: [
                 {
                   key: 'bio',
                   icon: <UserOutlined />,
-                  label: 'View Full Bio & Form',
+                  label: 'View Full Profile',
                   onClick: () => setSelectedVolunteer(record),
                 },
                 {
                   key: 'email',
                   icon: <MailOutlined />,
-                  label: 'Email Applicant',
+                  label: 'Copy Email',
                   onClick: () => {
                     navigator.clipboard.writeText(record.email);
-                    message.success(`Copied email for ${record.full_name}`);
+                    message.success(`Copied ${record.email}`);
                   },
                 },
-                ...(record.status === 'Pending'
+                ...(record.status !== 'Approved'
                   ? [
-                      {
-                        type: 'divider' as const,
-                      },
                       {
                         key: 'approve',
                         icon: <CheckOutlined />,
                         label: 'Approve Application',
-                        onClick: () => handleApprove(record),
+                        onClick: () => void handleStatusChange(record, 'Approved', `Approved ${volunteerLabel(record)}.`),
                       },
+                    ]
+                  : []),
+                ...(record.status !== 'Declined'
+                  ? [
                       {
                         key: 'decline',
                         danger: true,
                         icon: <CloseOutlined />,
                         label: 'Decline Application',
-                        onClick: () => handleDecline(record),
+                        onClick: () => void handleStatusChange(record, 'Declined', `Declined application for ${volunteerLabel(record)}.`),
+                      },
+                    ]
+                  : []),
+                ...(onDelete
+                  ? [
+                      { type: 'divider' as const },
+                      {
+                        key: 'delete',
+                        danger: true,
+                        icon: <DeleteOutlined />,
+                        label: 'Delete Application',
+                        onClick: () => void handleDelete(record),
                       },
                     ]
                   : []),
@@ -425,8 +414,25 @@ export default function VolunteersView({
     },
   ];
 
+  const selectedDate = selectedVolunteer ? formatAppliedDate(selectedVolunteer.applied_date) : null;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          action={
+            onRefresh && (
+              <Button size="small" onClick={onRefresh}>
+                Retry
+              </Button>
+            )
+          }
+        />
+      )}
+
       {/* ─── Unified SaaS Table Card ─── */}
       <div className="admin-saas-card">
         {/* Top Header Row of Card */}
@@ -464,25 +470,25 @@ export default function VolunteersView({
                 Volunteer Family Registry
               </div>
               <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
-                Community servant applicants, vetting checks, and placement coordination
+                Live volunteer applications submitted through the LAB website
               </div>
             </div>
           </div>
 
-          {/* Right Status Summary Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Right Status Summary Pills & Refresh */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <span
               style={{
                 padding: '4px 12px',
                 borderRadius: 9999,
                 fontSize: 12,
                 fontWeight: 600,
-                backgroundColor: '#EFF6FF',
-                color: '#2563EB',
-                border: '1px solid #BFDBFE',
+                backgroundColor: '#FFFBEB',
+                color: '#D97706',
+                border: '1px solid #FDE68A',
               }}
             >
-              {pendingCount} Pending Review
+              {pendingCount} Pending
             </span>
             <span
               style={{
@@ -495,8 +501,18 @@ export default function VolunteersView({
                 border: '1px solid #A7F3D0',
               }}
             >
-              {approvedCount} Active Servants
+              {approvedCount} Approved
             </span>
+            {onRefresh && (
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={onRefresh}
+                loading={loading}
+                style={{ borderRadius: 8 }}
+              >
+                Refresh
+              </Button>
+            )}
           </div>
         </div>
 
@@ -527,7 +543,7 @@ export default function VolunteersView({
             style={{ width: 170, height: 36 }}
           >
             <Option value="All">All Applicants ({volunteers.length})</Option>
-            <Option value="Pending">Scheduled ({pendingCount})</Option>
+            <Option value="Pending">Pending ({pendingCount})</Option>
             <Option value="Approved">Approved ({approvedCount})</Option>
             <Option value="Declined">Declined ({declinedCount})</Option>
           </Select>
@@ -546,7 +562,7 @@ export default function VolunteersView({
           )}
 
           <div style={{ marginLeft: 'auto', color: '#64748B', fontSize: 13, fontWeight: 500 }}>
-            Filtered: <strong style={{ color: '#0F172A' }}>{filteredVolunteers.length}</strong> of {volunteers.length}
+            Showing: <strong style={{ color: '#0F172A' }}>{filteredVolunteers.length}</strong> of {volunteers.length}
           </div>
         </div>
 
@@ -555,7 +571,16 @@ export default function VolunteersView({
           className="admin-saas-table"
           dataSource={filteredVolunteers}
           columns={columns}
+          loading={loading}
           rowKey="id"
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No volunteer applications submitted yet"
+              />
+            ),
+          }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
@@ -567,7 +592,7 @@ export default function VolunteersView({
               </span>
             ),
           }}
-          scroll={{ x: 1220 }}
+          scroll={{ x: 1120 }}
         />
       </div>
 
@@ -607,66 +632,83 @@ export default function VolunteersView({
 
             <Descriptions bordered column={1}>
               <Descriptions.Item label="Application Status">
-                <span
-                  style={{
-                    padding: '3px 12px',
-                    borderRadius: 9999,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    backgroundColor: selectedVolunteer.status === 'Approved' ? '#ECFDF5' : '#EFF6FF',
-                    color: selectedVolunteer.status === 'Approved' ? '#059669' : '#2563EB',
-                    border: `1px solid ${selectedVolunteer.status === 'Approved' ? '#A7F3D0' : '#BFDBFE'}`,
-                  }}
-                >
-                  {selectedVolunteer.status}
-                </span>
+                {renderStatusBadge(selectedVolunteer.status)}
               </Descriptions.Item>
-              <Descriptions.Item label="Date Submitted">{selectedVolunteer.applied_date}</Descriptions.Item>
-              <Descriptions.Item label="Preferred Availability">{selectedVolunteer.availability}</Descriptions.Item>
+              <Descriptions.Item label="Date Submitted">
+                {selectedDate
+                  ? `${selectedDate.dateLabel}${selectedDate.timeLabel ? ` at ${selectedDate.timeLabel}` : ''}`
+                  : '—'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Preferred Availability">
+                {selectedVolunteer.availability || 'Not specified'}
+              </Descriptions.Item>
               <Descriptions.Item label="Service Interests">
-                <Space wrap>
-                  {selectedVolunteer.interests.map((item) => (
-                    <span
-                      key={item}
-                      style={{
-                        padding: '2px 10px',
-                        borderRadius: 9999,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        backgroundColor: '#FFF7ED',
-                        color: '#C2410C',
-                        border: '1px solid #FED7AA',
-                      }}
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </Space>
+                {selectedVolunteer.interests.length > 0 ? (
+                  <Space wrap>
+                    {selectedVolunteer.interests.map((item) => (
+                      <span
+                        key={item}
+                        style={{
+                          padding: '2px 10px',
+                          borderRadius: 9999,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          backgroundColor: '#FFF7ED',
+                          color: '#C2410C',
+                          border: '1px solid #FED7AA',
+                        }}
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </Space>
+                ) : (
+                  <Text type="secondary">None specified</Text>
+                )}
               </Descriptions.Item>
               <Descriptions.Item label="Personal Statement / Background">
-                <Paragraph style={{ margin: 0, lineHeight: 1.6 }}>{selectedVolunteer.bio}</Paragraph>
+                <Paragraph style={{ margin: 0, lineHeight: 1.6 }}>
+                  {selectedVolunteer.bio || 'No personal bio provided.'}
+                </Paragraph>
               </Descriptions.Item>
             </Descriptions>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 12 }}>
-              {selectedVolunteer.status === 'Pending' && (
-                <>
-                  <Popconfirm
-                    title="Decline application?"
-                    onConfirm={() => handleDecline(selectedVolunteer)}
-                    okText="Yes, decline"
-                    cancelText="Cancel"
-                  >
-                    <Button danger>Decline</Button>
-                  </Popconfirm>
-                  <Button
-                    type="primary"
-                    style={{ backgroundColor: '#F97316' }}
-                    onClick={() => handleApprove(selectedVolunteer)}
-                  >
-                    Approve Volunteer
-                  </Button>
-                </>
+              {onDelete && (
+                <Button danger icon={<DeleteOutlined />} onClick={() => void handleDelete(selectedVolunteer)}>
+                  Delete
+                </Button>
+              )}
+              {selectedVolunteer.status !== 'Declined' && (
+                <Popconfirm
+                  title="Decline application?"
+                  onConfirm={() =>
+                    void handleStatusChange(
+                      selectedVolunteer,
+                      'Declined',
+                      `Declined application for ${selectedVolunteer.full_name}.`
+                    )
+                  }
+                  okText="Yes, decline"
+                  cancelText="Cancel"
+                >
+                  <Button danger>Decline</Button>
+                </Popconfirm>
+              )}
+              {selectedVolunteer.status !== 'Approved' && (
+                <Button
+                  type="primary"
+                  style={{ backgroundColor: '#F97316' }}
+                  onClick={() =>
+                    void handleStatusChange(
+                      selectedVolunteer,
+                      'Approved',
+                      `Approved ${selectedVolunteer.full_name}.`
+                    )
+                  }
+                >
+                  Approve Volunteer
+                </Button>
               )}
             </div>
           </div>
@@ -674,4 +716,8 @@ export default function VolunteersView({
       </Drawer>
     </div>
   );
+}
+
+function volunteerLabel(volunteer: VolunteerApplication) {
+  return volunteer.full_name || 'applicant';
 }

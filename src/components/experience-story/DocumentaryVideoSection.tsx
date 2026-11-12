@@ -1,5 +1,6 @@
-﻿import { useRef } from 'react';
+import { useRef } from 'react';
 import docVideo from '@/assets/experience-story/experience-story-2.mp4';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface DocumentaryVideoSectionProps {
   id?: string;
@@ -11,6 +12,12 @@ export default function DocumentaryVideoSection({
   className = "" 
 }: DocumentaryVideoSectionProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/experience-the-story', '/experience-story', '/about'],
+    slotMatchers: ['documentary', 'story-2', 'second'],
+    slotIndex: 1,
+    fallbackUrl: docVideo,
+  });
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -34,7 +41,8 @@ export default function DocumentaryVideoSection({
       <div className="relative w-full max-w-[1920px] aspect-video overflow-hidden bg-black flex items-center justify-center group">
         <video
           ref={videoRef}
-          src={docVideo}
+          src={liveVideo.videoUrl}
+          poster={liveVideo.posterUrl}
           autoPlay
           loop
           muted

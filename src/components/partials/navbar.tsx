@@ -77,7 +77,7 @@ export default function Navbar() {
 
   const navItems: NavItem[] = [
     { label: "Welcome", to: "/" },
-    { label: "Experience the Story", to: "/about" },
+    { label: "Experience the Story", to: "/experience-the-story" },
     { label: "Who We Are", to: "/who-we-are" },
     { 
       label: "How We Serve", 

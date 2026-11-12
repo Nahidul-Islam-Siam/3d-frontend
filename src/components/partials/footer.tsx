@@ -45,7 +45,7 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-[#F97316] transition-colors">
+                <Link to="/experience-the-story" className="hover:text-[#F97316] transition-colors">
                   Our Story
                 </Link>
               </li>
@@ -127,6 +127,9 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
           </p>
 
           <div className="flex items-center gap-6 text-stone-600 font-sans">
+            <Link to="/about-us" className="hover:text-[#F97316] transition-colors">
+              About Us
+            </Link>
             <Link to="/privacy" className="hover:text-[#F97316] transition-colors">
               Privacy Policy
             </Link>

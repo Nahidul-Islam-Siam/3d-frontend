@@ -56,7 +56,7 @@ export default function StoriesFinaleSection() {
           transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-wrap items-center justify-center gap-4 sm:gap-5"
         >
-          <FigmaButton to="/about" variant="primary" size="lg">
+          <FigmaButton to="/experience-the-story" variant="primary" size="lg">
             Experience the Show
           </FigmaButton>
 

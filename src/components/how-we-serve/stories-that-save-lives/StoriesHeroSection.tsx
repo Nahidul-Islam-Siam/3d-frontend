@@ -5,6 +5,7 @@ import heroVideo from '@/assets/how-we-serve/stories-that-save-lives/Untitled de
 import heroPoster from '@/assets/how-we-serve/stories-that-save-lives/image copy.png';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { officialPillars } from '@/data/officialVerbiage';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 interface StoriesHeroSectionProps {
   onScrollClick?: () => void;
@@ -16,6 +17,13 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const content = officialPillars.storiesThatSaveLives;
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve/stories-that-save-lives', '/stories-that-save-lives'],
+    slotMatchers: ['hero', 'stories', 'save-lives'],
+    slotIndex: 0,
+    fallbackUrl: heroVideo,
+    fallbackPoster: heroPoster,
+  });
 
   useEffect(() => {
     if (videoRef.current) {
@@ -72,8 +80,8 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
         <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#0A090D]">
           <video
             ref={videoRef}
-            src={heroVideo}
-            poster={heroPoster}
+            src={liveVideo.videoUrl}
+            poster={liveVideo.posterUrl}
             playsInline
             autoPlay
             muted={isMuted}

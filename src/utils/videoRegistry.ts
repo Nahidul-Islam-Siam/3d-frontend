@@ -121,31 +121,3 @@ export function parseEmbedUrl(url?: string): { isEmbed: boolean; embedUrl?: stri
   return { isEmbed: false };
 }
 
-/**
- * Returns the configured live video URL for a public website component,
- * synchronized directly with the admin dashboard's localStorage CMS.
- */
-export function getPublicPageVideo(slotIdOrLabel: string, defaultFallback: string): string {
-  try {
-    const saved = localStorage.getItem('lab_admin_videos');
-    if (!saved) return defaultFallback;
-
-    const list = JSON.parse(saved);
-    if (!Array.isArray(list)) return defaultFallback;
-
-    const match = list.find(
-      (item: { id?: string; slot_label?: string; status?: string; video_url?: string }) =>
-        (item.id === slotIdOrLabel || item.slot_label?.toLowerCase() === slotIdOrLabel.toLowerCase()) &&
-        item.status === 'Live'
-    );
-
-    if (match && match.video_url) {
-      return resolveVideoUrl(match.video_url);
-    }
-  } catch {
-    // fallback gracefully
-  }
-
-  return defaultFallback;
-}
-

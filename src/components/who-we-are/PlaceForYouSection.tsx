@@ -48,7 +48,7 @@ export default function PlaceForYouSection() {
                 Support Our Mission
               </FigmaButton>
 
-              <FigmaButton to="/about" variant="outline" size="md">
+              <FigmaButton to="/experience-the-story" variant="outline" size="md">
                 Explore Our Programs
               </FigmaButton>
             </div>

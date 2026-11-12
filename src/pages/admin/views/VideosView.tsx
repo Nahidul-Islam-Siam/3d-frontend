@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  Alert,
   Card,
   Row,
   Col,
@@ -13,10 +14,11 @@ import {
   Typography,
   message,
   Space,
-  Popconfirm,
   Pagination,
   Upload,
   Tabs,
+  Empty,
+  Spin,
 } from 'antd';
 import {
   VideoCameraOutlined,
@@ -34,21 +36,70 @@ import {
   ArrowLeftOutlined,
   CheckOutlined,
   EditOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
-import type { VideoSlot } from '../mockData';
+import type { VideoSlot } from '../types';
 import {
   resolveVideoUrl,
   parseEmbedUrl,
   DEFAULT_POSTERS,
 } from '@/utils/videoRegistry';
 import RichTextEditor from '@/components/common/RichTextEditor';
+import SafeHtmlContent from '@/components/common/SafeHtmlContent';
+import movementService from '@/lib/api/services/movement.service';
+import { formatBytes, optimizeImageForUpload } from '@/utils/mediaOptimizer';
+import { confirmDelete } from '@/utils/confirmDelete';
+import { Progress } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 const { Dragger } = Upload;
+
+interface VideoRouteGroup {
+  group: string;
+  routes: ReadonlyArray<{
+    value: string;
+    label: string;
+    anchors: string;
+  }>;
+}
+
+const VIDEO_ROUTE_GROUPS: ReadonlyArray<VideoRouteGroup> = [
+  {
+    group: 'Core Pages',
+    routes: [
+      { value: '/ (Homepage)', label: '/ (Homepage) — Welcome Stage', anchors: '#rm-chapter-05' },
+      { value: '/experience-the-story', label: '/experience-the-story — Experience the Story', anchors: '#story-hero-stage, #documentary-video' },
+      { value: '/who-we-are', label: '/who-we-are — Who We Are', anchors: '#who-we-are-video' },
+      { value: '/how-we-serve', label: '/how-we-serve — The Hallway Overview', anchors: '#how-we-serve-overview' },
+      { value: '/join-the-movement', label: '/join-the-movement — Join the Movement', anchors: '#movement-hero, #movement-second-video, #movement-third-video' },
+      { value: '/meet-us', label: '/meet-us — Stewards & Leadership', anchors: '#leadership-spotlight' },
+    ],
+  },
+  {
+    group: 'How We Serve — Sub-Routes (Doors)',
+    routes: [
+      { value: '/how-we-serve/a-place-at-the-table', label: '/how-we-serve/a-place-at-the-table — Door 1: A Place at the Table', anchors: '#table-hero' },
+      { value: '/how-we-serve/you-matter', label: '/how-we-serve/you-matter — Door 2: Strong Foundations (You Matter)', anchors: '#you-matter-video-stage, #classroom-moment' },
+      { value: '/how-we-serve/stories-that-save-lives', label: '/how-we-serve/stories-that-save-lives — Door 3: Stories That Save Lives', anchors: '#stories-video-stage, #documentary-interlude' },
+      { value: '/how-we-serve/welcome-home', label: '/how-we-serve/welcome-home — Door 4: Welcome Home (Veterans)', anchors: '#welcome-home-video-hero, #what-veterans-feel' },
+    ],
+  },
+  {
+    group: 'Productions & Action Pages',
+    routes: [
+      { value: '/suicide-awareness-showdown', label: '/suicide-awareness-showdown — Suicide Awareness Showdown', anchors: '#what-coming-up-next' },
+      { value: '/contact', label: '/contact — Connect With Us', anchors: '' },
+      { value: '/donate', label: '/donate — Give Hope', anchors: '' },
+    ],
+  },
+];
 
 interface VideosViewProps {
   videos: VideoSlot[];
+  loading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
   onUpdateVideo: (updated: VideoSlot) => void;
   onAddSlot: (newSlot: VideoSlot) => void;
   onDeleteSlot: (id: string) => void;
@@ -56,6 +107,9 @@ interface VideosViewProps {
 
 export default function VideosView({
   videos,
+  loading = false,
+  error = null,
+  onRefresh,
   onUpdateVideo,
   onAddSlot,
   onDeleteSlot,
@@ -78,7 +132,95 @@ export default function VideosView({
   const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<string>('');
   const [uploadedThumbnailFileName, setUploadedThumbnailFileName] = useState<string>('');
   const [sourceType, setSourceType] = useState<'upload' | 'url'>('upload');
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+
+  const handleVideoFileUpload = async (file: File) => {
+    const allowed = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-m4v'];
+    if (!allowed.includes(file.type)) {
+      message.error('Unsupported video format. Please upload MP4, WebM, or MOV.');
+      return false;
+    }
+    if (file.size > 100 * 1024 * 1024) {
+      message.error('Video must be under 100MB before Cloudinary optimization.');
+      return false;
+    }
+
+    setUploadingVideo(true);
+    setVideoUploadProgress(0);
+    try {
+      const uploaded = await movementService.uploadMedia([file], (pct) => {
+        setVideoUploadProgress(pct);
+      });
+      const url = uploaded[0]?.url;
+      if (!url) throw new Error('Missing video URL');
+      setUploadedVideoUrl(url);
+      setUploadedVideoFileName(file.name);
+      form.setFieldsValue({ video_url: url });
+      message.success(
+        `Uploaded & optimized (${formatBytes(file.size)}): ${file.name}`,
+      );
+    } catch {
+      message.error('Video upload failed. Please try again or paste a direct URL.');
+    } finally {
+      setUploadingVideo(false);
+    }
+    return false;
+  };
+
+  const handleThumbnailFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      message.error('Please upload an image file (PNG, JPG, WebP, AVIF).');
+      return false;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      message.error('Source image must be under 15MB.');
+      return false;
+    }
+
+    setUploadingThumbnail(true);
+    try {
+      const optimized = await optimizeImageForUpload(file, {
+        maxWidth: 1600,
+        maxHeight: 1600,
+        quality: 0.85,
+      });
+      const uploaded = await movementService.uploadMedia([optimized.file]);
+      const url = uploaded[0]?.url;
+      if (!url) throw new Error('Missing thumbnail URL');
+      setUploadedThumbnailUrl(url);
+      setUploadedThumbnailFileName(optimized.file.name);
+      form.setFieldsValue({ thumbnail: url });
+      if (optimized.wasCompressed) {
+        message.success(
+          `Poster optimized (${formatBytes(optimized.originalBytes)} -> ${formatBytes(optimized.optimizedBytes)}) & uploaded!`,
+        );
+      } else {
+        message.success(`Poster uploaded & CDN-optimized: ${optimized.file.name}`);
+      }
+    } catch {
+      message.error('Poster image upload failed. Please try again.');
+    } finally {
+      setUploadingThumbnail(false);
+    }
+    return false;
+  };
   const [editorHtml, setEditorHtml] = useState<string>('');
+
+  const handleRemoveUploadedVideo = () => {
+    setUploadedVideoUrl('');
+    setUploadedVideoFileName('');
+    form.setFieldsValue({ video_url: '' });
+    message.info('Video removed. Upload a new video or paste a link.');
+  };
+
+  const handleRemoveThumbnail = () => {
+    setUploadedThumbnailUrl('');
+    setUploadedThumbnailFileName('');
+    form.setFieldsValue({ thumbnail: '' });
+    message.info('Thumbnail removed.');
+  };
 
   // Filtered and searched videos for grid
   const filteredVideos = videos.filter((v) => {
@@ -107,7 +249,14 @@ export default function VideosView({
     const nextStatus = slot.status === 'Live' ? 'Draft' : 'Live';
     const updated: VideoSlot = { ...slot, status: nextStatus, updated_at: new Date().toISOString().slice(0, 10) };
     onUpdateVideo(updated);
-    message.success(`${slot.slot_label} is now ${nextStatus === 'Live' ? 'LIVE on the website' : 'saved as Draft'}`);
+    if (selectedVideo?.id === slot.id) {
+      setSelectedVideo(updated);
+    }
+    message.success(
+      nextStatus === 'Live'
+        ? `${slot.slot_label} published on the website`
+        : `${slot.slot_label} unpublished (saved as Draft)`
+    );
   };
 
   // Navigate to Dedicated Create Page
@@ -121,7 +270,7 @@ export default function VideosView({
     setEditorHtml('');
     form.resetFields();
     form.setFieldsValue({
-      status: 'Live',
+      status: 'Draft',
       category: 'General',
       video_type: 'MP4 Video',
       duration: '1:30',
@@ -173,11 +322,17 @@ export default function VideosView({
     thumbnail?: string;
     video_url?: string;
   }) => {
-    const finalVideoUrl = uploadedVideoUrl || values.video_url || 'welcome';
-    const finalThumbnail = uploadedThumbnailUrl || values.thumbnail || '';
+    const finalVideoUrl = (uploadedVideoUrl || values.video_url || '').trim();
+    if (!finalVideoUrl) {
+      message.error('Please upload a video file or provide a video URL.');
+      return;
+    }
+
+    const finalThumbnail = (uploadedThumbnailUrl || values.thumbnail || '').trim();
     const finalDescription = editorHtml || values.title;
 
     if (viewMode === 'create') {
+      const initialStatus: VideoSlot['status'] = values.status || 'Draft';
       const newSlot: VideoSlot = {
         id: `vid-${Date.now().toString().slice(-4)}`,
         slot_label: values.slot_label,
@@ -191,19 +346,23 @@ export default function VideosView({
         thumbnail: finalThumbnail,
         views_count: 0,
         featured: false,
-        status: values.status || 'Live',
+        status: initialStatus,
         sort_order: videos.length + 1,
         updated_at: new Date().toISOString().slice(0, 10),
         video_url: finalVideoUrl,
       };
       onAddSlot(newSlot);
-      message.success(`Created & Published new video slot: ${values.slot_label}`);
+      message.success(
+        initialStatus === 'Live'
+          ? `Created & published video slot: ${values.slot_label}`
+          : `Saved "${values.slot_label}" to dashboard (Not Published)`
+      );
     } else if (viewMode === 'edit' && selectedVideo) {
       const updated: VideoSlot = {
         ...selectedVideo,
         slot_label: values.slot_label,
         page_location: values.page_location,
-        section_anchor: values.section_anchor || selectedVideo.section_anchor,
+        section_anchor: values.section_anchor?.trim() || '',
         title: values.title,
         description: finalDescription,
         duration: values.duration,
@@ -223,9 +382,18 @@ export default function VideosView({
   };
 
   // Helper to get clean route for "View on Website"
-  const getCleanRoute = (pageLocation: string) => {
-    if (pageLocation.startsWith('/ (Homepage)')) return '/';
-    return pageLocation.split(' ')[0] || '/';
+  const getCleanRoute = (pageLocation: string, sectionAnchor?: string) => {
+    const raw = (pageLocation || '').trim();
+    let base = '/';
+    if (!raw.startsWith('/ (Homepage)')) {
+      base = raw.split(' ')[0] || '/';
+      if (base === '/about' || base === '/experience-story') base = '/experience-the-story';
+      if (base === '/movement') base = '/join-the-movement';
+    }
+    const cleanAnchor = (sectionAnchor || '').trim();
+    if (!cleanAnchor) return base;
+    const hash = cleanAnchor.startsWith('#') ? cleanAnchor : `#${cleanAnchor}`;
+    return `${base}${hash}`;
   };
 
   // ═════════════════════════════════════════════════════════════════
@@ -282,23 +450,37 @@ export default function VideosView({
             >
               Cancel
             </Button>
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={() => form.submit()}
-              style={{
-                backgroundColor: '#F97316',
-                borderColor: '#F97316',
-                borderRadius: 8,
-                height: 40,
-                fontWeight: 600,
-                color: '#FFFFFF',
-                padding: '0 24px',
-                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+            <Form.Item noStyle shouldUpdate={(prev, cur) => prev.status !== cur.status}>
+              {({ getFieldValue }) => {
+                const selectedStatus = getFieldValue('status');
+                const submitLabel = isEdit
+                  ? 'Save Changes'
+                  : selectedStatus === 'Live'
+                    ? 'Save & Publish'
+                    : 'Save to Dashboard';
+                return (
+                  <Button
+                    type="primary"
+                    icon={<CheckOutlined />}
+                    disabled={uploadingVideo || uploadingThumbnail}
+                    loading={uploadingVideo || uploadingThumbnail}
+                    onClick={() => form.submit()}
+                    style={{
+                      backgroundColor: '#F97316',
+                      borderColor: '#F97316',
+                      borderRadius: 8,
+                      height: 40,
+                      fontWeight: 600,
+                      color: '#FFFFFF',
+                      padding: '0 24px',
+                      boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+                    }}
+                  >
+                    {submitLabel}
+                  </Button>
+                );
               }}
-            >
-              {isEdit ? 'Save Changes' : 'Publish Film'}
-            </Button>
+            </Form.Item>
           </Space>
         </div>
 
@@ -345,13 +527,21 @@ export default function VideosView({
                       label="Website Page Route"
                       rules={[{ required: true }]}
                     >
-                      <Select placeholder="Select route" style={{ height: 40 }}>
-                        <Option value="/ (Homepage)">/ (Homepage)</Option>
-                        <Option value="/experience-the-story">/experience-the-story</Option>
-                        <Option value="/who-we-are">/who-we-are</Option>
-                        <Option value="/how-we-serve">/how-we-serve</Option>
-                        <Option value="/join-the-movement">/join-the-movement</Option>
-                        <Option value="/meet-us">/meet-us</Option>
+                      <Select
+                        showSearch
+                        optionFilterProp="children"
+                        placeholder="Select public route or sub-route"
+                        style={{ height: 40 }}
+                      >
+                        {VIDEO_ROUTE_GROUPS.map((grp) => (
+                          <OptGroup key={grp.group} label={grp.group}>
+                            {grp.routes.map((rt) => (
+                              <Option key={rt.value} value={rt.value}>
+                                {rt.label}
+                              </Option>
+                            ))}
+                          </OptGroup>
+                        ))}
                       </Select>
                     </Form.Item>
                   </Col>
@@ -387,15 +577,34 @@ export default function VideosView({
                       <Select placeholder="Select pillar" style={{ height: 40 }}>
                         <Option value="General">General Mission</Option>
                         <Option value="Community Meals">Community Meals (Food Relief)</Option>
-                        <Option value="LEADS Youth Development">LEADS Youth Development</Option>
-                        <Option value="Suicide Awareness Showdown">Suicide Awareness Showdown</Option>
+                        <Option value="Youth Mentorship">Youth Mentorship (LEADS)</Option>
+                        <Option value="Suicide Awareness">Suicide Awareness Showdown</Option>
                         <Option value="Veterans Support">Veterans Support</Option>
+                        <Option value="Living Movement">Living Movement</Option>
                       </Select>
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
-                    <Form.Item name="section_anchor" label="Target Section Anchor (Optional)">
-                      <Input placeholder="e.g. #hero-cinema or #documentary" style={{ height: 40, borderRadius: 8 }} />
+                    <Form.Item noStyle shouldUpdate={(prev, cur) => prev.page_location !== cur.page_location}>
+                      {({ getFieldValue }) => {
+                        const selectedRoute = getFieldValue('page_location');
+                        const matchedRoute = VIDEO_ROUTE_GROUPS.flatMap((g) => g.routes).find(
+                          (r) => r.value === selectedRoute
+                        );
+                        return (
+                          <Form.Item
+                            name="section_anchor"
+                            label="Target Section Anchor (Optional)"
+                            help={
+                              matchedRoute?.anchors
+                                ? `Suggested anchors: ${matchedRoute.anchors}`
+                                : 'e.g. #hero-cinema or #documentary'
+                            }
+                          >
+                            <Input placeholder="e.g. #classroom-moment" style={{ height: 40, borderRadius: 8 }} />
+                          </Form.Item>
+                        );
+                      }}
                     </Form.Item>
                   </Col>
                 </Row>
@@ -410,7 +619,7 @@ export default function VideosView({
                     <Form.Item name="video_type" label="Media Provider Type">
                       <Select placeholder="Select media format" style={{ height: 40 }}>
                         <Option value="MP4 Video">MP4 Video File</Option>
-                        <Option value="YouTube">YouTube Embed</Option>
+                        <Option value="YouTube Embed">YouTube Embed</Option>
                         <Option value="Vimeo">Vimeo Embed</Option>
                       </Select>
                     </Form.Item>
@@ -451,14 +660,8 @@ export default function VideosView({
                             <Dragger
                               accept="video/mp4,video/webm,video/quicktime"
                               maxCount={1}
-                              beforeUpload={(file) => {
-                                const blobUrl = URL.createObjectURL(file);
-                                setUploadedVideoUrl(blobUrl);
-                                setUploadedVideoFileName(file.name);
-                                form.setFieldsValue({ video_url: blobUrl });
-                                message.success(`Video selected: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
-                                return false;
-                              }}
+                              disabled={uploadingVideo}
+                              beforeUpload={handleVideoFileUpload}
                               showUploadList={false}
                               style={{ padding: '22px 14px', background: '#F8FAFC', borderRadius: 10, borderColor: '#CBD5E1' }}
                             >
@@ -466,14 +669,19 @@ export default function VideosView({
                                 <InboxOutlined style={{ color: '#F97316', fontSize: 36 }} />
                               </p>
                               <p style={{ fontWeight: 600, color: '#0F172A', fontSize: 13, margin: 0 }}>
-                                Drop video file here or click to browse
+                                {uploadingVideo ? 'Uploading & optimizing video...' : 'Drop video file here or click to browse'}
                               </p>
                               <p style={{ color: '#64748B', fontSize: 11.5, marginTop: 4 }}>
-                                MP4, WebM, MOV supported
+                                MP4, WebM, MOV up to 100MB · CDN auto-optimized
                               </p>
-                              {uploadedVideoFileName && (
+                              {uploadingVideo && (
+                                <div style={{ marginTop: 10, paddingInline: 12 }}>
+                                  <Progress percent={videoUploadProgress} size="small" strokeColor="#F97316" />
+                                </div>
+                              )}
+                              {!uploadingVideo && uploadedVideoFileName && (
                                 <Tag color="success" style={{ marginTop: 8, padding: '4px 10px', fontSize: 12 }}>
-                                  ✓ Ready: {uploadedVideoFileName}
+                                  ✓ Uploaded: {uploadedVideoFileName}
                                 </Tag>
                               )}
                             </Dragger>
@@ -483,6 +691,8 @@ export default function VideosView({
                               <div style={{ marginTop: 14, borderRadius: 10, overflow: 'hidden', height: 160, backgroundColor: '#000' }}>
                                 <video
                                   controls
+                                  preload="none"
+                                  poster={uploadedThumbnailUrl || selectedVideo?.thumbnail || undefined}
                                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                   src={resolveVideoUrl(uploadedVideoUrl)}
                                 />
@@ -531,27 +741,19 @@ export default function VideosView({
                   </Paragraph>
 
                   <Dragger
-                    accept="image/png,image/jpeg,image/webp"
+                    accept="image/png,image/jpeg,image/webp,image/avif"
                     maxCount={1}
-                    beforeUpload={(file) => {
-                      const reader = new FileReader();
-                      reader.onload = (e) => {
-                        const res = e.target?.result as string;
-                        setUploadedThumbnailUrl(res);
-                        setUploadedThumbnailFileName(file.name);
-                        form.setFieldsValue({ thumbnail: res });
-                        message.success(`Poster image loaded: ${file.name}`);
-                      };
-                      reader.readAsDataURL(file);
-                      return false;
-                    }}
+                    disabled={uploadingThumbnail}
+                    beforeUpload={handleThumbnailFileUpload}
                     showUploadList={false}
                     style={{ padding: '16px 12px', background: '#F8FAFC', borderRadius: 10, borderColor: '#CBD5E1' }}
                   >
                     <PictureOutlined style={{ fontSize: 28, color: '#F97316', marginBottom: 4 }} />
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>Click or drag thumbnail image</div>
-                    <div style={{ fontSize: 11.5, color: '#64748B' }}>PNG, JPG, or WebP</div>
-                    {uploadedThumbnailFileName && (
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>
+                      {uploadingThumbnail ? 'Optimizing & uploading poster...' : 'Click or drag thumbnail image'}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: '#64748B' }}>PNG, JPG, WebP, AVIF · Auto WebP</div>
+                    {!uploadingThumbnail && uploadedThumbnailFileName && (
                       <Tag color="orange" style={{ marginTop: 6 }}>
                         ✓ {uploadedThumbnailFileName}
                       </Tag>
@@ -603,16 +805,19 @@ export default function VideosView({
                     boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                   }}
                 >
-                  <Text strong style={{ fontSize: 15, display: 'block', marginBottom: 12, color: '#0F172A' }}>
+                  <Text strong style={{ fontSize: 15, display: 'block', marginBottom: 6, color: '#0F172A' }}>
                     Publishing Status
                   </Text>
-                  <Form.Item name="status" initialValue="Live" style={{ margin: 0 }}>
+                  <Paragraph type="secondary" style={{ fontSize: 12, marginBottom: 12 }}>
+                    Keep as Not Published to preview in dashboard first, or publish live immediately.
+                  </Paragraph>
+                  <Form.Item name="status" initialValue="Draft" style={{ margin: 0 }}>
                     <Radio.Group buttonStyle="solid" style={{ width: '100%' }}>
-                      <Radio.Button value="Live" style={{ width: '50%', textAlign: 'center' }}>
-                        Live on Site
-                      </Radio.Button>
                       <Radio.Button value="Draft" style={{ width: '50%', textAlign: 'center' }}>
-                        Draft Slot
+                        Not Published
+                      </Radio.Button>
+                      <Radio.Button value="Live" style={{ width: '50%', textAlign: 'center' }}>
+                        Published
                       </Radio.Button>
                     </Radio.Group>
                   </Form.Item>
@@ -630,6 +835,21 @@ export default function VideosView({
   // ═════════════════════════════════════════════════════════════════
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          action={
+            onRefresh && (
+              <Button size="small" onClick={onRefresh}>
+                Retry
+              </Button>
+            )
+          }
+        />
+      )}
+
       {/* ─── Header ─── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
         <div>
@@ -640,26 +860,38 @@ export default function VideosView({
             Manage video films, upload media, edit story narratives, and review engagement telemetry.
           </Paragraph>
         </div>
-        <Button
-          type="primary"
-          icon={<CloudUploadOutlined />}
-          onClick={handleOpenCreatePage}
-          style={{
-            backgroundColor: '#F97316',
-            borderColor: '#F97316',
-            borderRadius: 8,
-            height: 40,
-            fontWeight: 600,
-            padding: '0 20px',
-            color: '#FFFFFF',
-            boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          Upload New Video
-        </Button>
+        <Space>
+          {onRefresh && (
+            <Button
+              icon={<ReloadOutlined />}
+              loading={loading}
+              onClick={onRefresh}
+              style={{ borderRadius: 8, height: 40, borderColor: '#CBD5E1' }}
+            >
+              Refresh
+            </Button>
+          )}
+          <Button
+            type="primary"
+            icon={<CloudUploadOutlined />}
+            onClick={handleOpenCreatePage}
+            style={{
+              backgroundColor: '#F97316',
+              borderColor: '#F97316',
+              borderRadius: 8,
+              height: 40,
+              fontWeight: 600,
+              padding: '0 20px',
+              color: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(249, 115, 22, 0.28)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            Upload New Video
+          </Button>
+        </Space>
       </div>
 
       {/* ─── Filter Pills & Search ─── */}
@@ -671,10 +903,10 @@ export default function VideosView({
         >
           <Radio.Button value="All">All ({videos.length})</Radio.Button>
           <Radio.Button value="Live">
-            Live ({videos.filter((v) => v.status === 'Live').length})
+            Published ({videos.filter((v) => v.status === 'Live').length})
           </Radio.Button>
           <Radio.Button value="Draft">
-            Draft ({videos.filter((v) => v.status === 'Draft').length})
+            Not Published ({videos.filter((v) => v.status === 'Draft').length})
           </Radio.Button>
           <Radio.Button value="Empty">
             Needs Film ({videos.filter((v) => v.status === 'Empty').length})
@@ -695,10 +927,29 @@ export default function VideosView({
       </div>
 
       {/* ─── Video Slot Cards Grid ─── */}
+      {loading && videos.length === 0 ? (
+        <div className="admin-saas-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
+          <Spin size="large" />
+        </div>
+      ) : paginatedVideos.length === 0 ? (
+        <div className="admin-saas-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
+          <Empty
+            description={
+              videos.length === 0
+                ? 'No video slots saved in the database yet.'
+                : 'No video slots match your current filter.'
+            }
+          >
+            <Button type="primary" onClick={handleOpenCreatePage} style={{ backgroundColor: '#F97316' }}>
+              Upload First Video
+            </Button>
+          </Empty>
+        </div>
+      ) : (
       <Row gutter={[16, 16]}>
         {paginatedVideos.map((slot) => {
           const poster = slot.thumbnail || DEFAULT_POSTERS[slot.id] || DEFAULT_POSTERS.default;
-          const targetRoute = getCleanRoute(slot.page_location);
+          const targetRoute = getCleanRoute(slot.page_location, slot.section_anchor);
 
           return (
             <Col xs={24} md={12} xl={8} key={slot.id}>
@@ -733,7 +984,11 @@ export default function VideosView({
                       }
                       style={{ borderRadius: 6, fontWeight: 600 }}
                     >
-                      {slot.status}
+                      {slot.status === 'Live'
+                        ? 'Published'
+                        : slot.status === 'Draft'
+                          ? 'Not Published'
+                          : slot.status}
                     </Tag>
                   </div>
                 }
@@ -881,8 +1136,9 @@ export default function VideosView({
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                     }}
-                    dangerouslySetInnerHTML={{ __html: slot.description }}
-                  />
+                  >
+                    <SafeHtmlContent html={slot.description} />
+                  </div>
 
                   {/* Target route with View on Site link */}
                   <div
@@ -977,35 +1233,39 @@ export default function VideosView({
                         }
                         onClick={() => handleTogglePublish(slot)}
                       >
-                        {slot.status === 'Live' ? 'Unpublish' : 'Go Live'}
+                        {slot.status === 'Live' ? 'Unpublish' : 'Publish'}
                       </Button>
                     )}
 
-                    <Popconfirm
-                      title="Delete video slot?"
-                      description="This removes the slot from the admin manager."
-                      onConfirm={() => onDeleteSlot(slot.id)}
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <Button
-                        size="small"
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        style={{
-                          borderRadius: 8,
-                          backgroundColor: '#FEF2F2',
-                          borderColor: '#FEE2E2',
-                          color: '#EF4444',
-                          height: 32,
-                          width: 32,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      />
-                    </Popconfirm>
+                    <Button
+                      size="small"
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      aria-label={`Delete ${slot.slot_label}`}
+                      onClick={() =>
+                        void confirmDelete({
+                          title: 'Delete video slot?',
+                          itemName: slot.slot_label,
+                          text: 'This removes the video slot from the admin manager.',
+                          onConfirm: () => {
+                            onDeleteSlot(slot.id);
+                            message.success(`Deleted ${slot.slot_label}`);
+                          },
+                        })
+                      }
+                      style={{
+                        borderRadius: 8,
+                        backgroundColor: '#FEF2F2',
+                        borderColor: '#FEE2E2',
+                        color: '#EF4444',
+                        height: 32,
+                        width: 32,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    />
                   </Space>
                 </div>
               </Card>
@@ -1013,6 +1273,7 @@ export default function VideosView({
           );
         })}
       </Row>
+      )}
 
       {/* ─── Pagination Footer ─── */}
       <div
@@ -1068,24 +1329,54 @@ export default function VideosView({
         footer={
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <a
-              href={selectedVideo ? getCleanRoute(selectedVideo.page_location) : '/'}
+              href={
+                selectedVideo
+                  ? getCleanRoute(selectedVideo.page_location, selectedVideo.section_anchor)
+                  : '/'
+              }
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: '#F97316', fontWeight: 600, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 4 }}
             >
               Open public page <ExportOutlined style={{ fontSize: 11 }} />
             </a>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => {
-                setIsPreviewModalOpen(false);
-                if (selectedVideo) handleOpenEditPage(selectedVideo);
-              }}
-              style={{ backgroundColor: '#F97316', borderColor: '#F97316', borderRadius: 8, fontWeight: 600 }}
-            >
-              Edit This Film Page
-            </Button>
+            <Space>
+              {selectedVideo && selectedVideo.status !== 'Empty' && (
+                <Button
+                  onClick={() => handleTogglePublish(selectedVideo)}
+                  style={
+                    selectedVideo.status === 'Live'
+                      ? {
+                          borderRadius: 8,
+                          backgroundColor: '#FEF3C7',
+                          borderColor: '#FDE68A',
+                          color: '#D97706',
+                          fontWeight: 600,
+                        }
+                      : {
+                          borderRadius: 8,
+                          backgroundColor: '#ECFDF5',
+                          borderColor: '#A7F3D0',
+                          color: '#059669',
+                          fontWeight: 600,
+                        }
+                  }
+                >
+                  {selectedVideo.status === 'Live' ? 'Unpublish' : 'Publish'}
+                </Button>
+              )}
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => {
+                  setIsPreviewModalOpen(false);
+                  if (selectedVideo) handleOpenEditPage(selectedVideo);
+                }}
+                style={{ backgroundColor: '#F97316', borderColor: '#F97316', borderRadius: 8, fontWeight: 600 }}
+              >
+                Edit This Film Page
+              </Button>
+            </Space>
           </div>
         }
         width={780}
@@ -1124,6 +1415,7 @@ export default function VideosView({
                     controls
                     autoPlay
                     playsInline
+                    poster={selectedVideo.thumbnail || undefined}
                     style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     src={resolveVideoUrl(selectedVideo.video_url)}
                   />
@@ -1138,17 +1430,16 @@ export default function VideosView({
                 <Tag color="blue" style={{ borderRadius: 6 }}>
                   Target: {selectedVideo.page_location}
                 </Tag>
-                <Tag color={selectedVideo.status === 'Live' ? 'success' : 'default'} style={{ borderRadius: 6 }}>
-                  Status: {selectedVideo.status}
+                <Tag color={selectedVideo.status === 'Live' ? 'success' : 'warning'} style={{ borderRadius: 6 }}>
+                  Status: {selectedVideo.status === 'Live' ? 'Published' : selectedVideo.status === 'Draft' ? 'Not Published' : selectedVideo.status}
                 </Tag>
                 <span style={{ fontSize: 12, color: '#64748B', marginLeft: 'auto' }}>
                   Duration: <strong>{selectedVideo.duration}</strong> · Updated: {selectedVideo.updated_at}
                 </span>
               </div>
-              <div
-                style={{ marginTop: 12, fontSize: 13.5, color: '#334155', lineHeight: 1.6 }}
-                dangerouslySetInnerHTML={{ __html: selectedVideo.description }}
-              />
+              <div style={{ marginTop: 12, fontSize: 13.5, color: '#334155', lineHeight: 1.6 }}>
+                <SafeHtmlContent html={selectedVideo.description} />
+              </div>
             </div>
           </div>
         )}

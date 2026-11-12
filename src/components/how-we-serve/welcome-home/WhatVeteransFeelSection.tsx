@@ -13,6 +13,7 @@ import {
   ArrowDown
 } from 'lucide-react';
 import veteranVideo from '@/assets/how-we-serve/welcome-home/gemini_generated_video_382e9620.mp4.mp4';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface WhatVeteransFeelSectionProps {
   id?: string;
@@ -66,6 +67,12 @@ export default function WhatVeteransFeelSection({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve/welcome-home', '/welcome-home'],
+    slotMatchers: ['veteran', 'feel', 'covenant', 'second'],
+    slotIndex: 1,
+    fallbackUrl: veteranVideo,
+  });
 
   useEffect(() => {
     if (videoRef.current) {
@@ -102,7 +109,8 @@ export default function WhatVeteransFeelSection({
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <video
           ref={videoRef}
-          src={veteranVideo}
+          src={liveVideo.videoUrl}
+          poster={liveVideo.posterUrl}
           playsInline
           autoPlay
           loop

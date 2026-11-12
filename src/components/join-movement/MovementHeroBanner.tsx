@@ -4,6 +4,7 @@ import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import heroVideo from '@/assets/join-movement/join-movement.mp4';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { serveBesideUs } from '@/data/officialVerbiage';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface MovementHeroBannerProps {
   id?: string;
@@ -20,6 +21,12 @@ export default function MovementHeroBanner({
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/join-the-movement', '/movement'],
+    slotMatchers: ['movement 1', 'hero', 'banner'],
+    slotIndex: 0,
+    fallbackUrl: heroVideo,
+  });
 
   const handleReplay = () => {
     const video = videoRef.current;
@@ -123,7 +130,8 @@ export default function MovementHeroBanner({
           {/* Video (Fades smoothly on completion to reveal verbiage) */}
           <video
             ref={videoRef}
-            src={heroVideo}
+            src={liveVideo.videoUrl}
+            poster={liveVideo.posterUrl}
             autoPlay
             muted={isMuted}
             playsInline

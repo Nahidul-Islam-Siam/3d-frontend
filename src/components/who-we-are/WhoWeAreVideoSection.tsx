@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface WhoWeAreVideoSectionProps {
   id?: string;
@@ -16,6 +17,11 @@ export default function WhoWeAreVideoSection({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/who-we-are'],
+    slotMatchers: ['who', 'lab'],
+    fallbackUrl: '/who/who-we-are-video.mp4',
+  });
 
   // ─── Play / Pause Toggle ───
   const togglePlay = (e?: React.MouseEvent) => {
@@ -67,7 +73,8 @@ export default function WhoWeAreVideoSection({
           {/* Continuous HTML5 Video */}
           <video
             ref={videoRef}
-            src="/who/who-we-are-video.mp4"
+            src={liveVideo.videoUrl}
+            poster={liveVideo.posterUrl}
             autoPlay
             loop
             muted={isMuted}

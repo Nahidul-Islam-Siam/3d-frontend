@@ -15,6 +15,7 @@ import {
   Phone
 } from 'lucide-react';
 import Seo from '@/components/Seo';
+import PublicUpcomingEventsStrip from '@/components/events/PublicUpcomingEventsStrip';
 import auditionBanner from '@/assets/welcome/audition_banner.png';
 import movementService from '@/lib/api/services/movement.service';
 
@@ -249,6 +250,9 @@ export default function SuicideAwarenessShowdownPage() {
               Call or Text 988
             </a>
           </div>
+
+          {/* ─── 2.5 LIVE COMMUNITY EVENTS & RSVP ─── */}
+          <PublicUpcomingEventsStrip />
 
           {/* ─── 3. TABBED PARTICIPATION FORMS (Volunteer, Audition, Sponsor, Donate) ─── */}
           <div id="forms-section" className="rounded-3xl bg-[#1B0B2B]/90 border border-purple-500/30 p-6 sm:p-10 lg:p-12 shadow-2xl backdrop-blur-xl space-y-8">

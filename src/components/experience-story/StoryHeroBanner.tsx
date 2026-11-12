@@ -1,8 +1,9 @@
-﻿import { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { ArrowDown } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import storyVideo from '@/assets/experience-story/experience-story.mp4';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 import MovementStorySection from './MovementStorySection';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -23,6 +24,11 @@ export default function StoryHeroBanner({
   const video1WrapperRef = useRef<HTMLDivElement | null>(null);
   const section2WrapperRef = useRef<HTMLDivElement | null>(null);
   const promptBtnRef = useRef<HTMLButtonElement | null>(null);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/experience-the-story', '/experience-story', '/about'],
+    slotMatchers: ['story', 'hero'],
+    fallbackUrl: storyVideo,
+  });
 
   // â”€â”€â”€ GSAP ScrollTrigger Pinned Cinema Stage Animation â”€â”€â”€
   useEffect(() => {
@@ -138,7 +144,8 @@ export default function StoryHeroBanner({
             className="absolute inset-0 w-full h-full flex items-center justify-center will-change-transform z-0"
           >
             <video
-              src={storyVideo}
+              src={liveVideo.videoUrl}
+              poster={liveVideo.posterUrl}
               autoPlay
               loop
               muted

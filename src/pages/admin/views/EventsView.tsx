@@ -1,23 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
+  Alert,
   Table,
   Button,
   Progress,
   Space,
   Drawer,
+  Empty,
   Form,
   Input,
   InputNumber,
   DatePicker,
   TimePicker,
   Segmented,
+  Spin,
   message,
   Dropdown,
   Select,
   Radio,
   Switch,
   Upload,
-  Popconfirm,
   Tag,
   Row,
   Col,
@@ -39,9 +41,12 @@ import {
   CheckOutlined,
   LinkOutlined,
   InboxOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import type { EventItem } from '../mockData';
+import movementService, { type EventRsvpItem } from '@/lib/api/services/movement.service';
+import { formatBytes, optimizeImageForUpload } from '@/utils/mediaOptimizer';
+import type { EventItem } from '../types';
 import RichTextEditor from '@/components/common/RichTextEditor';
 
 const { Option } = Select;
@@ -49,13 +54,21 @@ const { Dragger } = Upload;
 
 interface EventsViewProps {
   events: EventItem[];
+  loading?: boolean;
+  error?: string | null;
+  onRefresh?: () => void;
   onAddEvent: (newEvent: EventItem) => void;
   onUpdateEvent: (updated: EventItem) => void;
   onDeleteEvent?: (id: string) => void;
 }
 
+import { confirmDelete } from '@/utils/confirmDelete';
+
 export default function EventsView({
   events,
+  loading = false,
+  error = null,
+  onRefresh,
   onAddEvent,
   onUpdateEvent,
   onDeleteEvent,
@@ -64,6 +77,9 @@ export default function EventsView({
   const [viewMode, setViewMode] = useState<'list' | 'cards' | 'create' | 'edit'>('list');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
+  const [eventRsvps, setEventRsvps] = useState<EventRsvpItem[]>([]);
+  const [rsvpsLoading, setRsvpsLoading] = useState(false);
+  const [rsvpsError, setRsvpsError] = useState<string | null>(null);
 
   // Filters & Search
   const [searchText, setSearchText] = useState('');
@@ -74,18 +90,57 @@ export default function EventsView({
   const [form] = Form.useForm();
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [bannerUploadProgress, setBannerUploadProgress] = useState(0);
   const [eventDescription, setEventDescription] = useState<string>('');
   const [selectedTicketType, setSelectedTicketType] = useState<'Free RSVP' | 'Paid Ticket' | 'Suggested Donation'>('Free RSVP');
 
-  // Mock RSVP guests for the selected event drawer
-  const mockRsvps = [
-    { name: 'Dr. Raymond Chen', email: 'raymond.chen@metrohealth.edu', tickets: 2, date: '2026-11-01' },
-    { name: 'Marcus Sterling', email: 'm.sterling@sterlingholdings.com', tickets: 4, date: '2026-10-31' },
-    { name: 'Eleanor Wright', email: 'eleanor.wright@heritage.org', tickets: 2, date: '2026-10-30' },
-    { name: 'Sarah Jenkins', email: 'sjenkins@communitycare.net', tickets: 1, date: '2026-10-29' },
-    { name: 'Carlos Mendez', email: 'mendez.family@outlook.com', tickets: 3, date: '2026-10-28' },
-    { name: 'Pastor Thomas Cole', email: 'tcole@gracelutheran.org', tickets: 6, date: '2026-10-27' },
-  ];
+  const loadEventRsvps = useCallback(async (eventId: string) => {
+    setRsvpsLoading(true);
+    setRsvpsError(null);
+    try {
+      const list = await movementService.getEventRsvps(eventId);
+      setEventRsvps(list);
+    } catch {
+      setEventRsvps([]);
+      setRsvpsError('Could not load confirmed RSVP list from server.');
+    } finally {
+      setRsvpsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEvent?.id) {
+      setEventRsvps([]);
+      setRsvpsError(null);
+      return;
+    }
+    void loadEventRsvps(selectedEvent.id);
+  }, [selectedEvent?.id, loadEventRsvps]);
+
+  const handleExportRsvps = () => {
+    if (!selectedEvent || eventRsvps.length === 0) return;
+    const escapeCell = (val: string | number | undefined) =>
+      `"${String(val ?? '').replace(/"/g, '""')}"`;
+    const headers = ['Guest Name', 'Email', 'Phone', 'Seats', 'RSVP Date', 'Notes'];
+    const rows = eventRsvps.map((r) => [
+      escapeCell(r.guest_name),
+      escapeCell(r.guest_email),
+      escapeCell(r.guest_phone || ''),
+      escapeCell(r.tickets),
+      escapeCell(r.rsvp_date ? dayjs(r.rsvp_date).format('YYYY-MM-DD HH:mm') : ''),
+      escapeCell(r.notes || ''),
+    ]);
+    const csv = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${selectedEvent.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-rsvps.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    message.success('Guest list CSV downloaded.');
+  };
 
   // ─── Filter Events ───
   const filteredEvents = events.filter((evt) => {
@@ -158,24 +213,46 @@ export default function EventsView({
   };
 
   // ─── Image Upload Helpers ───
-  const handleImageFile = (file: File) => {
+  const handleImageFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      message.error('Please upload an image file (PNG, JPG, WEBP).');
+      message.error('Please upload an image file (PNG, JPG, WEBP, AVIF).');
       return false;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      message.error('Image file must be under 5MB.');
+    if (file.size > 15 * 1024 * 1024) {
+      message.error('Source image file must be under 15MB.');
       return false;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (typeof e.target?.result === 'string') {
-        setAttachedImage(e.target.result);
-        message.success('Cover image attached successfully!');
+
+    setUploadingBanner(true);
+    setBannerUploadProgress(0);
+    try {
+      const optimized = await optimizeImageForUpload(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.85,
+      });
+      const uploaded = await movementService.uploadMedia(
+        [optimized.file],
+        (pct) => setBannerUploadProgress(pct),
+      );
+      const url = uploaded[0]?.url;
+      if (!url) {
+        throw new Error('Upload completed without a media URL.');
       }
-    };
-    reader.readAsDataURL(file);
-    return false; // prevent automatic POST
+      setAttachedImage(url);
+      if (optimized.wasCompressed) {
+        message.success(
+          `Optimized (${formatBytes(optimized.originalBytes)} -> ${formatBytes(optimized.optimizedBytes)}) & uploaded to CDN!`,
+        );
+      } else {
+        message.success('Cover image uploaded & CDN-optimized!');
+      }
+    } catch {
+      message.error('Failed to upload cover image. Please try again.');
+    } finally {
+      setUploadingBanner(false);
+    }
+    return false; // prevent automatic antd POST
   };
 
   const handleApplyImageUrl = () => {
@@ -242,13 +319,20 @@ export default function EventsView({
   };
 
   const handleDelete = (event: EventItem) => {
-    if (onDeleteEvent) {
-      onDeleteEvent(event.id);
-      message.success(`Deleted ${event.title}`);
-    } else {
-      onUpdateEvent({ ...event, status: 'Cancelled' });
-      message.info(`Event archived`);
-    }
+    void confirmDelete({
+      title: 'Delete this event?',
+      itemName: event.title,
+      text: 'This removes the event from schedules and RSVP registrations.',
+      onConfirm: () => {
+        if (onDeleteEvent) {
+          onDeleteEvent(event.id);
+          message.success(`Deleted ${event.title}`);
+        } else {
+          onUpdateEvent({ ...event, status: 'Cancelled' });
+          message.info('Event archived');
+        }
+      },
+    });
   };
 
   // ─── Table Columns ───
@@ -544,19 +628,10 @@ export default function EventsView({
               },
               {
                 key: 'delete',
+                danger: true,
                 icon: <DeleteOutlined />,
-                label: (
-                  <Popconfirm
-                    title="Delete this event?"
-                    description="This removes the event from schedules and RSVP registrations."
-                    onConfirm={() => handleDelete(record)}
-                    okText="Yes, delete"
-                    cancelText="No"
-                    okButtonProps={{ danger: true }}
-                  >
-                    <span style={{ color: '#EF4444' }}>Delete Event</span>
-                  </Popconfirm>
-                ),
+                label: 'Delete Event',
+                onClick: () => handleDelete(record),
               },
             ],
           }}
@@ -658,6 +733,7 @@ export default function EventsView({
             <Button
               type="primary"
               icon={<CheckOutlined />}
+              disabled={uploadingBanner}
               onClick={() => form.submit()}
               style={{
                 borderRadius: 8,
@@ -891,7 +967,9 @@ export default function EventsView({
                   ) : (
                     <Dragger
                       name="file"
+                      accept="image/png,image/jpeg,image/webp,image/avif"
                       multiple={false}
+                      disabled={uploadingBanner}
                       beforeUpload={handleImageFile}
                       showUploadList={false}
                       style={{
@@ -905,11 +983,16 @@ export default function EventsView({
                         <InboxOutlined style={{ color: '#F97316', fontSize: 32 }} />
                       </p>
                       <p style={{ fontWeight: 600, color: '#0F172A', fontSize: 13, margin: '0 0 2px' }}>
-                        Click to upload or drag & drop poster
+                        {uploadingBanner ? 'Optimizing & uploading poster...' : 'Click to upload or drag & drop poster'}
                       </p>
-                      <p style={{ color: '#94A3B8', fontSize: 11, margin: 0 }}>
-                        PNG, JPG, WEBP up to 5MB
+                      <p style={{ color: '#64748B', fontSize: 11, margin: 0 }}>
+                        PNG, JPG, WEBP, AVIF · Auto-compressed WebP & CDN
                       </p>
+                      {uploadingBanner && (
+                        <div style={{ marginTop: 10, paddingInline: 12 }}>
+                          <Progress percent={bannerUploadProgress} size="small" strokeColor="#F97316" />
+                        </div>
+                      )}
                     </Dragger>
                   )}
 
@@ -1057,6 +1140,21 @@ export default function EventsView({
   // ═══════════════════════════════════════════════════════════════════════
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          action={
+            onRefresh && (
+              <Button size="small" onClick={onRefresh}>
+                Retry
+              </Button>
+            )
+          }
+        />
+      )}
+
       {/* ─── Header & Primary Controls ─── */}
       <div
         className="admin-saas-card"
@@ -1109,6 +1207,16 @@ export default function EventsView({
 
           {/* Right: Actions */}
           <Space wrap size="middle">
+            {onRefresh && (
+              <Button
+                icon={<ReloadOutlined />}
+                loading={loading}
+                onClick={onRefresh}
+                style={{ borderRadius: 8, height: 38, borderColor: '#CBD5E1' }}
+              >
+                Refresh
+              </Button>
+            )}
             <Segmented
               value={viewMode}
               onChange={(val) => setViewMode(val as 'list' | 'cards')}
@@ -1194,9 +1302,16 @@ export default function EventsView({
         {viewMode === 'list' ? (
           <Table
             className="admin-saas-table"
+            loading={loading}
             dataSource={filteredEvents}
             columns={columns}
             rowKey="id"
+            locale={{
+              emptyText:
+                events.length === 0
+                  ? 'No community events scheduled yet.'
+                  : 'No events match your search or filters.',
+            }}
             pagination={{
               pageSize: 10,
               showSizeChanger: true,
@@ -1210,10 +1325,28 @@ export default function EventsView({
             }}
             scroll={{ x: 1200 }}
           />
+        ) : loading && events.length === 0 ? (
+          <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <Spin size="large" />
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <Empty
+              description={
+                events.length === 0
+                  ? 'No community events scheduled yet.'
+                  : 'No events match your current filters.'
+              }
+            >
+              <Button type="primary" onClick={handleStartCreate} style={{ backgroundColor: '#F97316' }}>
+                Schedule New Event
+              </Button>
+            </Empty>
+          </div>
         ) : (
           <div style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
             {filteredEvents.map((evt) => {
-              const pct = Math.min(100, Math.round((evt.rsvps_count / evt.capacity) * 100));
+              const pct = evt.capacity > 0 ? Math.min(100, Math.round((evt.rsvps_count / evt.capacity) * 100)) : 0;
               return (
                 <div
                   key={evt.id}
@@ -1403,32 +1536,51 @@ export default function EventsView({
               </div>
               <Button
                 icon={<DownloadOutlined />}
+                disabled={eventRsvps.length === 0}
                 style={{ borderRadius: 8, backgroundColor: '#FFFFFF', borderColor: '#FED7AA', color: '#C2410C' }}
-                onClick={() => message.success('Exporting full attendee CSV list...')}
+                onClick={handleExportRsvps}
               >
                 Export Guest List
               </Button>
             </div>
 
+            {rsvpsError && (
+              <Alert
+                type="error"
+                showIcon
+                message={rsvpsError}
+                action={
+                  <Button size="small" onClick={() => void loadEventRsvps(selectedEvent.id)}>
+                    Retry
+                  </Button>
+                }
+              />
+            )}
+
             <div style={{ fontWeight: 600, fontSize: 14, color: '#0F172A' }}>
-              Confirmed RSVPs ({mockRsvps.length} party leads)
+              Confirmed RSVPs ({eventRsvps.length} party lead{eventRsvps.length === 1 ? '' : 's'})
             </div>
 
             <Table
               className="admin-saas-table"
-              dataSource={mockRsvps}
-              rowKey="email"
+              loading={rsvpsLoading}
+              dataSource={eventRsvps}
+              rowKey="id"
               pagination={false}
               size="small"
+              locale={{ emptyText: 'No confirmed RSVPs for this event yet.' }}
               columns={[
                 {
                   title: 'Guest Name',
-                  dataIndex: 'name',
-                  key: 'name',
-                  render: (name: string, record) => (
+                  dataIndex: 'guest_name',
+                  key: 'guest_name',
+                  render: (name: string, record: EventRsvpItem) => (
                     <div>
                       <div style={{ fontWeight: 600, color: '#0F172A' }}>{name}</div>
-                      <div style={{ fontSize: 11.5, color: '#94A3B8' }}>{record.email}</div>
+                      <div style={{ fontSize: 11.5, color: '#64748B' }}>{record.guest_email}</div>
+                      {record.guest_phone && (
+                        <div style={{ fontSize: 11, color: '#94A3B8' }}>{record.guest_phone}</div>
+                      )}
                     </div>
                   ),
                 },
@@ -1444,7 +1596,7 @@ export default function EventsView({
                         fontSize: 11.5,
                         fontWeight: 600,
                         backgroundColor: '#FFF7ED',
-                        color: '#EA580C',
+                        color: '#C2410C',
                         border: '1px solid #FFEDD5',
                       }}
                     >
@@ -1454,9 +1606,13 @@ export default function EventsView({
                 },
                 {
                   title: 'RSVP Date',
-                  dataIndex: 'date',
-                  key: 'date',
-                  render: (d: string) => <span style={{ color: '#64748B', fontSize: 12 }}>{d}</span>,
+                  dataIndex: 'rsvp_date',
+                  key: 'rsvp_date',
+                  render: (d: string) => (
+                    <span style={{ color: '#475569', fontSize: 12 }}>
+                      {d ? dayjs(d).format('MMM D, YYYY') : '—'}
+                    </span>
+                  ),
                 },
               ]}
             />

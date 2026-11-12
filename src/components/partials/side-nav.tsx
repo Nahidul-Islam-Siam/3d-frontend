@@ -25,10 +25,10 @@ const navSections = [
     title: "The Main Journey",
     items: [
       { to: "/", label: "Welcome", icon: Sparkles },
-      { to: "/about", label: "Experience the Story", icon: Compass },
-      { to: "/about#who-we-are", label: "Who We Are", icon: BookHeart },
+      { to: "/experience-the-story", label: "Experience the Story", icon: Compass },
+      { to: "/who-we-are", label: "Who We Are", icon: BookHeart },
       { to: "/movement", label: "Join the Movement", icon: Users },
-      { to: "/about#team", label: "Meet Us", icon: Users },
+      { to: "/meet-us", label: "Meet Us", icon: Users },
     ]
   },
   {

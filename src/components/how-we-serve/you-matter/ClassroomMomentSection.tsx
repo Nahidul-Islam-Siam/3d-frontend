@@ -1,7 +1,16 @@
 import classroomVideo from '@/assets/how-we-serve/you-matter/Cinematic_documentary_style_sc.mp4.mp4';
 import classroomImg from '@/assets/how-we-serve/you-matter/image copy 8.png';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export default function ClassroomMomentSection() {
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve/you-matter', '/you-matter'],
+    slotMatchers: ['classroom', 'moment', 'documentary', 'second'],
+    slotIndex: 1,
+    fallbackUrl: classroomVideo,
+    fallbackPoster: classroomImg,
+  });
+
   return (
     <section 
       id="classroom-moment"
@@ -10,8 +19,8 @@ export default function ClassroomMomentSection() {
       {/* ─── Full-Bleed Edge-to-Edge Cinematic Video ─── */}
       <div className="relative w-full h-full overflow-hidden bg-black">
         <video
-          src={classroomVideo}
-          poster={classroomImg}
+          src={liveVideo.videoUrl}
+          poster={liveVideo.posterUrl}
           autoPlay
           loop
           muted

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import storyVideo2 from '@/assets/join-movement/join-the-movement-2.mp4';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface MovementSecondVideoProps {
   id?: string;
@@ -20,6 +21,12 @@ export default function MovementSecondVideo({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/join-the-movement', '/movement'],
+    slotMatchers: ['movement 2', 'second', 'showcase 2'],
+    slotIndex: 1,
+    fallbackUrl: storyVideo2,
+  });
 
   // ─── Play / Pause Toggle ───
   const togglePlay = (e?: React.MouseEvent) => {
@@ -84,7 +91,8 @@ export default function MovementSecondVideo({
     >
       <video
         ref={videoRef}
-        src={storyVideo2}
+        src={liveVideo.videoUrl}
+        poster={liveVideo.posterUrl}
         autoPlay
         loop
         muted={isMuted}

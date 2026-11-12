@@ -62,7 +62,7 @@ export default function YouWereExpectedSection() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="flex flex-wrap items-center justify-center gap-3.5 pt-3"
         >
-          <FigmaButton to="/about" variant="primary">
+          <FigmaButton to="/experience-the-story" variant="primary">
             Explore Our Story
           </FigmaButton>
 

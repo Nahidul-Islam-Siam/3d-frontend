@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { howWeServeManifesto } from '@/data/officialVerbiage';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface HowWeServeHeroProps {
   id?: string;
@@ -19,6 +20,11 @@ export default function HowWeServeHero({
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+  const liveVideo = usePublicVideoSlot({
+    pagePaths: ['/how-we-serve'],
+    slotMatchers: ['serve', 'hero'],
+    fallbackUrl: '/who/how-we-serve-hero.mp4',
+  });
 
   const handleReplay = () => {
     const video = videoRef.current;
@@ -80,7 +86,8 @@ export default function HowWeServeHero({
           {/* Video (Fades out smoothly on completion to reveal verbiage) */}
           <video
             ref={videoRef}
-            src="/who/how-we-serve-hero.mp4"
+            src={liveVideo.videoUrl}
+            poster={liveVideo.posterUrl}
             autoPlay
             muted={isMuted}
             playsInline
