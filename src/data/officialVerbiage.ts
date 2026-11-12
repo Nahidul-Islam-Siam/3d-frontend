@@ -154,3 +154,84 @@ export const oneMissionManyExpressions = {
   ],
 };
 
+export interface OfficialLeaderProfile {
+  id: string;
+  indexLabel: string;
+  monogram: string;
+  name: string;
+  role: string;
+  organization: string;
+  headline: string;
+  bioParagraphs: string[];
+  quoteLines: string[];
+  quoteAttribution: string;
+}
+
+export const meetUsLeadership = {
+  eyebrow: "MEET US",
+  heading: "The people behind Live Achieve Believe, Inc.",
+  subheadline: "Different experiences. Different strengths. One shared belief: People Matter.",
+  leaders: [
+    {
+      id: "celeste-hudson",
+      indexLabel: "01",
+      monogram: "CH",
+      name: "Celeste Hudson",
+      role: "Founder",
+      organization: "Live Achieve Believe, Inc.",
+      headline: "A Heart for People. A Life of Purpose.",
+      bioParagraphs: [
+        "Celeste Hudson has traveled many roads, from foreign missionary service to Wall Street, where she worked as a broker, to establishing her own commodities brokerage firm and building three business ventures, including Live Achieve Believe, Inc.",
+        "Yet her greatest accomplishment cannot be measured by professional success. It is found in her unwavering belief in the value of people.",
+        "Celeste’s life has been shaped by faith, resilience, courage, and an enduring willingness to grow. She understands that strength is not born from perfection, but often from the imperfections, challenges, and unexpected turns that teach us humility, deepen our compassion, and strengthen our foundation.",
+        "Through LAB, Celeste brings together her entrepreneurial spirit and her heart for humanity, encouraging people to look beyond circumstances, embrace possibilities, and turn compassion into meaningful action. She continues to approach life as a journey of discovery, believing that growth is not simply about how far we travel, but how deeply we come to understand what truly matters.",
+      ],
+      quoteLines: [
+        "We shall not cease from exploration",
+        "And the end of all our exploring",
+        "Will be to arrive where we started",
+        "And know the place for the first time.",
+      ],
+      quoteAttribution: "— T. S. Eliot, Little Gidding",
+    },
+    {
+      id: "aniah-danielle",
+      indexLabel: "02",
+      monogram: "AD",
+      name: "Aniah Danielle",
+      role: "Chief Operating Officer",
+      organization: "Live Achieve Believe, Inc.",
+      headline: "A Heart for Healing. A Passion for Empowerment.",
+      bioParagraphs: [
+        "Aniah Danielle believes that true success begins with a healthy mind, a strong foundation, and the confidence to embrace life’s possibilities.",
+        "Her passion for mental-health advocacy grew from a deeply personal experience: the loss of a close friend to suicide during her senior year of high school. That experience strengthened her commitment to helping others navigate challenges with compassion, resilience, and hope.",
+        "Currently pursuing a degree in Clinical Psychology, Aniah brings both curiosity and purpose to her work. As an educator of young children and a facilitator with the LEADS youth-development program, she is dedicated to creating environments where children feel safe, valued, encouraged, and empowered to grow.",
+        "Her experiences advocating for children and families navigating complex legal and mental-health systems have deepened her understanding of patience, empathy, and meaningful support. As a wife, educator, student, and nonprofit leader, she strives to encourage others to discover their strengths and pursue their goals with emotional wellness, resilience, and confidence.",
+      ],
+      quoteLines: [
+        "My mission in life is not merely to survive but to thrive; and to do so with some passion, compassion, some humor and some style.",
+      ],
+      quoteAttribution: "— Maya Angelou",
+    },
+    {
+      id: "uzziah-townsley",
+      indexLabel: "03",
+      monogram: "UT",
+      name: "Uzziah Townsley",
+      role: "Director of Operations",
+      organization: "Live Achieve Believe, Inc.",
+      headline: "Building Possibilities. Creating Pathways.",
+      bioParagraphs: [
+        "Uzziah Townsley believes that building a better future requires more than vision. It takes determination, practical experience, and a genuine desire to make a difference in the lives of others.",
+        "With aspirations of pursuing a degree in Mechanical Engineering at the University of South Florida, Uzziah is actively preparing for the next chapter of his educational journey. Through apprenticeships with construction companies, he has gained hands-on exposure to different aspects of engineering, strengthening his technical interests and appreciation for how things work.",
+        "As Director of Operations for Live Achieve Believe, Inc., Uzziah has supported fundraising initiatives, prepared and served meals to people experiencing homelessness, and contributed to the organization’s creative work. During LAB’s first Suicide Awareness Showdown, he ran stage operations while working directly with the stage manager.",
+        "He approaches challenges with curiosity, determination, and a willingness to learn by doing. For Uzziah, engineering and humanitarian service are complementary expressions of the same purpose: creating solutions that improve lives and making sure those solutions serve the people who need them.",
+      ],
+      quoteLines: [
+        "The mechanical engineer builds the bridge, the humanitarian ensures that everyone can safely cross it, my job is to do both.",
+      ],
+      quoteAttribution: "— Uzziah Townsley",
+    },
+  ] satisfies OfficialLeaderProfile[],
+};
+

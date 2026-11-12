@@ -26,6 +26,7 @@ export default function PeopleBehindMissionSection({
 
     const nextSection =
       document.getElementById('people-leading-the-way') ||
+      document.getElementById('leadership-spotlight') ||
       document.getElementById('meet-us-team');
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: 'smooth' });
