@@ -369,7 +369,7 @@ export default function VideosView({
         category: values.category || selectedVideo.category || 'General',
         video_type: values.video_type || selectedVideo.video_type || 'MP4 Video',
         status: values.status || selectedVideo.status,
-        thumbnail: finalThumbnail || selectedVideo.thumbnail,
+        thumbnail: finalThumbnail,
         video_url: finalVideoUrl,
         updated_at: new Date().toISOString().slice(0, 10),
       };
@@ -688,14 +688,29 @@ export default function VideosView({
 
                             {/* Mini Video Player Preview */}
                             {uploadedVideoUrl && (
-                              <div style={{ marginTop: 14, borderRadius: 10, overflow: 'hidden', height: 160, backgroundColor: '#000' }}>
-                                <video
-                                  controls
-                                  preload="none"
-                                  poster={uploadedThumbnailUrl || selectedVideo?.thumbnail || undefined}
-                                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                  src={resolveVideoUrl(uploadedVideoUrl)}
-                                />
+                              <div style={{ marginTop: 14 }}>
+                                <div style={{ borderRadius: 10, overflow: 'hidden', height: 160, backgroundColor: '#000' }}>
+                                  <video
+                                    controls
+                                    preload="none"
+                                    poster={uploadedThumbnailUrl || undefined}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    src={resolveVideoUrl(uploadedVideoUrl)}
+                                  />
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, gap: 8 }}>
+                                  <Text type="secondary" ellipsis style={{ fontSize: 11.5, maxWidth: '65%' }}>
+                                    {uploadedVideoFileName || uploadedVideoUrl}
+                                  </Text>
+                                  <Button
+                                    size="small"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    onClick={handleRemoveUploadedVideo}
+                                  >
+                                    Remove Video
+                                  </Button>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -705,18 +720,33 @@ export default function VideosView({
                         key: 'url',
                         label: <span><LinkOutlined /> Video Link</span>,
                         children: (
-                          <Form.Item
-                            name="video_url"
-                            label="Paste Video Link / Embed"
-                            help="Supports YouTube, Vimeo, or CDN URL"
-                            style={{ margin: 0 }}
-                          >
-                            <Input
-                              placeholder="e.g. https://www.youtube.com/watch?v=..."
-                              onChange={(e) => setUploadedVideoUrl(e.target.value)}
-                              style={{ height: 38, borderRadius: 8 }}
-                            />
-                          </Form.Item>
+                          <div>
+                            <Form.Item
+                              name="video_url"
+                              label="Paste Video Link / Embed"
+                              help="Supports YouTube, Vimeo, or CDN URL"
+                              style={{ margin: 0 }}
+                            >
+                              <Input
+                                allowClear
+                                placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                onChange={(e) => setUploadedVideoUrl(e.target.value)}
+                                style={{ height: 38, borderRadius: 8 }}
+                              />
+                            </Form.Item>
+                            {uploadedVideoUrl && (
+                              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                                <Button
+                                  size="small"
+                                  danger
+                                  icon={<DeleteOutlined />}
+                                  onClick={handleRemoveUploadedVideo}
+                                >
+                                  Remove Video
+                                </Button>
+                              </div>
+                            )}
+                          </div>
                         ),
                       },
                     ]}
@@ -772,22 +802,38 @@ export default function VideosView({
                       alignItems: 'center',
                       justifyContent: 'center',
                       overflow: 'hidden',
+                      position: 'relative',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       backgroundImage: uploadedThumbnailUrl
                         ? `url(${uploadedThumbnailUrl})`
-                        : selectedVideo?.thumbnail
-                        ? `url(${selectedVideo.thumbnail})`
                         : 'none',
                     }}
                   >
-                    {!uploadedThumbnailUrl && !selectedVideo?.thumbnail && (
+                    {!uploadedThumbnailUrl && (
                       <span style={{ fontSize: 12, color: '#94A3B8' }}>Live Poster Preview</span>
                     )}
                   </div>
 
+                  {uploadedThumbnailUrl && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, gap: 8 }}>
+                      <Text type="secondary" ellipsis style={{ fontSize: 11.5, maxWidth: '60%' }}>
+                        {uploadedThumbnailFileName || uploadedThumbnailUrl}
+                      </Text>
+                      <Button
+                        size="small"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={handleRemoveThumbnail}
+                      >
+                        Remove Thumbnail
+                      </Button>
+                    </div>
+                  )}
+
                   <Form.Item name="thumbnail" label="Or Poster Image URL" style={{ marginTop: 12, marginBottom: 0 }}>
                     <Input
+                      allowClear
                       placeholder="https://.../poster.jpg"
                       onChange={(e) => setUploadedThumbnailUrl(e.target.value)}
                       style={{ height: 36, borderRadius: 8 }}
