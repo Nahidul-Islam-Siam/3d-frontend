@@ -38,6 +38,11 @@ export function invalidatePublicVideosCache(): void {
   cachedVideosAt = 0;
 }
 
+export function invalidatePublicEventsCache(): void {
+  cachedEvents = null;
+  cachedEventsAt = 0;
+}
+
 function normalizePagePath(path?: string): string {
   const raw = (path || '').trim().toLowerCase();
   if (!raw) return '';

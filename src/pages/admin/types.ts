@@ -40,7 +40,7 @@ export interface EventItem {
   location: string;
   capacity: number;
   rsvps_count: number;
-  status: 'Upcoming' | 'Happening now' | 'Past' | 'Cancelled';
+  status: 'Draft' | 'Upcoming' | 'Happening now' | 'Past' | 'Cancelled';
   description: string;
   image_url?: string;
   ticket_type?: 'Free RSVP' | 'Paid Ticket' | 'Suggested Donation';

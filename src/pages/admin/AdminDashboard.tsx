@@ -43,7 +43,7 @@ import movementService, {
 } from '@/lib/api/services/movement.service';
 import { useAppDispatch, useAppSelector } from '@/lib/store';
 import { logout } from '@/lib/store/thunks/auth.thunks';
-import { invalidatePublicVideosCache } from '@/lib/hooks/usePublicCms';
+import { invalidatePublicEventsCache, invalidatePublicVideosCache } from '@/lib/hooks/usePublicCms';
 
 import type {
   VideoSlot,
@@ -368,6 +368,7 @@ export default function AdminDashboard() {
 
   const handleAddEvent = (newEvent: EventItem) => {
     setEvents((prev) => [newEvent, ...prev]);
+    invalidatePublicEventsCache();
     if (!token) return;
     const { id: tempId, ...payload } = newEvent;
     movementService
@@ -375,6 +376,7 @@ export default function AdminDashboard() {
       .then((created) => {
         setEvents((prev) => prev.map((e) => (e.id === tempId ? created : e)));
         loadedResourcesRef.current.delete('overview');
+        invalidatePublicEventsCache();
       })
       .catch(() => {
         message.error('Failed to create event on server.');
@@ -384,12 +386,14 @@ export default function AdminDashboard() {
 
   const handleUpdateEvent = (updated: EventItem) => {
     setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+    invalidatePublicEventsCache();
     if (!token) return;
     movementService
       .updateEvent(updated.id, updated)
       .then((saved) => {
         setEvents((prev) => prev.map((e) => (e.id === updated.id ? saved : e)));
         loadedResourcesRef.current.delete('overview');
+        invalidatePublicEventsCache();
       })
       .catch(() => {
         message.error('Failed to update event on server.');
@@ -399,11 +403,13 @@ export default function AdminDashboard() {
 
   const handleDeleteEvent = (id: string) => {
     setEvents((prev) => prev.filter((e) => e.id !== id));
+    invalidatePublicEventsCache();
     if (!token) return;
     movementService
       .deleteEvent(id)
       .then(() => {
         loadedResourcesRef.current.delete('overview');
+        invalidatePublicEventsCache();
       })
       .catch(() => {
         message.error('Failed to delete event on server.');

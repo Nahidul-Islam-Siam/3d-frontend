@@ -30,6 +30,7 @@ import {
   PlusOutlined,
   DownloadOutlined,
   EyeOutlined,
+  EyeInvisibleOutlined,
   MoreOutlined,
   CloseOutlined,
   PictureOutlined,
@@ -88,6 +89,7 @@ export default function EventsView({
 
   // Form states
   const [form] = Form.useForm();
+  const watchedStatus = Form.useWatch('status', form) as EventItem['status'] | undefined;
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [imageUrlInput, setImageUrlInput] = useState<string>('');
   const [uploadingBanner, setUploadingBanner] = useState(false);
@@ -170,7 +172,7 @@ export default function EventsView({
       category: 'Community Meals & Dinners',
       capacity: 50,
       ticket_type: 'Free RSVP',
-      status: 'Upcoming',
+      status: 'Draft',
       featured: false,
     });
     setViewMode('create');
@@ -197,7 +199,7 @@ export default function EventsView({
       registration_url: event.registration_url || '',
       host_lead: event.host_lead || '',
       dress_code: event.dress_code || '',
-      status: event.status || 'Upcoming',
+      status: event.status || 'Draft',
       featured: !!event.featured,
     });
     setViewMode('edit');
@@ -240,6 +242,7 @@ export default function EventsView({
         throw new Error('Upload completed without a media URL.');
       }
       setAttachedImage(url);
+      setImageUrlInput(url);
       if (optimized.wasCompressed) {
         message.success(
           `Optimized (${formatBytes(optimized.originalBytes)} -> ${formatBytes(optimized.optimizedBytes)}) & uploaded to CDN!`,
@@ -262,6 +265,12 @@ export default function EventsView({
     }
     setAttachedImage(imageUrlInput.trim());
     message.success('Applied image URL preview!');
+  };
+
+  const handleRemoveBanner = () => {
+    setAttachedImage(null);
+    setImageUrlInput('');
+    message.info('Event banner removed. Click Save to persist changes.');
   };
 
   // ─── Form Submission ───
@@ -291,9 +300,9 @@ export default function EventsView({
       location: values.location,
       capacity: values.capacity,
       rsvps_count: editingEvent ? editingEvent.rsvps_count : 0,
-      status: values.status || 'Upcoming',
+      status: values.status || 'Draft',
       description: eventDescription || '<p>No details provided.</p>',
-      image_url: attachedImage || undefined,
+      image_url: attachedImage ?? '',
       ticket_type: values.ticket_type || 'Free RSVP',
       price: values.ticket_type === 'Paid Ticket' ? values.price : undefined,
       registration_url: values.registration_url || undefined,
@@ -307,10 +316,25 @@ export default function EventsView({
       message.success(`Updated event: "${eventPayload.title}"`);
     } else {
       onAddEvent(eventPayload);
-      message.success(`Scheduled new event: "${eventPayload.title}"`);
+      if (eventPayload.status === 'Draft') {
+        message.info(`Saved "${eventPayload.title}" to dashboard as Draft (Not Published).`);
+      } else {
+        message.success(`Published new event: "${eventPayload.title}"`);
+      }
     }
 
     handleBackToList();
+  };
+
+  const handleTogglePublishEvent = (event: EventItem) => {
+    const isLive = event.status === 'Upcoming' || event.status === 'Happening now';
+    const nextStatus: EventItem['status'] = isLive ? 'Draft' : 'Upcoming';
+    onUpdateEvent({ ...event, status: nextStatus });
+    if (nextStatus === 'Draft') {
+      message.info(`Unpublished "${event.title}" (moved to Draft).`);
+    } else {
+      message.success(`Published "${event.title}" to public schedule!`);
+    }
   };
 
   const handleCancelEvent = (event: EventItem) => {
@@ -501,6 +525,26 @@ export default function EventsView({
       key: 'status',
       width: 130,
       render: (status: EventItem['status']) => {
+        if (status === 'Draft') {
+          return (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '3px 12px',
+                borderRadius: 9999,
+                fontSize: 11.5,
+                fontWeight: 600,
+                backgroundColor: '#FFFBEB',
+                color: '#B45309',
+                border: '1px solid #FDE68A',
+              }}
+            >
+              Not Published
+            </span>
+          );
+        }
         if (status === 'Upcoming') {
           return (
             <span
@@ -601,6 +645,20 @@ export default function EventsView({
                 icon: <EditOutlined />,
                 label: 'Edit Event',
                 onClick: () => handleStartEdit(record),
+              },
+              {
+                key: 'toggle-publish',
+                icon:
+                  record.status === 'Upcoming' || record.status === 'Happening now' ? (
+                    <EyeInvisibleOutlined />
+                  ) : (
+                    <CheckOutlined />
+                  ),
+                label:
+                  record.status === 'Upcoming' || record.status === 'Happening now'
+                    ? 'Unpublish (Move to Draft)'
+                    : 'Publish Event',
+                onClick: () => handleTogglePublishEvent(record),
               },
               ...(record.registration_url
                 ? [
@@ -744,7 +802,13 @@ export default function EventsView({
                 boxShadow: '0 2px 8px rgba(249,115,22,0.3)',
               }}
             >
-              {isEdit ? 'Save Changes' : 'Publish Event'}
+              {isEdit
+                ? watchedStatus === 'Draft'
+                  ? 'Save as Draft'
+                  : 'Save Changes'
+                : watchedStatus === 'Draft' || !watchedStatus
+                ? 'Save to Dashboard (Draft)'
+                : 'Save & Publish'}
             </Button>
           </Space>
         </div>
@@ -935,10 +999,7 @@ export default function EventsView({
                           size="small"
                           danger
                           icon={<DeleteOutlined />}
-                          onClick={() => {
-                            setAttachedImage(null);
-                            setImageUrlInput('');
-                          }}
+                          onClick={handleRemoveBanner}
                           style={{
                             borderRadius: 6,
                             backgroundColor: 'rgba(239, 68, 68, 0.95)',
@@ -1005,7 +1066,14 @@ export default function EventsView({
                       <Input
                         placeholder="https://images.unsplash.com/..."
                         value={imageUrlInput}
-                        onChange={(e) => setImageUrlInput(e.target.value)}
+                        allowClear
+                        onChange={(e) => {
+                          const next = e.target.value;
+                          setImageUrlInput(next);
+                          if (!next.trim() && e.type === 'click') {
+                            setAttachedImage(null);
+                          }
+                        }}
                         onPressEnter={handleApplyImageUrl}
                       />
                       <Button onClick={handleApplyImageUrl}>Preview</Button>
@@ -1092,8 +1160,9 @@ export default function EventsView({
                     rules={[{ required: true }]}
                   >
                     <Select size="large">
-                      <Option value="Upcoming">📅 Upcoming (Scheduled)</Option>
-                      <Option value="Happening now">🔴 Live Now (In Progress)</Option>
+                      <Option value="Draft">📝 Not Published (Draft — Dashboard Only)</Option>
+                      <Option value="Upcoming">🌐 Published — Upcoming (Scheduled)</Option>
+                      <Option value="Happening now">🔴 Published — Live Now (In Progress)</Option>
                       <Option value="Past">✅ Past (Completed)</Option>
                       <Option value="Cancelled">❌ Cancelled</Option>
                     </Select>
@@ -1270,9 +1339,10 @@ export default function EventsView({
             <Select
               value={statusFilter}
               onChange={(val) => setStatusFilter(val)}
-              style={{ width: 150 }}
+              style={{ width: 170 }}
             >
               <Option value="All">All Statuses</Option>
+              <Option value="Draft">Not Published (Draft)</Option>
               <Option value="Upcoming">Scheduled</Option>
               <Option value="Happening now">Live Now</Option>
               <Option value="Past">Completed</Option>
@@ -1409,23 +1479,31 @@ export default function EventsView({
                           fontSize: 11,
                           fontWeight: 600,
                           backgroundColor:
-                            evt.status === 'Upcoming'
+                            evt.status === 'Draft'
+                              ? '#FFFBEB'
+                              : evt.status === 'Upcoming'
                               ? '#EFF6FF'
                               : evt.status === 'Happening now'
                               ? '#ECFDF5'
                               : '#F8FAFC',
                           color:
-                            evt.status === 'Upcoming'
+                            evt.status === 'Draft'
+                              ? '#B45309'
+                              : evt.status === 'Upcoming'
                               ? '#2563EB'
                               : evt.status === 'Happening now'
                               ? '#059669'
                               : '#64748B',
                           border: `1px solid ${
-                            evt.status === 'Upcoming' ? '#BFDBFE' : '#E2E8F0'
+                            evt.status === 'Draft'
+                              ? '#FDE68A'
+                              : evt.status === 'Upcoming'
+                              ? '#BFDBFE'
+                              : '#E2E8F0'
                           }`,
                         }}
                       >
-                        {evt.status}
+                        {evt.status === 'Draft' ? 'Not Published' : evt.status}
                       </span>
                     </div>
                   </div>
@@ -1459,12 +1537,37 @@ export default function EventsView({
                       <Progress percent={pct} strokeColor="#F97316" showInfo={false} size="small" />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                       <Button
-                        onClick={() => setSelectedEvent(evt)}
-                        style={{ borderRadius: 8, borderColor: '#CBD5E1', fontSize: 12.5 }}
+                        icon={
+                          evt.status === 'Upcoming' || evt.status === 'Happening now' ? (
+                            <EyeInvisibleOutlined />
+                          ) : (
+                            <CheckOutlined />
+                          )
+                        }
+                        onClick={() => handleTogglePublishEvent(evt)}
+                        style={{
+                          borderRadius: 8,
+                          fontSize: 12.5,
+                          fontWeight: 600,
+                          borderColor:
+                            evt.status === 'Upcoming' || evt.status === 'Happening now'
+                              ? '#FDE68A'
+                              : '#A7F3D0',
+                          color:
+                            evt.status === 'Upcoming' || evt.status === 'Happening now'
+                              ? '#B45309'
+                              : '#047857',
+                          backgroundColor:
+                            evt.status === 'Upcoming' || evt.status === 'Happening now'
+                              ? '#FFFBEB'
+                              : '#ECFDF5',
+                        }}
                       >
-                        Guest Roster
+                        {evt.status === 'Upcoming' || evt.status === 'Happening now'
+                          ? 'Unpublish'
+                          : 'Publish'}
                       </Button>
                       <Button
                         type="primary"
@@ -1477,6 +1580,20 @@ export default function EventsView({
                         }}
                       >
                         Edit Event
+                      </Button>
+                      <Button
+                        onClick={() => setSelectedEvent(evt)}
+                        style={{ borderRadius: 8, borderColor: '#CBD5E1', fontSize: 12.5 }}
+                      >
+                        Guest Roster
+                      </Button>
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(evt)}
+                        style={{ borderRadius: 8, fontSize: 12.5 }}
+                      >
+                        Delete
                       </Button>
                     </div>
                   </div>
