@@ -159,7 +159,7 @@ const movementService = {
     slug: string,
     payload: { title?: string; htmlContent?: string; isPublished?: boolean }
   ) => {
-    const res = await apiClient.put(`/settings/${slug}`, payload);
+    const res = await apiClient.patch(`/settings/${slug}`, payload);
     return res.data?.data ?? res.data;
   },
 
@@ -167,9 +167,7 @@ const movementService = {
   uploadMedia: async (files: File[]): Promise<Array<{ url: string; publicId: string }>> => {
     const formData = new FormData();
     files.forEach((f) => formData.append('files', f));
-    const res = await apiClient.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const res = await apiClient.post('/upload', formData);
     const data = res.data?.data ?? res.data;
     return Array.isArray(data) ? data : [data];
   },

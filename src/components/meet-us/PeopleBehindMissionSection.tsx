@@ -17,7 +17,7 @@ export default function PeopleBehindMissionSection({
 }: PeopleBehindMissionSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-
+  
   const handleScrollDown = () => {
     if (onScrollClick) {
       onScrollClick();

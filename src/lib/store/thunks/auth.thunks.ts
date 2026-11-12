@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import authService, { LoginCredentials, RegisterData, AuthResponse } from '@/lib/api/services/auth.service';
+import authService, { LoginCredentials, RegisterData, UpdateProfilePayload } from '@/lib/api/services/auth.service';
 import { handleApiError } from '@/lib/api/utils/error-handler';
 
 export const login = createAsyncThunk(
@@ -63,7 +63,7 @@ export const getProfile = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
     'auth/updateProfile',
-    async (data: Partial<AuthResponse['user']>, { rejectWithValue }) => {
+    async (data: UpdateProfilePayload, { rejectWithValue }) => {
         try {
             const response = await authService.updateProfile(data);
             return response;

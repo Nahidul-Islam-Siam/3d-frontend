@@ -19,6 +19,15 @@ export interface AuthUser {
   avatar?: string;
 }
 
+export interface UpdateProfilePayload {
+  name?: string;
+  phone?: string;
+  avatar?: {
+    url: string;
+    publicId?: string;
+  };
+}
+
 export interface AuthResponse {
   user: AuthUser;
   token: string;
@@ -128,7 +137,7 @@ const authService = {
     return user;
   },
 
-  updateProfile: async (data: Partial<AuthUser>): Promise<AuthUser> => {
+  updateProfile: async (data: UpdateProfilePayload): Promise<AuthUser> => {
     const response = await apiClient.patch('/user/me', data);
     const payload = response.data?.data ?? response.data;
     const user = normalizeUser(payload);

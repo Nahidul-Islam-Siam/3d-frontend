@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Space, Tooltip } from 'antd';
+import { Space, Tooltip, message } from 'antd';
 import {
   BoldOutlined,
   ItalicOutlined,
@@ -14,12 +14,14 @@ import {
   UndoOutlined,
   RedoOutlined,
 } from '@ant-design/icons';
+import { safeSetHTML } from '@/lib/utils/sanitizeHtml';
 
 interface RichTextEditorProps {
   value?: string;
   onChange?: (val: string) => void;
   placeholder?: string;
   minHeight?: number;
+  ariaLabel?: string;
 }
 
 export default function RichTextEditor({
@@ -27,17 +29,30 @@ export default function RichTextEditor({
   onChange,
   placeholder = 'Write detailed film synopsis, director notes, or narrative story...',
   minHeight = 180,
+  ariaLabel,
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const isUpdatingRef = useRef(false);
 
-  // Sync incoming value to contentEditable without resetting cursor
+  // Sync incoming value safely without resetting cursor during active typing
   useEffect(() => {
-    if (editorRef.current && !isUpdatingRef.current) {
-      if (editorRef.current.innerHTML !== (value || '')) {
-        editorRef.current.innerHTML = value || '';
+    const el = editorRef.current;
+    if (!el || isUpdatingRef.current) return;
+    if (document.activeElement === el) return;
+
+    const nextHtml = value || '';
+    if (el.innerHTML === nextHtml) return;
+
+    let cancelled = false;
+    void safeSetHTML(el, nextHtml).catch(() => {
+      if (!cancelled && editorRef.current) {
+        editorRef.current.textContent = '';
       }
-    }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [value]);
 
   const handleInput = () => {
@@ -60,14 +75,21 @@ export default function RichTextEditor({
   };
 
   const handleInsertLink = () => {
-    const url = prompt('Enter link URL (e.g. https://...):');
-    if (url) {
-      exec('createLink', url);
+    const rawUrl = prompt('Enter link URL (e.g. https://...):');
+    if (!rawUrl) return;
+
+    const trimmed = rawUrl.trim();
+    if (!/^(https?:\/\/|mailto:|\/)/i.test(trimmed)) {
+      message.warning('Please enter a valid URL starting with https://, http://, mailto:, or /');
+      return;
     }
+
+    exec('createLink', trimmed);
   };
 
   return (
     <div
+      className="rich-text-editor"
       style={{
         border: '1px solid #CBD5E1',
         borderRadius: 10,
@@ -78,6 +100,9 @@ export default function RichTextEditor({
     >
       {/* ─── Rich Toolbar ─── */}
       <div
+        className="rich-text-toolbar"
+        role="toolbar"
+        aria-label="Text formatting toolbar"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -92,6 +117,7 @@ export default function RichTextEditor({
           <Tooltip title="Undo">
             <button
               type="button"
+              aria-label="Undo"
               onClick={() => exec('undo')}
               style={toolBtnStyle}
             >
@@ -101,6 +127,7 @@ export default function RichTextEditor({
           <Tooltip title="Redo">
             <button
               type="button"
+              aria-label="Redo"
               onClick={() => exec('redo')}
               style={toolBtnStyle}
             >
@@ -109,12 +136,13 @@ export default function RichTextEditor({
           </Tooltip>
         </Space>
 
-        <span style={dividerStyle}>|</span>
+        <span style={dividerStyle} aria-hidden="true">|</span>
 
         <Space size={3}>
           <Tooltip title="Heading 1">
             <button
               type="button"
+              aria-label="Heading 1"
               onClick={() => exec('formatBlock', '<h1>')}
               style={{ ...toolBtnStyle, fontWeight: 700, fontSize: 12 }}
             >
@@ -124,6 +152,7 @@ export default function RichTextEditor({
           <Tooltip title="Heading 2">
             <button
               type="button"
+              aria-label="Heading 2"
               onClick={() => exec('formatBlock', '<h2>')}
               style={{ ...toolBtnStyle, fontWeight: 700, fontSize: 12 }}
             >
@@ -133,6 +162,7 @@ export default function RichTextEditor({
           <Tooltip title="Normal Paragraph">
             <button
               type="button"
+              aria-label="Normal Paragraph"
               onClick={() => exec('formatBlock', '<p>')}
               style={{ ...toolBtnStyle, fontWeight: 600, fontSize: 12 }}
             >
@@ -141,12 +171,13 @@ export default function RichTextEditor({
           </Tooltip>
         </Space>
 
-        <span style={dividerStyle}>|</span>
+        <span style={dividerStyle} aria-hidden="true">|</span>
 
         <Space size={3}>
           <Tooltip title="Bold">
             <button
               type="button"
+              aria-label="Bold"
               onClick={() => exec('bold')}
               style={toolBtnStyle}
             >
@@ -156,6 +187,7 @@ export default function RichTextEditor({
           <Tooltip title="Italic">
             <button
               type="button"
+              aria-label="Italic"
               onClick={() => exec('italic')}
               style={toolBtnStyle}
             >
@@ -165,6 +197,7 @@ export default function RichTextEditor({
           <Tooltip title="Underline">
             <button
               type="button"
+              aria-label="Underline"
               onClick={() => exec('underline')}
               style={toolBtnStyle}
             >
@@ -174,6 +207,7 @@ export default function RichTextEditor({
           <Tooltip title="Strikethrough">
             <button
               type="button"
+              aria-label="Strikethrough"
               onClick={() => exec('strikeThrough')}
               style={toolBtnStyle}
             >
@@ -182,12 +216,13 @@ export default function RichTextEditor({
           </Tooltip>
         </Space>
 
-        <span style={dividerStyle}>|</span>
+        <span style={dividerStyle} aria-hidden="true">|</span>
 
         <Space size={3}>
           <Tooltip title="Align Left">
             <button
               type="button"
+              aria-label="Align Left"
               onClick={() => exec('justifyLeft')}
               style={toolBtnStyle}
             >
@@ -197,6 +232,7 @@ export default function RichTextEditor({
           <Tooltip title="Align Center">
             <button
               type="button"
+              aria-label="Align Center"
               onClick={() => exec('justifyCenter')}
               style={toolBtnStyle}
             >
@@ -206,6 +242,7 @@ export default function RichTextEditor({
           <Tooltip title="Align Right">
             <button
               type="button"
+              aria-label="Align Right"
               onClick={() => exec('justifyRight')}
               style={toolBtnStyle}
             >
@@ -214,12 +251,13 @@ export default function RichTextEditor({
           </Tooltip>
         </Space>
 
-        <span style={dividerStyle}>|</span>
+        <span style={dividerStyle} aria-hidden="true">|</span>
 
         <Space size={3}>
           <Tooltip title="Bullet List">
             <button
               type="button"
+              aria-label="Bullet List"
               onClick={() => exec('insertUnorderedList')}
               style={toolBtnStyle}
             >
@@ -229,6 +267,7 @@ export default function RichTextEditor({
           <Tooltip title="Numbered List">
             <button
               type="button"
+              aria-label="Numbered List"
               onClick={() => exec('insertOrderedList')}
               style={toolBtnStyle}
             >
@@ -238,6 +277,7 @@ export default function RichTextEditor({
           <Tooltip title="Insert Link">
             <button
               type="button"
+              aria-label="Insert Link"
               onClick={handleInsertLink}
               style={toolBtnStyle}
             >
@@ -250,7 +290,11 @@ export default function RichTextEditor({
       {/* ─── Editable Body ─── */}
       <div
         ref={editorRef}
+        className="rich-text-content"
         contentEditable
+        role="textbox"
+        aria-multiline="true"
+        aria-label={ariaLabel || placeholder}
         onInput={handleInput}
         onBlur={handleInput}
         data-placeholder={placeholder}
@@ -288,4 +332,3 @@ const dividerStyle: React.CSSProperties = {
   userSelect: 'none',
   padding: '0 2px',
 };
-

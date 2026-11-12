@@ -817,7 +817,11 @@ export default function AdminDashboard() {
 
               <Dropdown menu={userMenuItems} placement="bottomRight" arrow>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '4px 8px', borderRadius: 8 }}>
-                  <Avatar style={{ backgroundColor: '#F97316', fontWeight: 600 }} size={34}>
+                  <Avatar
+                    src={user?.avatar || undefined}
+                    style={{ backgroundColor: '#F97316', fontWeight: 600 }}
+                    size={34}
+                  >
                     {(user?.name || 'Admin')
                       .split(' ')
                       .map((n) => n[0])

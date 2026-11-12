@@ -1,31 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import {
+  Alert,
+  Avatar,
   Button,
+  Col,
   Input,
+  Row,
   Select,
+  Skeleton,
   Space,
   Typography,
   message,
 } from 'antd';
 import {
   ArrowLeftOutlined,
+  CameraOutlined,
   EditOutlined,
-  BoldOutlined,
-  ItalicOutlined,
-  UnderlineOutlined,
-  StrikethroughOutlined,
-  AlignLeftOutlined,
-  AlignCenterOutlined,
-  AlignRightOutlined,
-  UnorderedListOutlined,
-  OrderedListOutlined,
-  LinkOutlined,
-  UndoOutlined,
-  RedoOutlined,
+  ReloadOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
-import defaultAvatar from '../../../assets/meet-us/sarah-mitchell.png';
+import { AxiosError } from 'axios';
+import RichTextEditor from '@/components/common/RichTextEditor';
+import SafeHtmlContent from '@/components/common/SafeHtmlContent';
+import authService from '@/lib/api/services/auth.service';
+import movementService from '@/lib/api/services/movement.service';
+import { useAppDispatch, useAppSelector } from '@/lib/store';
+import { getProfile, updateProfile } from '@/lib/store/thunks/auth.thunks';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 export type SettingsSubTab =
@@ -40,28 +42,458 @@ interface SettingsViewProps {
   onNavigateSubTab: (sub: string) => void;
 }
 
+type CmsSubTab = 'settings-about' | 'settings-privacy' | 'settings-terms';
+
+interface CmsPageConfig {
+  slug: string;
+  title: string;
+  editTitle: string;
+  placeholder: string;
+  saveLabel: string;
+}
+
+const CMS_PAGE_CONFIG: Record<CmsSubTab, CmsPageConfig> = {
+  'settings-about': {
+    slug: 'about-us',
+    title: 'About us',
+    editTitle: 'Edit about us',
+    placeholder: 'Write organization background, core pillars, and community impact...',
+    saveLabel: 'About us',
+  },
+  'settings-privacy': {
+    slug: 'privacy-policy',
+    title: 'Privacy policy',
+    editTitle: 'Edit privacy policy',
+    placeholder: 'Write privacy policy details, data handling, and donor protections...',
+    saveLabel: 'Privacy policy',
+  },
+  'settings-terms': {
+    slug: 'terms-and-conditions',
+    title: 'Terms and condition',
+    editTitle: 'Edit terms and condition',
+    placeholder: 'Write terms and conditions, conduct guidelines, and participation rules...',
+    saveLabel: 'Terms and conditions',
+  },
+};
+
+const ALLOWED_AVATAR_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const E164_PHONE_REGEX = /^\+[1-9]\d{6,14}$/;
+
+const COUNTRY_OPTIONS = [
+  { value: 'US United States', dialCode: '+1', codeOption: 'US +1' },
+  { value: 'CA Canada', dialCode: '+1', codeOption: 'CA +1' },
+  { value: 'GB United Kingdom', dialCode: '+44', codeOption: 'GB +44' },
+  { value: 'BD Bangladesh', dialCode: '+880', codeOption: 'BD +880' },
+] as const;
+
+function getDialCode(countryCodeOption: string): string {
+  const match = countryCodeOption.match(/(\+\d+)/);
+  return match ? match[1] : '+1';
+}
+
+function parseUserPhone(rawPhone?: string): {
+  country: string;
+  countryCode: string;
+  localPhone: string;
+} {
+  const cleaned = (rawPhone || '').replace(/[\s\-()]/g, '');
+  if (cleaned.startsWith('+880')) {
+    return { country: 'BD Bangladesh', countryCode: 'BD +880', localPhone: cleaned.slice(4) };
+  }
+  if (cleaned.startsWith('+44')) {
+    return { country: 'GB United Kingdom', countryCode: 'GB +44', localPhone: cleaned.slice(3) };
+  }
+  if (cleaned.startsWith('+1')) {
+    return { country: 'US United States', countryCode: 'US +1', localPhone: cleaned.slice(2) };
+  }
+  return { country: 'US United States', countryCode: 'US +1', localPhone: rawPhone || '' };
+}
+
+function getInitials(name?: string): string {
+  const parts = (name || 'Admin').trim().split(/\s+/).filter(Boolean);
+  return parts
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function getApiErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof AxiosError) {
+    return err.response?.data?.message || err.message || fallback;
+  }
+  if (err instanceof Error && err.message) {
+    return err.message;
+  }
+  return fallback;
+}
+
+function extractPlainTextLength(html: string): number {
+  const parsed = new DOMParser().parseFromString(html, 'text/html');
+  return (parsed.body.textContent || '').trim().length;
+}
+
+interface CmsSettingSectionProps {
+  config: CmsPageConfig;
+  isAuthenticated: boolean;
+  onBack: () => void;
+}
+
+function CmsSettingSection({ config, isAuthenticated, onBack }: CmsSettingSectionProps) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [savedHtml, setSavedHtml] = useState('');
+  const [draftHtml, setDraftHtml] = useState('');
+
+  const fetchPage = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const page = await movementService.getSettingPage(config.slug);
+      const html = page?.htmlContent || '';
+      setSavedHtml(html);
+      setDraftHtml(html);
+    } catch (err) {
+      setLoadError(getApiErrorMessage(err, `Failed to load ${config.title.toLowerCase()}.`));
+    } finally {
+      setLoading(false);
+    }
+  }, [config.slug, config.title]);
+
+  useEffect(() => {
+    setIsEditing(false);
+    void fetchPage();
+  }, [fetchPage]);
+
+  const handleStartEdit = () => {
+    setDraftHtml(savedHtml);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setDraftHtml(savedHtml);
+    setIsEditing(false);
+  };
+
+  const handleSave = async () => {
+    if (!isAuthenticated) {
+      message.warning('Please sign in with an administrator account to save page content.');
+      return;
+    }
+
+    const trimmedHtml = draftHtml.trim();
+    if (trimmedHtml.length < 10 || extractPlainTextLength(trimmedHtml) === 0) {
+      message.error('Content must contain at least 10 characters before saving.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const updated = await movementService.updateSettingPage(config.slug, {
+        htmlContent: trimmedHtml,
+      });
+      const nextHtml = updated?.htmlContent ?? trimmedHtml;
+      setSavedHtml(nextHtml);
+      setDraftHtml(nextHtml);
+      setIsEditing(false);
+      message.success(`${config.saveLabel} updated successfully`);
+    } catch (err) {
+      message.error(getApiErrorMessage(err, `Failed to update ${config.title.toLowerCase()}.`));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <button
+            type="button"
+            onClick={() => {
+              if (isEditing) handleCancelEdit();
+              else onBack();
+            }}
+            aria-label={isEditing ? 'Cancel editing' : 'Back to profile'}
+            title="Back"
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: '50%',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#10B981',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeftOutlined style={{ fontSize: 16 }} />
+          </button>
+          <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.3px' }}>
+            {isEditing ? config.editTitle : config.title}
+          </Title>
+        </div>
+
+        {!isEditing ? (
+          <Button
+            icon={<EditOutlined />}
+            onClick={handleStartEdit}
+            disabled={loading}
+            style={{
+              borderRadius: 10,
+              height: 38,
+              borderColor: '#E2E8F0',
+              color: '#334155',
+              fontWeight: 500,
+            }}
+          >
+            Edit
+          </Button>
+        ) : (
+          <Space>
+            <Button
+              type="primary"
+              loading={saving}
+              onClick={() => void handleSave()}
+              style={{
+                backgroundColor: '#0EA5E9',
+                borderRadius: 10,
+                height: 38,
+                fontWeight: 600,
+              }}
+            >
+              Save changes
+            </Button>
+            <Button
+              onClick={handleCancelEdit}
+              disabled={saving}
+              style={{
+                borderRadius: 10,
+                height: 38,
+                borderColor: '#E2E8F0',
+              }}
+            >
+              Cancel
+            </Button>
+          </Space>
+        )}
+      </div>
+
+      {!isAuthenticated && (
+        <Alert
+          type="info"
+          showIcon
+          title="Sign in with an admin account to publish CMS page updates to the live website."
+        />
+      )}
+
+      {loadError && (
+        <Alert
+          type="error"
+          showIcon
+          title={loadError}
+          action={
+            <Button size="small" icon={<ReloadOutlined />} onClick={() => void fetchPage()}>
+              Retry
+            </Button>
+          }
+        />
+      )}
+
+      <div
+        className="admin-saas-card"
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: 24,
+          border: '1px solid #F1F5F9',
+          overflow: 'hidden',
+          padding: '28px 32px',
+        }}
+      >
+        {loading ? (
+          <Skeleton active paragraph={{ rows: 8 }} />
+        ) : isEditing ? (
+          <RichTextEditor
+            value={draftHtml}
+            onChange={setDraftHtml}
+            placeholder={config.placeholder}
+            minHeight={340}
+            ariaLabel={config.editTitle}
+          />
+        ) : savedHtml.trim() ? (
+          <SafeHtmlContent html={savedHtml} className="rich-text-content" />
+        ) : (
+          <Text type="secondary">No content published yet. Click Edit to add page copy.</Text>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsView({
   currentSubTab = 'settings-profile',
   onNavigateSubTab,
 }: SettingsViewProps) {
-  // Normalize sub-tab
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated, token } = useAppSelector((state) => state.auth);
+  const canPersist = Boolean(isAuthenticated && token);
+
   const activeTab: SettingsSubTab =
     currentSubTab === 'settings' || currentSubTab === 'settings-profile'
       ? 'settings-profile'
       : (currentSubTab as SettingsSubTab);
 
-  // ─── 1. Profile / Personal Information State ───
+  // ─── 1. Profile / Personal Information & Avatar State ───
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
   const [profile, setProfile] = useState({
-    name: 'Sarah Mitchell',
-    email: 'sarah.m@liveachievebelieve.org',
+    name: user?.name || '',
+    email: user?.email || '',
     country: 'US United States',
     countryCode: 'US +1',
-    phone: '(555) 382-9012',
-    avatar: defaultAvatar,
+    phone: '',
   });
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string>('');
+  const [pendingAvatar, setPendingAvatar] = useState<{ url: string; publicId?: string } | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
 
-  const handleSaveProfile = () => {
-    message.success('Personal information updated successfully');
+  const revokePreviewObjectUrl = useCallback(() => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => revokePreviewObjectUrl, [revokePreviewObjectUrl]);
+
+  useEffect(() => {
+    if (canPersist) {
+      void dispatch(getProfile());
+    }
+  }, [canPersist, dispatch]);
+
+  useEffect(() => {
+    if (!user) return;
+    const parsedPhone = parseUserPhone(user.phone);
+    setProfile({
+      name: user.name || '',
+      email: user.email || '',
+      country: parsedPhone.country,
+      countryCode: parsedPhone.countryCode,
+      phone: parsedPhone.localPhone,
+    });
+  }, [user]);
+
+  const handleAvatarFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!canPersist) {
+      message.warning('Please sign in to upload and save your profile avatar.');
+      e.target.value = '';
+      return;
+    }
+
+    if (!ALLOWED_AVATAR_TYPES.has(file.type)) {
+      message.error('Please upload a PNG, JPG, or WebP image file.');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_AVATAR_BYTES) {
+      message.error('Avatar image must be 5MB or smaller.');
+      e.target.value = '';
+      return;
+    }
+
+    revokePreviewObjectUrl();
+    const localPreview = URL.createObjectURL(file);
+    objectUrlRef.current = localPreview;
+    setAvatarPreviewUrl(localPreview);
+    setUploadingAvatar(true);
+
+    try {
+      const uploaded = await movementService.uploadMedia([file]);
+      const media = uploaded[0];
+      if (!media?.url) {
+        throw new Error('Upload succeeded without returning an image URL.');
+      }
+
+      const avatarPayload = {
+        url: media.url,
+        ...(media.publicId ? { publicId: media.publicId } : {}),
+      };
+      setPendingAvatar(avatarPayload);
+
+      await dispatch(updateProfile({ avatar: avatarPayload })).unwrap();
+      revokePreviewObjectUrl();
+      setAvatarPreviewUrl('');
+      setPendingAvatar(null);
+      message.success('Profile avatar updated successfully');
+    } catch (err) {
+      revokePreviewObjectUrl();
+      setAvatarPreviewUrl('');
+      setPendingAvatar(null);
+      message.error(getApiErrorMessage(err, 'Failed to upload profile avatar.'));
+    } finally {
+      setUploadingAvatar(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveProfile = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!canPersist) {
+      message.warning('Please sign in to save profile changes.');
+      return;
+    }
+
+    const trimmedName = profile.name.trim();
+    if (trimmedName.length < 2 || trimmedName.length > 50) {
+      message.error('Name must be between 2 and 50 characters.');
+      return;
+    }
+
+    const rawPhone = profile.phone.trim();
+    let formattedPhone = '';
+    if (rawPhone) {
+      if (rawPhone.startsWith('+')) {
+        formattedPhone = rawPhone.replace(/[\s\-()]/g, '');
+      } else {
+        const digits = rawPhone.replace(/\D/g, '');
+        formattedPhone = `${getDialCode(profile.countryCode)}${digits}`;
+      }
+
+      if (!E164_PHONE_REGEX.test(formattedPhone)) {
+        message.error('Please enter a valid phone number with country code.');
+        return;
+      }
+    }
+
+    setSavingProfile(true);
+    try {
+      await dispatch(
+        updateProfile({
+          name: trimmedName,
+          phone: formattedPhone,
+          ...(pendingAvatar ? { avatar: pendingAvatar } : {}),
+        })
+      ).unwrap();
+      setPendingAvatar(null);
+      message.success('Personal information updated successfully');
+    } catch (err) {
+      message.error(getApiErrorMessage(err, 'Failed to update personal information.'));
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   // ─── 2. Change Password State ───
@@ -70,85 +502,63 @@ export default function SettingsView({
     newPassword: '',
     confirmPassword: '',
   });
+  const [savingPassword, setSavingPassword] = useState(false);
 
-  const handleUpdatePassword = () => {
-    if (!passwordForm.currentPassword) {
-      message.error('Please enter current password');
+  const handleUpdatePassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!canPersist) {
+      message.warning('Please sign in to update your password.');
       return;
     }
-    if (passwordForm.newPassword.length < 6) {
-      message.error('New password must be at least 6 characters');
+
+    if (passwordForm.currentPassword.length < 8) {
+      message.error('Current password must be at least 8 characters.');
+      return;
+    }
+    if (passwordForm.newPassword.length < 8) {
+      message.error('New password must be at least 8 characters.');
+      return;
+    }
+    if (passwordForm.newPassword === passwordForm.currentPassword) {
+      message.error('New password cannot be the same as your current password.');
       return;
     }
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      message.error('Passwords do not match');
+      message.error('Passwords do not match.');
       return;
     }
-    message.success('Password updated successfully');
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+    setSavingPassword(true);
+    try {
+      await authService.changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      message.success('Password updated successfully');
+    } catch (err) {
+      message.error(getApiErrorMessage(err, 'Failed to update password.'));
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
-  // ─── 3. About Us State (View & Edit Modes) ───
-  const [isEditingAbout, setIsEditingAbout] = useState(false);
-  const [aboutContent, setAboutContent] = useState(`About Live Achieve Believe
-
-Live Achieve Believe, Inc. (LAB) is a faith-rooted, Tampa Bay-based 501(c)(3) nonprofit dedicated to strengthening lives and building a community where everyone feels seen, heard, valued, and supported. We unite volunteers, culinary masters, civic partners, and donors around a singular conviction: dignity is non-negotiable.
-
-Our Core Pillars & Capabilities
-
-Multi-Tier Community Feast Initiative: Certified commercial kitchen partnerships serving nutrient-dense, chef-prepared hot dinners to families experiencing food insecurity, veterans in transition, and displaced neighbors with table-side hospitality.
-LEADS Youth Mentorship: After-school tutoring, executive life skills training, character-building athletic leagues, and collegiate access assistance for under-resourced youth.
-Suicide Awareness Showdown: Annual inter-community creative showcase bringing performing arts, clinical mental health counseling, and destigmatizing dialogues directly to youth and families.
-Veterans Dignity & Housing Bridge: Direct emergency relocation assistance, military transition peer groups, and essential home furnishing provisions.
-
-Our Commitment to Transparency & Stewardship
-
-At Live Achieve Believe, 100% of public individual contributions are allocated directly to program execution and community dinner provisions. We operate under rigorous 501(c)(3) federal oversight with open-book financial reporting.`);
-
-  // ─── 4. Privacy Policy State (View & Edit Modes) ───
-  const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
-  const [privacyContent, setPrivacyContent] = useState(`Privacy Policy for Live Achieve Believe
-
-Last updated: November 2026
-
-Live Achieve Believe ("we", "us", or "our") respects your privacy and is committed to protecting the personal information you share with us.
-
-1. Information We Collect
-We collect personal information when you register as a donor, apply as a volunteer, RSVP for community dinners, or subscribe to our newsletter. This includes your name, email, phone number, mailing address, and payment information processed through secure PCI-compliant processors (Square, Zeffy).
-
-2. Donor Data Protection & Non-Commercial Guarantee
-We will never sell, rent, trade, or share your personal donor information with any outside commercial entities or marketing brokers. All donor data is used solely for tax receipt issuance, stewardship updates, and mission transparency.
-
-3. Security Measures
-We employ industry-standard encryption protocols (TLS 1.3), secure cloud vaults, and multi-factor authentication across all administrative systems to safeguard personal data.`);
-
-  // ─── 5. Terms and Conditions State (View & Edit Modes) ───
-  const [isEditingTerms, setIsEditingTerms] = useState(false);
-  const [termsContent, setTermsContent] = useState(`Terms and Conditions
-
-Last updated: November 2026
-
-By accessing the Live Achieve Believe website, participating in our community suppers, or donating to our initiatives, you agree to comply with and be bound by the following terms.
-
-1. Tax-Deductible Contributions
-Live Achieve Believe is recognized by the IRS as a tax-exempt charitable organization under Section 501(c)(3) of the Internal Revenue Code. All financial donations made through our platforms are tax-deductible to the fullest extent permitted by law.
-
-2. Community Event & Dinner Conduct
-Our banquets and gatherings are safe, dignified spaces dedicated to community fellowship. We uphold a zero-tolerance policy against discrimination, harassment, substance misuse, or disruptive conduct at all physical events.
-
-3. Volunteer Participation & Clearances
-Volunteers working with vulnerable populations or minors agree to standard background screenings and must follow the volunteer code of conduct.`);
+  const displayedAvatar = avatarPreviewUrl || pendingAvatar?.url || user?.avatar || '';
+  const activeCmsConfig =
+    activeTab === 'settings-about' ||
+    activeTab === 'settings-privacy' ||
+    activeTab === 'settings-terms'
+      ? CMS_PAGE_CONFIG[activeTab]
+      : null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1100 }}>
-      {/* ─── TAB 1: Personal Information (Profile) ─── */}
+      {/* ─── TAB 1: Personal Information (Profile & Avatar Upload) ─── */}
       {activeTab === 'settings-profile' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Header Bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button
               type="button"
               onClick={() => onNavigateSubTab('overview')}
+              aria-label="Back to overview"
               title="Back"
               style={{
                 width: 38,
@@ -171,134 +581,154 @@ Volunteers working with vulnerable populations or minors agree to standard backg
             </Title>
           </div>
 
-          {/* Profile Card (1:1 with Image 2) */}
+          {!canPersist && (
+            <Alert
+              type="info"
+              showIcon
+              title="Sign in with an administrator account to load and save live profile and avatar updates."
+            />
+          )}
+
           <div
             className="admin-saas-card"
             style={{
-              padding: '36px 36px',
+              padding: '36px',
               backgroundColor: '#FFFFFF',
               borderRadius: 24,
               border: '1px solid #F1F5F9',
               boxShadow: '0 4px 25px -4px rgba(15, 23, 42, 0.04)',
             }}
           >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(140px, 200px) 1fr',
-                gap: 40,
-                alignItems: 'flex-start',
-              }}
-            >
-              {/* Left Column: Avatar & Profile Title */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <div
-                  style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    border: '3px solid #F1F5F9',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
-                    backgroundColor: '#F8FAFC',
-                    position: 'relative',
-                  }}
-                >
-                  <img
-                    src={profile.avatar}
-                    alt="Profile Avatar"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-                <div style={{ marginTop: 14 }}>
-                  <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>Profile</div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
-                    {profile.name.toLowerCase()}
-                  </div>
-                </div>
-              </div>
+            <Row gutter={[40, 28]} align="top">
+              {/* Left Column: Avatar Uploader */}
+              <Col xs={24} md={7}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                    {displayedAvatar ? (
+                      <div
+                        style={{
+                          width: 120,
+                          height: 120,
+                          borderRadius: '50%',
+                          overflow: 'hidden',
+                          border: '3px solid #F1F5F9',
+                          boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+                          backgroundColor: '#F8FAFC',
+                        }}
+                      >
+                        <img
+                          src={displayedAvatar}
+                          alt={`${profile.name || 'User'} avatar`}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </div>
+                    ) : (
+                      <Avatar
+                        size={120}
+                        style={{
+                          backgroundColor: '#F97316',
+                          fontSize: 34,
+                          fontWeight: 700,
+                          border: '3px solid #F1F5F9',
+                          boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+                        }}
+                      >
+                        {getInitials(profile.name)}
+                      </Avatar>
+                    )}
 
-              {/* Right Column: Form Fields */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                {/* Name */}
-                <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
-                    Name
-                  </label>
-                  <Input
-                    value={profile.name}
-                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    style={{
-                      height: 48,
-                      borderRadius: 12,
-                      borderColor: '#E2E8F0',
-                      fontSize: 14,
-                      color: '#0F172A',
-                      padding: '0 16px',
-                    }}
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
-                    Email
-                  </label>
-                  <Input
-                    value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    style={{
-                      height: 48,
-                      borderRadius: 12,
-                      borderColor: '#E2E8F0',
-                      fontSize: 14,
-                      color: '#0F172A',
-                      padding: '0 16px',
-                    }}
-                  />
-                </div>
-
-                {/* Country */}
-                <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
-                    Country
-                  </label>
-                  <Select
-                    value={profile.country}
-                    onChange={(val) => setProfile({ ...profile, country: val })}
-                    style={{
-                      width: '100%',
-                      height: 48,
-                    }}
-                    popupClassName="rounded-xl"
-                  >
-                    <Option value="GB United Kingdom">GB United Kingdom</Option>
-                    <Option value="US United States">US United States</Option>
-                    <Option value="CA Canada">CA Canada</Option>
-                    <Option value="BD Bangladesh">BD Bangladesh</Option>
-                  </Select>
-                </div>
-
-                {/* Phone No. */}
-                <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
-                    Phone No.
-                  </label>
-                  <div style={{ display: 'flex', gap: 12 }}>
-                    <Select
-                      value={profile.countryCode}
-                      onChange={(val) => setProfile({ ...profile, countryCode: val })}
-                      style={{ width: 140, height: 48 }}
-                    >
-                      <Option value="BD +880">BD +880</Option>
-                      <Option value="US +1">US +1</Option>
-                      <Option value="GB +44">GB +44</Option>
-                    </Select>
-                    <Input
-                      value={profile.phone}
-                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    <Button
+                      type="primary"
+                      shape="circle"
+                      size="small"
+                      icon={<CameraOutlined />}
+                      loading={uploadingAvatar}
+                      onClick={() => avatarInputRef.current?.click()}
+                      aria-label="Upload profile avatar"
                       style={{
-                        flex: 1,
+                        position: 'absolute',
+                        right: 4,
+                        bottom: 4,
+                        backgroundColor: '#0EA5E9',
+                        borderColor: '#FFFFFF',
+                        borderWidth: 2,
+                        boxShadow: '0 2px 8px rgba(15, 23, 42, 0.18)',
+                      }}
+                    />
+                  </div>
+
+                  <input
+                    ref={avatarInputRef}
+                    id="admin-avatar-upload"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    tabIndex={-1}
+                    className="visually-hidden"
+                    aria-describedby="avatar-upload-hint"
+                    onChange={(e) => void handleAvatarFileChange(e)}
+                  />
+
+                  <div style={{ marginTop: 14 }}>
+                    <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>
+                      {user?.role ? user.role.replace('_', ' ') : 'Profile'}
+                    </div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
+                      {profile.name || 'Administrator'}
+                    </div>
+                  </div>
+
+                  <Button
+                    icon={<UploadOutlined />}
+                    loading={uploadingAvatar}
+                    onClick={() => avatarInputRef.current?.click()}
+                    style={{
+                      marginTop: 14,
+                      borderRadius: 10,
+                      borderColor: '#E2E8F0',
+                      color: '#334155',
+                      fontWeight: 500,
+                    }}
+                  >
+                    {uploadingAvatar
+                      ? 'Uploading...'
+                      : displayedAvatar
+                        ? 'Change Photo'
+                        : 'Upload Photo'}
+                  </Button>
+                  <Text
+                    id="avatar-upload-hint"
+                    type="secondary"
+                    style={{ fontSize: 11.5, marginTop: 6 }}
+                  >
+                    PNG, JPG, or WebP (max 5MB)
+                  </Text>
+                </div>
+              </Col>
+
+              {/* Right Column: Profile Form Fields */}
+              <Col xs={24} md={17}>
+                <form
+                  onSubmit={(e) => void handleSaveProfile(e)}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+                >
+                  <div>
+                    <label
+                      htmlFor="profile-name"
+                      style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                    >
+                      Name
+                    </label>
+                    <Input
+                      id="profile-name"
+                      name="name"
+                      autoComplete="name"
+                      required
+                      minLength={2}
+                      maxLength={50}
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      placeholder="Enter your full name"
+                      style={{
                         height: 48,
                         borderRadius: 12,
                         borderColor: '#E2E8F0',
@@ -308,27 +738,125 @@ Volunteers working with vulnerable populations or minors agree to standard backg
                       }}
                     />
                   </div>
-                </div>
 
-                {/* Submit Button */}
-                <div style={{ marginTop: 10 }}>
-                  <Button
-                    type="primary"
-                    onClick={handleSaveProfile}
-                    style={{
-                      backgroundColor: '#F97316',
-                      borderRadius: 10,
-                      height: 44,
-                      padding: '0 28px',
-                      fontWeight: 600,
-                      boxShadow: '0 2px 10px rgba(249,115,22,0.3)',
-                    }}
-                  >
-                    Save Changes
-                  </Button>
-                </div>
-              </div>
-            </div>
+                  <div>
+                    <label
+                      htmlFor="profile-email"
+                      style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                    >
+                      Email
+                    </label>
+                    <Input
+                      id="profile-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      value={profile.email}
+                      readOnly
+                      disabled
+                      aria-describedby="profile-email-note"
+                      style={{
+                        height: 48,
+                        borderRadius: 12,
+                        borderColor: '#E2E8F0',
+                        fontSize: 14,
+                        padding: '0 16px',
+                      }}
+                    />
+                    <Text id="profile-email-note" type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 6 }}>
+                      Email address is managed by authentication and cannot be edited here.
+                    </Text>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="profile-country"
+                      style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                    >
+                      Country
+                    </label>
+                    <Select
+                      id="profile-country"
+                      value={profile.country}
+                      onChange={(val) => {
+                        const matched = COUNTRY_OPTIONS.find((item) => item.value === val);
+                        setProfile({
+                          ...profile,
+                          country: val,
+                          countryCode: matched ? matched.codeOption : profile.countryCode,
+                        });
+                      }}
+                      style={{ width: '100%', height: 48 }}
+                      classNames={{ popup: { root: 'rounded-xl' } }}
+                    >
+                      {COUNTRY_OPTIONS.map((item) => (
+                        <Option key={item.value} value={item.value}>
+                          {item.value}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="profile-phone"
+                      style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                    >
+                      Phone No.
+                    </label>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                      <Select
+                        aria-label="Country calling code"
+                        value={profile.countryCode}
+                        onChange={(val) => setProfile({ ...profile, countryCode: val })}
+                        style={{ width: 140, height: 48 }}
+                      >
+                        <Option value="BD +880">BD +880</Option>
+                        <Option value="US +1">US +1</Option>
+                        <Option value="CA +1">CA +1</Option>
+                        <Option value="GB +44">GB +44</Option>
+                      </Select>
+                      <Input
+                        id="profile-phone"
+                        name="phone"
+                        type="tel"
+                        autoComplete="tel-national"
+                        value={profile.phone}
+                        onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                        placeholder="555 382 9012"
+                        style={{
+                          flex: 1,
+                          height: 48,
+                          borderRadius: 12,
+                          borderColor: '#E2E8F0',
+                          fontSize: 14,
+                          color: '#0F172A',
+                          padding: '0 16px',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: 10 }}>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={savingProfile}
+                      style={{
+                        backgroundColor: '#F97316',
+                        borderRadius: 10,
+                        height: 44,
+                        padding: '0 28px',
+                        fontWeight: 600,
+                        boxShadow: '0 2px 10px rgba(249,115,22,0.3)',
+                      }}
+                    >
+                      Save Changes
+                    </Button>
+                  </div>
+                </form>
+              </Col>
+            </Row>
           </div>
         </div>
       )}
@@ -336,11 +864,11 @@ Volunteers working with vulnerable populations or minors agree to standard backg
       {/* ─── TAB 2: Change Password ─── */}
       {activeTab === 'settings-password' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Header Bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button
               type="button"
               onClick={() => onNavigateSubTab('settings-profile')}
+              aria-label="Back to profile"
               title="Back"
               style={{
                 width: 38,
@@ -362,6 +890,14 @@ Volunteers working with vulnerable populations or minors agree to standard backg
             </Title>
           </div>
 
+          {!canPersist && (
+            <Alert
+              type="info"
+              showIcon
+              title="Please sign in before changing your account password."
+            />
+          )}
+
           <div
             className="admin-saas-card"
             style={{
@@ -372,12 +908,22 @@ Volunteers working with vulnerable populations or minors agree to standard backg
               maxWidth: 600,
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <form
+              onSubmit={(e) => void handleUpdatePassword(e)}
+              style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+            >
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
+                <label
+                  htmlFor="current-password"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                >
                   Current Password
                 </label>
                 <Input.Password
+                  id="current-password"
+                  name="currentPassword"
+                  autoComplete="current-password"
+                  required
                   placeholder="Enter current password"
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
@@ -386,22 +932,42 @@ Volunteers working with vulnerable populations or minors agree to standard backg
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
+                <label
+                  htmlFor="new-password"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                >
                   New Password
                 </label>
                 <Input.Password
-                  placeholder="Enter at least 6 characters"
+                  id="new-password"
+                  name="newPassword"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  aria-describedby="new-password-hint"
+                  placeholder="Enter at least 8 characters"
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                   style={{ height: 48, borderRadius: 12, borderColor: '#E2E8F0' }}
                 />
+                <Text id="new-password-hint" type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 6 }}>
+                  Minimum 8 characters and different from your current password.
+                </Text>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}>
+                <label
+                  htmlFor="confirm-password"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 8 }}
+                >
                   Confirm New Password
                 </label>
                 <Input.Password
+                  id="confirm-password"
+                  name="confirmPassword"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
                   placeholder="Re-enter new password"
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
@@ -412,7 +978,8 @@ Volunteers working with vulnerable populations or minors agree to standard backg
               <div style={{ marginTop: 10 }}>
                 <Button
                   type="primary"
-                  onClick={handleUpdatePassword}
+                  htmlType="submit"
+                  loading={savingPassword}
                   style={{
                     backgroundColor: '#F97316',
                     borderRadius: 10,
@@ -425,393 +992,18 @@ Volunteers working with vulnerable populations or minors agree to standard backg
                   Update Password
                 </Button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* ─── TAB 3: About Us (View & Edit matching Images 3 & 4) ─── */}
-      {activeTab === 'settings-about' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Header Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isEditingAbout) setIsEditingAbout(false);
-                  else onNavigateSubTab('settings-profile');
-                }}
-                title="Back"
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#10B981',
-                  cursor: 'pointer',
-                }}
-              >
-                <ArrowLeftOutlined style={{ fontSize: 16 }} />
-              </button>
-              <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.3px' }}>
-                {isEditingAbout ? 'Edit about us' : 'About us'}
-              </Title>
-            </div>
-
-            {/* Right Buttons */}
-            {!isEditingAbout ? (
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => setIsEditingAbout(true)}
-                style={{
-                  borderRadius: 10,
-                  height: 38,
-                  borderColor: '#E2E8F0',
-                  color: '#334155',
-                  fontWeight: 500,
-                }}
-              >
-                Edit
-              </Button>
-            ) : (
-              <Space>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setIsEditingAbout(false);
-                    message.success('About us content saved successfully');
-                  }}
-                  style={{
-                    backgroundColor: '#0EA5E9',
-                    borderRadius: 10,
-                    height: 38,
-                    fontWeight: 600,
-                  }}
-                >
-                  Save changes
-                </Button>
-                <Button
-                  onClick={() => setIsEditingAbout(false)}
-                  style={{
-                    borderRadius: 10,
-                    height: 38,
-                    borderColor: '#E2E8F0',
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Space>
-            )}
-          </div>
-
-          {/* Content Card (View or Edit Toolbar) */}
-          <div
-            className="admin-saas-card"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 24,
-              border: '1px solid #F1F5F9',
-              overflow: 'hidden',
-            }}
-          >
-            {isEditingAbout && (
-              /* Rich Text Editor Toolbar (Matching Image 4) */
-              <div
-                style={{
-                  backgroundColor: '#0EA5E9',
-                  padding: '10px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  flexWrap: 'wrap',
-                  color: '#FFFFFF',
-                }}
-              >
-                <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <RedoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <span style={{ opacity: 0.3 }}>|</span>
-                <span style={{ fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>H1</span>
-                <span style={{ fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>H2</span>
-                <span style={{ opacity: 0.3 }}>|</span>
-                <BoldOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <ItalicOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <UnderlineOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <StrikethroughOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <span style={{ opacity: 0.3 }}>|</span>
-                <AlignLeftOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <AlignCenterOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <AlignRightOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <span style={{ opacity: 0.3 }}>|</span>
-                <UnorderedListOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <OrderedListOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <LinkOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-              </div>
-            )}
-
-            <div style={{ padding: '32px' }}>
-              {!isEditingAbout ? (
-                <div style={{ lineHeight: 1.8, color: '#334155', whiteSpace: 'pre-wrap', fontSize: 14 }}>
-                  {aboutContent}
-                </div>
-              ) : (
-                <Input.TextArea
-                  rows={14}
-                  value={aboutContent}
-                  onChange={(e) => setAboutContent(e.target.value)}
-                  style={{
-                    border: 'none',
-                    boxShadow: 'none',
-                    fontSize: 14,
-                    lineHeight: 1.8,
-                    color: '#1E293B',
-                    padding: 0,
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── TAB 4: Privacy Policy ─── */}
-      {activeTab === 'settings-privacy' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Header Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isEditingPrivacy) setIsEditingPrivacy(false);
-                  else onNavigateSubTab('settings-profile');
-                }}
-                title="Back"
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#10B981',
-                  cursor: 'pointer',
-                }}
-              >
-                <ArrowLeftOutlined style={{ fontSize: 16 }} />
-              </button>
-              <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.3px' }}>
-                {isEditingPrivacy ? 'Edit privacy policy' : 'Privacy policy'}
-              </Title>
-            </div>
-
-            {!isEditingPrivacy ? (
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => setIsEditingPrivacy(true)}
-                style={{
-                  borderRadius: 10,
-                  height: 38,
-                  borderColor: '#E2E8F0',
-                  color: '#334155',
-                  fontWeight: 500,
-                }}
-              >
-                Edit
-              </Button>
-            ) : (
-              <Space>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setIsEditingPrivacy(false);
-                    message.success('Privacy policy saved successfully');
-                  }}
-                  style={{
-                    backgroundColor: '#0EA5E9',
-                    borderRadius: 10,
-                    height: 38,
-                    fontWeight: 600,
-                  }}
-                >
-                  Save changes
-                </Button>
-                <Button onClick={() => setIsEditingPrivacy(false)} style={{ borderRadius: 10, height: 38 }}>
-                  Cancel
-                </Button>
-              </Space>
-            )}
-          </div>
-
-          <div
-            className="admin-saas-card"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 24,
-              border: '1px solid #F1F5F9',
-              overflow: 'hidden',
-            }}
-          >
-            {isEditingPrivacy && (
-              <div
-                style={{
-                  backgroundColor: '#0EA5E9',
-                  padding: '10px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  color: '#FFFFFF',
-                }}
-              >
-                <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <RedoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <span style={{ opacity: 0.3 }}>|</span>
-                <BoldOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <ItalicOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <UnderlineOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-              </div>
-            )}
-
-            <div style={{ padding: '32px' }}>
-              {!isEditingPrivacy ? (
-                <div style={{ lineHeight: 1.8, color: '#334155', whiteSpace: 'pre-wrap', fontSize: 14 }}>
-                  {privacyContent}
-                </div>
-              ) : (
-                <Input.TextArea
-                  rows={12}
-                  value={privacyContent}
-                  onChange={(e) => setPrivacyContent(e.target.value)}
-                  style={{ border: 'none', boxShadow: 'none', fontSize: 14, lineHeight: 1.8, padding: 0 }}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── TAB 5: Terms and Condition ─── */}
-      {activeTab === 'settings-terms' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Header Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isEditingTerms) setIsEditingTerms(false);
-                  else onNavigateSubTab('settings-profile');
-                }}
-                title="Back"
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#10B981',
-                  cursor: 'pointer',
-                }}
-              >
-                <ArrowLeftOutlined style={{ fontSize: 16 }} />
-              </button>
-              <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A', letterSpacing: '-0.3px' }}>
-                {isEditingTerms ? 'Edit terms and condition' : 'Terms and condition'}
-              </Title>
-            </div>
-
-            {!isEditingTerms ? (
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => setIsEditingTerms(true)}
-                style={{
-                  borderRadius: 10,
-                  height: 38,
-                  borderColor: '#E2E8F0',
-                  color: '#334155',
-                  fontWeight: 500,
-                }}
-              >
-                Edit
-              </Button>
-            ) : (
-              <Space>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setIsEditingTerms(false);
-                    message.success('Terms and conditions saved successfully');
-                  }}
-                  style={{
-                    backgroundColor: '#0EA5E9',
-                    borderRadius: 10,
-                    height: 38,
-                    fontWeight: 600,
-                  }}
-                >
-                  Save changes
-                </Button>
-                <Button onClick={() => setIsEditingTerms(false)} style={{ borderRadius: 10, height: 38 }}>
-                  Cancel
-                </Button>
-              </Space>
-            )}
-          </div>
-
-          <div
-            className="admin-saas-card"
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 24,
-              border: '1px solid #F1F5F9',
-              overflow: 'hidden',
-            }}
-          >
-            {isEditingTerms && (
-              <div
-                style={{
-                  backgroundColor: '#0EA5E9',
-                  padding: '10px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  color: '#FFFFFF',
-                }}
-              >
-                <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <RedoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <span style={{ opacity: 0.3 }}>|</span>
-                <BoldOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <ItalicOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                <UnderlineOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-              </div>
-            )}
-
-            <div style={{ padding: '32px' }}>
-              {!isEditingTerms ? (
-                <div style={{ lineHeight: 1.8, color: '#334155', whiteSpace: 'pre-wrap', fontSize: 14 }}>
-                  {termsContent}
-                </div>
-              ) : (
-                <Input.TextArea
-                  rows={12}
-                  value={termsContent}
-                  onChange={(e) => setTermsContent(e.target.value)}
-                  style={{ border: 'none', boxShadow: 'none', fontSize: 14, lineHeight: 1.8, padding: 0 }}
-                />
-              )}
-            </div>
-          </div>
-        </div>
+      {/* ─── TABS 3–5: About Us, Privacy Policy & Terms and Conditions ─── */}
+      {activeCmsConfig && (
+        <CmsSettingSection
+          config={activeCmsConfig}
+          isAuthenticated={canPersist}
+          onBack={() => onNavigateSubTab('settings-profile')}
+        />
       )}
     </div>
   );
