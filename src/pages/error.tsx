@@ -1,6 +1,6 @@
 import { useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ApiError } from '@/lib/api/utils/error-handler';
+import { ApiError } from '@/utils/apiError';
 import { motion } from 'framer-motion';
 import { Home, RefreshCw } from 'lucide-react';
 

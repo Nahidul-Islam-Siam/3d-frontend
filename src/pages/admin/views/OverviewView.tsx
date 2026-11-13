@@ -10,7 +10,7 @@ import {
   ReloadOutlined,
   FormOutlined,
 } from '@ant-design/icons';
-import type { AdminOverviewData } from '@/lib/api/services/movement.service';
+import type { AdminOverviewData } from '@/redux/service/types';
 import type { VolunteerApplication } from '../types';
 import type { SubmissionSubTab } from './SubmissionsView';
 

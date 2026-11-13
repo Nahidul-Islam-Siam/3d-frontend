@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Layout,
@@ -37,13 +37,38 @@ import {
 } from '@ant-design/icons';
 
 import logoIconWhite from '@/assets/logo/logo-icon-white.png';
-import movementService, {
-  type AdminOverviewData,
-  type AdminNotificationItem,
-} from '@/lib/api/services/movement.service';
-import { useAppDispatch, useAppSelector } from '@/lib/store';
-import { logout } from '@/lib/store/thunks/auth.thunks';
-import { invalidatePublicEventsCache, invalidatePublicVideosCache } from '@/lib/hooks/usePublicCms';
+import { useLogoutSessionMutation } from '@/redux/api/authApi';
+import { useAppSelector } from '@/redux/hooks';
+import {
+  useCreateEventMutation,
+  useDeleteEventMutation,
+  useGetEventsQuery,
+  useUpdateEventMutation,
+} from '@/redux/service/eventsApi';
+import {
+  useGetAdminOverviewQuery,
+  useGetNotificationsQuery,
+  useGetUnreadNotificationCountQuery,
+  useMarkAllNotificationsReadMutation,
+  useMarkNotificationReadMutation,
+} from '@/redux/service/overviewApi';
+import {
+  useGetAuditionsQuery,
+  useGetInquiriesQuery,
+  useGetSponsorsQuery,
+} from '@/redux/service/submissionsApi';
+import { type AdminNotificationItem } from '@/redux/service/types';
+import {
+  useCreateVideoMutation,
+  useDeleteVideoMutation,
+  useGetVideosQuery,
+  useUpdateVideoMutation,
+} from '@/redux/service/videosApi';
+import {
+  useDeleteVolunteerMutation,
+  useGetVolunteersQuery,
+  useUpdateVolunteerStatusMutation,
+} from '@/redux/service/volunteersApi';
 
 import type {
   VideoSlot,
@@ -58,28 +83,18 @@ import EventsView from './views/EventsView';
 import VolunteersView from './views/VolunteersView';
 import SettingsView from './views/SettingsView';
 import SubmissionsView, {
-  type AuditionItem,
-  type SponsorItem,
-  type InquiryItem,
   type SubmissionSubTab,
 } from './views/SubmissionsView';
 
 const { Header, Sider, Content } = Layout;
 
-type AdminResource = 'overview' | 'videos' | 'events' | 'volunteers' | 'auditions' | 'sponsors' | 'inquiries';
-
-const TAB_RESOURCE_MAP: Record<string, AdminResource[]> = {
-  overview: ['overview'],
-  videos: ['videos'],
-  events: ['events'],
-  volunteers: ['volunteers'],
-};
-
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useAppDispatch();
   const { user, token, isAuthenticated } = useAppSelector((state) => state.auth);
+  const isAuthed = Boolean(token && isAuthenticated);
+
+  const [logoutSession] = useLogoutSessionMutation();
 
   const getTabFromPath = () => {
     const parts = location.pathname.split('/').filter(Boolean);
@@ -102,6 +117,7 @@ export default function AdminDashboard() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [submissionSubTab, setSubmissionSubTab] = useState<SubmissionSubTab>('auditions');
 
   // Detect screen size for responsive drawer
   useEffect(() => {
@@ -113,28 +129,6 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Central Application State synced with Backend APIs
-  const [overviewData, setOverviewData] = useState<AdminOverviewData | null>(null);
-  const [overviewLoading, setOverviewLoading] = useState(false);
-  const [overviewError, setOverviewError] = useState<string | null>(null);
-
-  const [videos, setVideos] = useState<VideoSlot[]>([]);
-  const [videosLoading, setVideosLoading] = useState(false);
-  const [videosError, setVideosError] = useState<string | null>(null);
-
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [eventsLoading, setEventsLoading] = useState(false);
-  const [eventsError, setEventsError] = useState<string | null>(null);
-
-  const [volunteers, setVolunteers] = useState<VolunteerApplication[]>([]);
-  const [volunteersLoading, setVolunteersLoading] = useState(false);
-  const [volunteersError, setVolunteersError] = useState<string | null>(null);
-
-  const [notifications, setNotifications] = useState<AdminNotificationItem[]>([]);
-  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const [notificationsError, setNotificationsError] = useState<string | null>(null);
-
   useEffect(() => {
     try {
       localStorage.removeItem('lab_admin_volunteers');
@@ -145,289 +139,200 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const [auditions, setAuditions] = useState<AuditionItem[]>([]);
-  const [sponsors, setSponsors] = useState<SponsorItem[]>([]);
-  const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
-  const [submissionSubTab, setSubmissionSubTab] = useState<SubmissionSubTab>('auditions');
-  const [submissionLoadingTab, setSubmissionLoadingTab] = useState<SubmissionSubTab | null>(null);
-  const [loadedSubmissionTabs, setLoadedSubmissionTabs] = useState<Record<SubmissionSubTab, boolean>>({
-    auditions: false,
-    sponsors: false,
-    inquiries: false,
+  // Declarative RTK Query subscriptions (auto-deduped & tag-invalidated)
+  const {
+    data: overviewData = null,
+    isLoading: overviewIsLoading,
+    isFetching: overviewFetching,
+    isError: isOverviewError,
+    refetch: refetchOverview,
+  } = useGetAdminOverviewQuery(undefined, {
+    skip: !isAuthed || activeTab !== 'overview',
+  });
+  const overviewLoading = overviewIsLoading || overviewFetching;
+  const overviewError = isOverviewError
+    ? 'Could not load dashboard overview metrics from server.'
+    : null;
+
+  const {
+    data: videos = [],
+    isLoading: videosIsLoading,
+    isFetching: videosFetching,
+    isError: isVideosError,
+    refetch: refetchVideos,
+  } = useGetVideosQuery(undefined, {
+    skip: activeTab !== 'videos',
+  });
+  const videosLoading = videosIsLoading || videosFetching;
+  const videosError = isVideosError ? 'Could not load video slots from server.' : null;
+
+  const {
+    data: events = [],
+    isLoading: eventsIsLoading,
+    isFetching: eventsFetching,
+    isError: isEventsError,
+    refetch: refetchEvents,
+  } = useGetEventsQuery(undefined, {
+    skip: activeTab !== 'events',
+  });
+  const eventsLoading = eventsIsLoading || eventsFetching;
+  const eventsError = isEventsError ? 'Could not load community events from server.' : null;
+
+  const {
+    data: volunteers = [],
+    isLoading: volunteersIsLoading,
+    isFetching: volunteersFetching,
+    isError: isVolunteersError,
+    refetch: refetchVolunteers,
+  } = useGetVolunteersQuery(undefined, {
+    skip: !isAuthed || activeTab !== 'volunteers',
+  });
+  const volunteersLoading = volunteersIsLoading || volunteersFetching;
+  const volunteersError = isVolunteersError
+    ? 'Could not load volunteer applications from server.'
+    : null;
+
+  const {
+    data: auditions = [],
+    isLoading: auditionsLoading,
+    isFetching: auditionsFetching,
+    isSuccess: auditionsSuccess,
+    refetch: refetchAuditions,
+  } = useGetAuditionsQuery(undefined, {
+    skip: !isAuthed || activeTab !== 'submissions' || submissionSubTab !== 'auditions',
   });
 
-  const loadedResourcesRef = useRef<Set<AdminResource>>(new Set());
-  const inFlightResourcesRef = useRef<Partial<Record<AdminResource, Promise<void>>>>({});
-  const prevAuthedRef = useRef<boolean>(Boolean(token && isAuthenticated));
+  const {
+    data: sponsors = [],
+    isLoading: sponsorsLoading,
+    isFetching: sponsorsFetching,
+    isSuccess: sponsorsSuccess,
+    refetch: refetchSponsors,
+  } = useGetSponsorsQuery(undefined, {
+    skip: !isAuthed || activeTab !== 'submissions' || submissionSubTab !== 'sponsors',
+  });
 
-  useEffect(() => {
-    const authed = Boolean(token && isAuthenticated);
-    if (authed && !prevAuthedRef.current) {
-      loadedResourcesRef.current.delete('overview');
-      loadedResourcesRef.current.delete('volunteers');
-      loadedResourcesRef.current.delete('auditions');
-      loadedResourcesRef.current.delete('sponsors');
-      loadedResourcesRef.current.delete('inquiries');
-      setLoadedSubmissionTabs({ auditions: false, sponsors: false, inquiries: false });
-    }
-    prevAuthedRef.current = authed;
-  }, [token, isAuthenticated]);
+  const {
+    data: inquiries = [],
+    isLoading: inquiriesLoading,
+    isFetching: inquiriesFetching,
+    isSuccess: inquiriesSuccess,
+    refetch: refetchInquiries,
+  } = useGetInquiriesQuery(undefined, {
+    skip: !isAuthed || activeTab !== 'submissions' || submissionSubTab !== 'inquiries',
+  });
 
-  const fetchNotifications = useCallback(async () => {
-    if (!token || !isAuthenticated) {
-      setNotifications([]);
-      setUnreadNotificationsCount(0);
-      return;
-    }
-    setNotificationsLoading(true);
-    setNotificationsError(null);
-    try {
-      const feed = await movementService.getNotifications({ limit: 15 });
-      setNotifications(feed.items);
-      setUnreadNotificationsCount(feed.unreadCount);
-    } catch {
-      setNotificationsError('Could not load notifications.');
-    } finally {
-      setNotificationsLoading(false);
-    }
-  }, [token, isAuthenticated]);
+  const submissionLoadingTab: SubmissionSubTab | null =
+    auditionsLoading || auditionsFetching
+      ? 'auditions'
+      : sponsorsLoading || sponsorsFetching
+        ? 'sponsors'
+        : inquiriesLoading || inquiriesFetching
+          ? 'inquiries'
+          : null;
 
-  useEffect(() => {
-    if (!token || !isAuthenticated) {
-      setUnreadNotificationsCount(0);
-      setNotifications([]);
-      return;
-    }
-    movementService
-      .getUnreadNotificationCount()
-      .then((count) => setUnreadNotificationsCount(count))
-      .catch(() => {});
-  }, [token, isAuthenticated]);
+  const loadedSubmissionTabs: Record<SubmissionSubTab, boolean> = {
+    auditions: auditionsSuccess,
+    sponsors: sponsorsSuccess,
+    inquiries: inquiriesSuccess,
+  };
 
-  const fetchResource = useCallback(
-    async (resource: AdminResource, force = false): Promise<void> => {
-      if (!force && loadedResourcesRef.current.has(resource)) {
-        return;
-      }
+  const { data: unreadCountData = 0 } = useGetUnreadNotificationCountQuery(undefined, {
+    skip: !isAuthed,
+  });
 
-      const existingRequest = inFlightResourcesRef.current[resource];
-      if (!force && existingRequest) {
-        return existingRequest;
-      }
-
-      const task = (async () => {
-        try {
-          if (resource === 'overview') {
-            if (!token || !isAuthenticated) {
-              setOverviewData(null);
-              return;
-            }
-            setOverviewLoading(true);
-            setOverviewError(null);
-            try {
-              const liveOverview = await movementService.getAdminOverview();
-              setOverviewData(liveOverview);
-              loadedResourcesRef.current.add('overview');
-            } catch {
-              setOverviewError('Could not load dashboard overview metrics from server.');
-            } finally {
-              setOverviewLoading(false);
-            }
-          } else if (resource === 'videos') {
-            setVideosLoading(true);
-            setVideosError(null);
-            try {
-              const liveVideos = await movementService.getVideos();
-              setVideos(liveVideos);
-              loadedResourcesRef.current.add('videos');
-            } catch {
-              setVideosError('Could not load video slots from server.');
-            } finally {
-              setVideosLoading(false);
-            }
-          } else if (resource === 'events') {
-            setEventsLoading(true);
-            setEventsError(null);
-            try {
-              const liveEvents = await movementService.getEvents();
-              setEvents(liveEvents);
-              loadedResourcesRef.current.add('events');
-            } catch {
-              setEventsError('Could not load community events from server.');
-            } finally {
-              setEventsLoading(false);
-            }
-          } else if (resource === 'volunteers') {
-            if (!token || !isAuthenticated) {
-              setVolunteers([]);
-              return;
-            }
-            setVolunteersLoading(true);
-            setVolunteersError(null);
-            try {
-              const liveVols = await movementService.getVolunteers();
-              setVolunteers(liveVols);
-              loadedResourcesRef.current.add('volunteers');
-            } catch {
-              setVolunteersError('Could not load volunteer applications from server.');
-            } finally {
-              setVolunteersLoading(false);
-            }
-          } else if (resource === 'auditions' || resource === 'sponsors' || resource === 'inquiries') {
-            if (!token || !isAuthenticated) return;
-            setSubmissionLoadingTab(resource);
-            try {
-              if (resource === 'auditions') {
-                const liveAuds = await movementService.getAuditions();
-                setAuditions(liveAuds);
-              } else if (resource === 'sponsors') {
-                const liveSpons = await movementService.getSponsors();
-                setSponsors(liveSpons);
-              } else {
-                const liveInqs = await movementService.getInquiries();
-                setInquiries(liveInqs);
-              }
-              loadedResourcesRef.current.add(resource);
-              setLoadedSubmissionTabs((prev) => ({ ...prev, [resource]: true }));
-            } finally {
-              setSubmissionLoadingTab((current) => (current === resource ? null : current));
-            }
-          }
-        } catch {
-          // Handled per resource
-        } finally {
-          delete inFlightResourcesRef.current[resource];
-        }
-      })();
-
-      inFlightResourcesRef.current[resource] = task;
-      return task;
-    },
-    [token, isAuthenticated]
+  const {
+    data: notificationsFeed,
+    isLoading: notificationsLoading,
+    isError: isNotificationsError,
+    refetch: refetchNotifications,
+  } = useGetNotificationsQuery(
+    { limit: 15 },
+    { skip: !isAuthed || !notificationOpen },
   );
 
-  useEffect(() => {
-    const resources =
-      activeTab === 'submissions' ? [submissionSubTab] : TAB_RESOURCE_MAP[activeTab];
-    if (!resources || resources.length === 0) return;
-    void Promise.all(resources.map((resource) => fetchResource(resource)));
-  }, [activeTab, submissionSubTab, fetchResource]);
+  const notifications = notificationsFeed?.items ?? [];
+  const unreadNotificationsCount = notificationsFeed?.unreadCount ?? unreadCountData;
+  const notificationsError = isNotificationsError ? 'Could not load notifications.' : null;
 
-  // State Updaters (live API sync)
+  // RTK Query Mutations
+  const [updateVideoMutation] = useUpdateVideoMutation();
+  const [createVideoMutation] = useCreateVideoMutation();
+  const [deleteVideoMutation] = useDeleteVideoMutation();
+  const [createEventMutation] = useCreateEventMutation();
+  const [updateEventMutation] = useUpdateEventMutation();
+  const [deleteEventMutation] = useDeleteEventMutation();
+  const [updateVolunteerStatusMutation] = useUpdateVolunteerStatusMutation();
+  const [deleteVolunteerMutation] = useDeleteVolunteerMutation();
+  const [markNotificationReadMutation] = useMarkNotificationReadMutation();
+  const [markAllNotificationsReadMutation] = useMarkAllNotificationsReadMutation();
 
+  // State Updaters (live API sync via RTK Query tag invalidation)
   const handleUpdateVideo = (updated: VideoSlot) => {
-    setVideos((prev) => prev.map((v) => (v.id === updated.id ? updated : v)));
-    invalidatePublicVideosCache();
     if (!token) return;
-    movementService
-      .updateVideo(updated.id, updated)
-      .then((saved) => {
-        setVideos((prev) => prev.map((v) => (v.id === updated.id ? saved : v)));
-        invalidatePublicVideosCache();
-        loadedResourcesRef.current.delete('overview');
-      })
+    void updateVideoMutation({ id: updated.id, body: updated })
+      .unwrap()
       .catch(() => {
         message.error('Failed to update video slot on server.');
-        void fetchResource('videos', true);
       });
   };
 
   const handleAddVideoSlot = (newSlot: VideoSlot) => {
-    setVideos((prev) => [...prev, newSlot]);
-    invalidatePublicVideosCache();
     if (!token) return;
-    const { id: tempId, ...payload } = newSlot;
-    movementService
-      .createVideo(payload)
-      .then((created) => {
-        setVideos((prev) => prev.map((v) => (v.id === tempId ? created : v)));
-        invalidatePublicVideosCache();
-        loadedResourcesRef.current.delete('overview');
-      })
+    const payload: Partial<VideoSlot> = { ...newSlot };
+    delete payload.id;
+    void createVideoMutation(payload)
+      .unwrap()
       .catch(() => {
         message.error('Failed to save new video slot on server.');
-        void fetchResource('videos', true);
       });
   };
 
   const handleDeleteVideoSlot = (id: string) => {
-    setVideos((prev) => prev.filter((v) => v.id !== id));
-    invalidatePublicVideosCache();
     if (!token) return;
-    movementService
-      .deleteVideo(id)
-      .then(() => {
-        invalidatePublicVideosCache();
-        loadedResourcesRef.current.delete('overview');
-      })
+    void deleteVideoMutation(id)
+      .unwrap()
       .catch(() => {
         message.error('Failed to delete video slot on server.');
-        void fetchResource('videos', true);
       });
   };
 
   const handleAddEvent = (newEvent: EventItem) => {
-    setEvents((prev) => [newEvent, ...prev]);
-    invalidatePublicEventsCache();
     if (!token) return;
-    const { id: tempId, ...payload } = newEvent;
-    movementService
-      .createEvent(payload)
-      .then((created) => {
-        setEvents((prev) => prev.map((e) => (e.id === tempId ? created : e)));
-        loadedResourcesRef.current.delete('overview');
-        invalidatePublicEventsCache();
-      })
+    const payload: Partial<EventItem> = { ...newEvent };
+    delete payload.id;
+    void createEventMutation(payload)
+      .unwrap()
       .catch(() => {
         message.error('Failed to create event on server.');
-        void fetchResource('events', true);
       });
   };
 
   const handleUpdateEvent = (updated: EventItem) => {
-    setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
-    invalidatePublicEventsCache();
     if (!token) return;
-    movementService
-      .updateEvent(updated.id, updated)
-      .then((saved) => {
-        setEvents((prev) => prev.map((e) => (e.id === updated.id ? saved : e)));
-        loadedResourcesRef.current.delete('overview');
-        invalidatePublicEventsCache();
-      })
+    void updateEventMutation({ id: updated.id, body: updated })
+      .unwrap()
       .catch(() => {
         message.error('Failed to update event on server.');
-        void fetchResource('events', true);
       });
   };
 
   const handleDeleteEvent = (id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-    invalidatePublicEventsCache();
     if (!token) return;
-    movementService
-      .deleteEvent(id)
-      .then(() => {
-        loadedResourcesRef.current.delete('overview');
-        invalidatePublicEventsCache();
-      })
+    void deleteEventMutation(id)
+      .unwrap()
       .catch(() => {
         message.error('Failed to delete event on server.');
-        void fetchResource('events', true);
       });
   };
 
   const handleUpdateVolunteerStatus = async (
     id: string,
-    status: VolunteerApplication['status']
+    status: VolunteerApplication['status'],
   ): Promise<boolean> => {
     if (!token) return false;
     try {
-      const updated = await movementService.updateVolunteerStatus(id, status);
-      setVolunteers((prev) =>
-        prev.map((v) => (v.id === id ? { ...v, status: updated?.status || status } : v))
-      );
-      loadedResourcesRef.current.delete('overview');
+      await updateVolunteerStatusMutation({ id, status }).unwrap();
       return true;
     } catch {
       return false;
@@ -437,9 +342,7 @@ export default function AdminDashboard() {
   const handleDeleteVolunteer = async (id: string): Promise<boolean> => {
     if (!token) return false;
     try {
-      await movementService.deleteVolunteer(id);
-      setVolunteers((prev) => prev.filter((v) => v.id !== id));
-      loadedResourcesRef.current.delete('overview');
+      await deleteVolunteerMutation(id).unwrap();
       return true;
     } catch {
       return false;
@@ -465,7 +368,7 @@ export default function AdminDashboard() {
   };
 
   const pendingVolunteersCount =
-    loadedResourcesRef.current.has('volunteers')
+    volunteers.length > 0
       ? volunteers.filter((v) => v.status === 'Pending').length
       : (overviewData?.metrics.pendingVolunteers ?? 0);
 
@@ -564,8 +467,7 @@ export default function AdminDashboard() {
             danger: true,
             label: 'Sign Out',
             onClick: () => {
-              dispatch(logout());
-              navigate('/login');
+              void logoutSession().finally(() => navigate('/login'));
             },
           }
         : {
@@ -680,11 +582,7 @@ export default function AdminDashboard() {
   const navigateFromNotification = async (item: AdminNotificationItem) => {
     setNotificationOpen(false);
     if (!item.isRead) {
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === item.id ? { ...n, isRead: true } : n))
-      );
-      setUnreadNotificationsCount((c) => Math.max(0, c - 1));
-      movementService.markNotificationRead(item.id).catch(() => {});
+      void markNotificationReadMutation(item.id);
     }
 
     const href = item.actionHref || '';
@@ -706,12 +604,11 @@ export default function AdminDashboard() {
   };
 
   const handleMarkAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    setUnreadNotificationsCount(0);
-    movementService.markAllNotificationsRead().catch(() => {
-      message.error('Could not mark notifications as read.');
-      void fetchNotifications();
-    });
+    void markAllNotificationsReadMutation()
+      .unwrap()
+      .catch(() => {
+        message.error('Could not mark notifications as read.');
+      });
   };
 
   // Notification Popover Content (Synced with GET /notifications)
@@ -1022,7 +919,7 @@ export default function AdminDashboard() {
                 open={notificationOpen}
                 onOpenChange={(open) => {
                   setNotificationOpen(open);
-                  if (open) void fetchNotifications();
+                  if (open && isAuthed) void refetchNotifications();
                 }}
                 placement="bottomRight"
                 arrow={{ pointAtCenter: true }}
@@ -1085,7 +982,7 @@ export default function AdminDashboard() {
                   overviewData={overviewData}
                   loading={overviewLoading}
                   error={overviewError}
-                  onRefresh={() => void fetchResource('overview', true)}
+                  onRefresh={() => void refetchOverview()}
                   onNavigateTab={handleTabChange}
                   onOpenSubmissionsTab={(sub) => {
                     setSubmissionSubTab(sub);
@@ -1099,7 +996,7 @@ export default function AdminDashboard() {
                   videos={videos}
                   loading={videosLoading}
                   error={videosError}
-                  onRefresh={() => void fetchResource('videos', true)}
+                  onRefresh={() => void refetchVideos()}
                   onUpdateVideo={handleUpdateVideo}
                   onAddSlot={handleAddVideoSlot}
                   onDeleteSlot={handleDeleteVideoSlot}
@@ -1111,7 +1008,7 @@ export default function AdminDashboard() {
                   events={events}
                   loading={eventsLoading}
                   error={eventsError}
-                  onRefresh={() => void fetchResource('events', true)}
+                  onRefresh={() => void refetchEvents()}
                   onAddEvent={handleAddEvent}
                   onUpdateEvent={handleUpdateEvent}
                   onDeleteEvent={handleDeleteEvent}
@@ -1123,7 +1020,7 @@ export default function AdminDashboard() {
                   volunteers={volunteers}
                   loading={volunteersLoading}
                   error={volunteersError}
-                  onRefresh={() => void fetchResource('volunteers', true)}
+                  onRefresh={() => void refetchVolunteers()}
                   onUpdateStatus={handleUpdateVolunteerStatus}
                   onDelete={handleDeleteVolunteer}
                 />
@@ -1139,7 +1036,11 @@ export default function AdminDashboard() {
                   sponsors={sponsors}
                   inquiries={inquiries}
                   isAuthenticated={Boolean(isAuthenticated && token)}
-                  onRefresh={(tab) => void fetchResource(tab, true)}
+                  onRefresh={(tab) => {
+                    if (tab === 'auditions') void refetchAuditions();
+                    else if (tab === 'sponsors') void refetchSponsors();
+                    else void refetchInquiries();
+                  }}
                 />
               )}
 

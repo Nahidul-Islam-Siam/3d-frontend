@@ -1,46 +1,29 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import movementService from '@/lib/api/services/movement.service';
-import type { VideoSlot, EventItem } from '@/pages/admin/types';
-import { resolveVideoUrl, parseEmbedUrl } from '@/utils/videoRegistry';
+import { useCallback, useMemo } from 'react';
+import type { EventItem, VideoSlot } from '@/pages/admin/types';
+import { baseApi } from '@/redux/api/baseApi';
+import { store } from '@/redux/store';
+import { useGetVideosQuery } from '@/redux/service/videosApi';
+import { useGetEventsQuery } from '@/redux/service/eventsApi';
+import { useGetSettingPageQuery } from '@/redux/service/settingsApi';
+import type { PublicSettingPage } from '@/redux/service/types';
+import { parseEmbedUrl, resolveVideoUrl } from '@/utils/videoRegistry';
 
-const CACHE_TTL_MS = 60_000;
-
-let cachedVideos: VideoSlot[] | null = null;
-let cachedVideosAt = 0;
-let videosInFlight: Promise<VideoSlot[]> | null = null;
-
-let cachedEvents: EventItem[] | null = null;
-let cachedEventsAt = 0;
-let eventsInFlight: Promise<EventItem[]> | null = null;
-
-export interface PublicSettingPage {
-  _id?: string;
-  slug: string;
-  title: string;
-  htmlContent: string;
-  isPublished?: boolean;
-  updatedAt?: string;
-}
-
-const settingCache = new Map<string, { data: PublicSettingPage; cachedAt: number }>();
-const settingInFlight = new Map<string, Promise<PublicSettingPage>>();
+export type { PublicSettingPage };
 
 export function invalidatePublicSettingCache(slug?: string): void {
-  if (slug) {
-    settingCache.delete(slug);
-  } else {
-    settingCache.clear();
-  }
+  store.dispatch(
+    baseApi.util.invalidateTags(
+      slug ? [{ type: 'Settings', id: slug }] : ['Settings'],
+    ),
+  );
 }
 
 export function invalidatePublicVideosCache(): void {
-  cachedVideos = null;
-  cachedVideosAt = 0;
+  store.dispatch(baseApi.util.invalidateTags(['Videos']));
 }
 
 export function invalidatePublicEventsCache(): void {
-  cachedEvents = null;
-  cachedEventsAt = 0;
+  store.dispatch(baseApi.util.invalidateTags(['Events']));
 }
 
 function normalizePagePath(path?: string): string {
@@ -61,46 +44,6 @@ function normalizePagePath(path?: string): string {
   return clean;
 }
 
-async function fetchPublicVideos(force = false): Promise<VideoSlot[]> {
-  const fresh = !force && cachedVideos && Date.now() - cachedVideosAt < CACHE_TTL_MS;
-  if (fresh && cachedVideos) return cachedVideos;
-  if (!force && videosInFlight) return videosInFlight;
-
-  videosInFlight = movementService
-    .getVideos()
-    .then((list) => {
-      cachedVideos = list;
-      cachedVideosAt = Date.now();
-      return list;
-    })
-    .catch(() => cachedVideos ?? [])
-    .finally(() => {
-      videosInFlight = null;
-    });
-
-  return videosInFlight;
-}
-
-async function fetchPublicEvents(force = false): Promise<EventItem[]> {
-  const fresh = !force && cachedEvents && Date.now() - cachedEventsAt < CACHE_TTL_MS;
-  if (fresh && cachedEvents) return cachedEvents;
-  if (!force && eventsInFlight) return eventsInFlight;
-
-  eventsInFlight = movementService
-    .getEvents()
-    .then((list) => {
-      cachedEvents = list;
-      cachedEventsAt = Date.now();
-      return list;
-    })
-    .catch(() => cachedEvents ?? [])
-    .finally(() => {
-      eventsInFlight = null;
-    });
-
-  return eventsInFlight;
-}
-
 export interface PublicVideoSlotOptions {
   pagePaths: string[];
   slotMatchers?: string[];
@@ -116,13 +59,11 @@ export function usePublicVideoSlot({
   fallbackUrl,
   fallbackPoster,
 }: PublicVideoSlotOptions) {
-  const [matchedSlot, setMatchedSlot] = useState<VideoSlot | null>(null);
-
+  const { data: allVideos = [] } = useGetVideosQuery();
   const pageKey = pagePaths.join('|');
   const matcherKey = slotMatchers.join('|');
 
-  useEffect(() => {
-    let active = true;
+  const matchedSlot = useMemo<VideoSlot | null>(() => {
     const targetPaths = pageKey
       .split('|')
       .filter(Boolean)
@@ -132,36 +73,28 @@ export function usePublicVideoSlot({
       .filter(Boolean)
       .map((m) => m.toLowerCase());
 
-    void fetchPublicVideos().then((allVideos) => {
-      if (!active) return;
+    const liveVideos = allVideos
+      .filter((v) => v.status === 'Live' && Boolean(v.video_url?.trim()))
+      .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
 
-      const liveVideos = allVideos
-        .filter((v) => v.status === 'Live' && Boolean(v.video_url?.trim()))
-        .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
+    const pageMatches = liveVideos.filter((v) =>
+      targetPaths.includes(normalizePagePath(v.page_location)),
+    );
 
-      const pageMatches = liveVideos.filter((v) =>
-        targetPaths.includes(normalizePagePath(v.page_location))
-      );
+    let chosen: VideoSlot | undefined;
+    if (matchers.length > 0) {
+      chosen = pageMatches.find((v) => {
+        const hay = `${v.slot_label || ''} ${v.section_anchor || ''} ${v.title || ''}`.toLowerCase();
+        return matchers.some((m) => hay.includes(m));
+      });
+    }
 
-      let chosen: VideoSlot | undefined;
-      if (matchers.length > 0) {
-        chosen = pageMatches.find((v) => {
-          const hay = `${v.slot_label || ''} ${v.section_anchor || ''} ${v.title || ''}`.toLowerCase();
-          return matchers.some((m) => hay.includes(m));
-        });
-      }
+    if (!chosen && pageMatches[slotIndex]) {
+      chosen = pageMatches[slotIndex];
+    }
 
-      if (!chosen && pageMatches[slotIndex]) {
-        chosen = pageMatches[slotIndex];
-      }
-
-      setMatchedSlot(chosen ?? null);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [pageKey, matcherKey, slotIndex]);
+    return chosen ?? null;
+  }, [allVideos, pageKey, matcherKey, slotIndex]);
 
   const rawUrl = matchedSlot?.video_url;
   const embed = parseEmbedUrl(rawUrl);
@@ -175,109 +108,66 @@ export function usePublicVideoSlot({
 }
 
 export function usePublicEvents() {
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: allEvents = [], isLoading, isFetching, refetch } = useGetEventsQuery();
 
-  const refresh = useCallback(async (force = true) => {
-    setLoading(true);
-    try {
-      const list = await fetchPublicEvents(force);
-      const visible = list
-        .filter((evt) => evt.status === 'Upcoming' || evt.status === 'Happening now')
-        .sort((a, b) => (a.event_date || '').localeCompare(b.event_date || ''));
-      setEvents(visible);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const events = useMemo<EventItem[]>(() => {
+    return allEvents
+      .filter((evt) => evt.status === 'Upcoming' || evt.status === 'Happening now')
+      .sort((a, b) => (a.event_date || '').localeCompare(b.event_date || ''));
+  }, [allEvents]);
 
-  useEffect(() => {
-    void refresh(false);
-  }, [refresh]);
+  const refresh = useCallback(
+    async (force = true) => {
+      if (force) {
+        await refetch();
+        return;
+      }
+      await refetch();
+    },
+    [refetch],
+  );
 
-  return { events, loading, refresh };
-}
-
-async function fetchPublicSettingPage(slug: string, force = false): Promise<PublicSettingPage> {
-  const cached = settingCache.get(slug);
-  if (!force && cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
-    return cached.data;
-  }
-
-  const pending = !force ? settingInFlight.get(slug) : undefined;
-  if (pending) return pending;
-
-  const request = movementService
-    .getSettingPage(slug)
-    .then((data) => {
-      const normalized: PublicSettingPage = {
-        _id: data?._id,
-        slug: data?.slug || slug,
-        title: data?.title || '',
-        htmlContent: data?.htmlContent || '',
-        isPublished: data?.isPublished,
-        updatedAt: data?.updatedAt,
-      };
-      settingCache.set(slug, { data: normalized, cachedAt: Date.now() });
-      return normalized;
-    })
-    .finally(() => {
-      settingInFlight.delete(slug);
-    });
-
-  settingInFlight.set(slug, request);
-  return request;
+  return { events, loading: isLoading || isFetching, refresh };
 }
 
 export function usePublicSettingPage(
   slug: string,
-  fallback?: { title: string; htmlContent: string }
+  fallback?: { title: string; htmlContent: string },
 ) {
-  const cached = settingCache.get(slug)?.data ?? null;
-  const [page, setPage] = useState<PublicSettingPage | null>(cached);
-  const [loading, setLoading] = useState(!cached);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isFetching, isError, refetch } = useGetSettingPageQuery(slug, {
+    skip: !slug,
+  });
 
   const fallbackTitle = fallback?.title ?? '';
   const fallbackHtml = fallback?.htmlContent ?? '';
-  const latestSlugRef = useRef(slug);
-  latestSlugRef.current = slug;
+
+  const page = useMemo<PublicSettingPage | null>(() => {
+    if (data) return data;
+    if (isError && fallbackHtml) {
+      return {
+        slug,
+        title: fallbackTitle,
+        htmlContent: fallbackHtml,
+      };
+    }
+    return null;
+  }, [data, isError, slug, fallbackTitle, fallbackHtml]);
 
   const refresh = useCallback(
     async (force = true) => {
-      const requestedSlug = slug;
-      const nextCached = settingCache.get(requestedSlug)?.data ?? null;
-      if (!force) {
-        setPage(nextCached);
+      if (force) {
+        await refetch();
+        return;
       }
-      setLoading(!nextCached || force);
-      setError(null);
-      try {
-        const data = await fetchPublicSettingPage(requestedSlug, force);
-        if (latestSlugRef.current !== requestedSlug) return;
-        setPage(data);
-      } catch {
-        if (latestSlugRef.current !== requestedSlug) return;
-        setError('Unable to load page content right now. Please try again.');
-        setPage((prev) =>
-          prev?.slug === requestedSlug
-            ? prev
-            : fallbackHtml
-              ? { slug: requestedSlug, title: fallbackTitle, htmlContent: fallbackHtml }
-              : null
-        );
-      } finally {
-        if (latestSlugRef.current === requestedSlug) {
-          setLoading(false);
-        }
-      }
+      await refetch();
     },
-    [slug, fallbackTitle, fallbackHtml]
+    [refetch],
   );
 
-  useEffect(() => {
-    void refresh(false);
-  }, [refresh]);
-
-  return { page, loading, error, refresh };
+  return {
+    page,
+    loading: isLoading || isFetching,
+    error: isError ? 'Unable to load page content right now. Please try again.' : null,
+    refresh,
+  };
 }

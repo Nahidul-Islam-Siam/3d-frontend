@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import Seo from '@/components/Seo';
 import AuthShowcaseShell from '@/components/auth/AuthShowcaseShell';
-import { useAppDispatch, useAppSelector } from '@/lib/store';
-import { register as registerUser } from '@/lib/store/thunks/auth.thunks';
-import { addToast } from '@/lib/store/slices/uiSlice';
+import { useRegisterMutation } from '@/redux/api/authApi';
+import { useAppDispatch } from '@/redux/hooks';
+import { addToast } from '@/redux/features/uiSlice';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 const schema = z
   .object({
@@ -32,7 +33,10 @@ type Inputs = z.infer<typeof schema>;
 export default function Signup() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const [registerMutation, { isLoading: loading, error: registerError }] = useRegisterMutation();
+  const error = registerError
+    ? extractApiErrorMessage(registerError, 'Registration failed')
+    : null;
   const [showPassword, setShowPassword] = useState(false);
   const [registeredSuccess, setRegisteredSuccess] = useState(false);
 
@@ -46,13 +50,11 @@ export default function Signup() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await dispatch(
-        registerUser({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        })
-      ).unwrap();
+      await registerMutation({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      }).unwrap();
 
       setRegisteredSuccess(true);
       dispatch(

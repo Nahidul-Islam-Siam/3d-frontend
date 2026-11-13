@@ -14,7 +14,10 @@ import {
   message,
 } from 'antd';
 import { Mic, Award, Mail, Eye, Trash2, Search } from 'lucide-react';
-import movementService from '@/lib/api/services/movement.service';
+import {
+  useDeleteSubmissionMutation,
+  useUpdateSubmissionStatusMutation,
+} from '@/redux/service/submissionsApi';
 import { confirmDelete } from '@/utils/confirmDelete';
 
 const { Title, Text, Paragraph } = Typography;
@@ -108,6 +111,8 @@ export default function SubmissionsView({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [selected, setSelected] = useState<SelectedSubmission>(null);
   const [drawerNotes, setDrawerNotes] = useState('');
+  const [updateSubmissionStatus] = useUpdateSubmissionStatusMutation();
+  const [deleteSubmission] = useDeleteSubmissionMutation();
 
   const openDetails = (entry: NonNullable<SelectedSubmission>) => {
     setSelected(entry);
@@ -122,7 +127,7 @@ export default function SubmissionsView({
   ) => {
     setBusyId(id);
     try {
-      await movementService.updateSubmissionStatus(endpoint, id, status, notes);
+      await updateSubmissionStatus({ endpoint, id, status, admin_notes: notes }).unwrap();
       message.success(`Submission marked as ${status}.`);
       if (selected && selected.kind === endpoint && selected.item.id === id) {
         setSelected({
@@ -157,7 +162,7 @@ export default function SubmissionsView({
 
     setBusyId(id);
     try {
-      await movementService.deleteSubmission(endpoint, id);
+      await deleteSubmission({ endpoint, id }).unwrap();
       message.success('Submission removed.');
       if (selected && selected.item.id === id) {
         setSelected(null);

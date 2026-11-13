@@ -5,7 +5,9 @@ import { Mail, MapPin, HeartHandshake, Send, CheckCircle2, AlertCircle } from 'l
 import Seo from '@/components/Seo';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import movementService, { InquiryCreatePayload } from '@/lib/api/services/movement.service';
+import { useSubmitInquiryMutation } from '@/redux/service/submissionsApi';
+import type { InquiryCreatePayload } from '@/redux/service/types';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 type InquiryCategory = NonNullable<InquiryCreatePayload['category']>;
 
@@ -18,6 +20,7 @@ const categoryOptions: Array<{ value: InquiryCategory; label: string; defaultSub
 
 export default function Contact() {
   const location = useLocation();
+  const [submitInquiry, { isLoading: isSubmitting }] = useSubmitInquiryMutation();
   const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
@@ -27,7 +30,6 @@ export default function Contact() {
     subject: 'General Question',
     message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -46,19 +48,12 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      await movementService.submitInquiry(formState);
+      await submitInquiry(formState).unwrap();
       setIsSubmitted(true);
     } catch (err) {
-      const respMsg =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-          : undefined;
-      setErrorMessage(respMsg || 'Unable to send message right now. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      setErrorMessage(extractApiErrorMessage(err, 'Unable to send message right now. Please try again.'));
     }
   };
 

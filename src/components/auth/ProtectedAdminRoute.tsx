@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { ShieldAlert, Lock } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/lib/store';
-import { getProfile } from '@/lib/store/thunks/auth.thunks';
-import { clearSession } from '@/lib/store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { useLazyGetProfileQuery } from '@/redux/api/authApi';
+import { clearSession } from '@/redux/features/authSlice';
 
 const ALLOWED_ADMIN_ROLES = new Set(['admin', 'super_admin', 'editor']);
 
@@ -21,6 +21,7 @@ export interface ProtectedAdminRouteProps {
 export default function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const [triggerGetProfile] = useLazyGetProfileQuery();
   const { user, token, isAuthenticated, initialized } = useAppSelector((state) => state.auth);
   const needsVerification = Boolean(token) && !(initialized && isAuthenticated && user);
   const [isVerifying, setIsVerifying] = useState<boolean>(needsVerification);
@@ -40,12 +41,9 @@ export default function ProtectedAdminRoute({ children }: ProtectedAdminRoutePro
     setIsVerifying(true);
 
     if (!inFlightVerify || inFlightVerify.token !== token) {
-      const verifyPromise = dispatch(getProfile())
+      const verifyPromise = triggerGetProfile()
         .unwrap()
         .catch(() => {
-          localStorage.removeItem('lab_access_token');
-          localStorage.removeItem('lab_refresh_token');
-          localStorage.removeItem('lab_user');
           dispatch(clearSession());
         })
         .finally(() => {
@@ -63,7 +61,7 @@ export default function ProtectedAdminRoute({ children }: ProtectedAdminRoutePro
     return () => {
       active = false;
     };
-  }, [dispatch, token, initialized, isAuthenticated, user]);
+  }, [dispatch, triggerGetProfile, token, initialized, isAuthenticated, user]);
 
   if (isVerifying) {
     return (

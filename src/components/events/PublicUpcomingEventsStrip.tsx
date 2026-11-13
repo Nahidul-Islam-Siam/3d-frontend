@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { Calendar, Clock, MapPin, Users, Ticket, X, CheckCircle2, ExternalLink } from 'lucide-react';
-import movementService from '@/lib/api/services/movement.service';
+import { useSubmitEventRsvpMutation } from '@/redux/service/eventsApi';
 import type { EventItem } from '@/pages/admin/types';
 import { usePublicEvents } from '@/lib/hooks/usePublicCms';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 export interface PublicUpcomingEventsStripProps {
   compact?: boolean;
@@ -14,6 +15,7 @@ export default function PublicUpcomingEventsStrip({
   className = '',
 }: PublicUpcomingEventsStripProps) {
   const { events, refresh } = usePublicEvents();
+  const [submitEventRsvp, { isLoading: submitting }] = useSubmitEventRsvpMutation();
   const [activeEvent, setActiveEvent] = useState<EventItem | null>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -22,7 +24,6 @@ export default function PublicUpcomingEventsStrip({
   const [guestPhone, setGuestPhone] = useState('');
   const [tickets, setTickets] = useState(1);
   const [notes, setNotes] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirmedMsg, setConfirmedMsg] = useState<string | null>(null);
 
@@ -59,25 +60,22 @@ export default function PublicUpcomingEventsStrip({
       return;
     }
 
-    setSubmitting(true);
     setErrorMsg(null);
     try {
-      await movementService.submitEventRsvp(activeEvent.id, {
-        guest_name: guestName.trim(),
-        guest_email: guestEmail.trim(),
-        ...(guestPhone.trim() ? { guest_phone: guestPhone.trim() } : {}),
-        tickets: Math.max(1, tickets),
-        ...(notes.trim() ? { notes: notes.trim() } : {}),
-      });
+      await submitEventRsvp({
+        eventId: activeEvent.id,
+        body: {
+          guest_name: guestName.trim(),
+          guest_email: guestEmail.trim(),
+          ...(guestPhone.trim() ? { guest_phone: guestPhone.trim() } : {}),
+          tickets: Math.max(1, tickets),
+          ...(notes.trim() ? { notes: notes.trim() } : {}),
+        },
+      }).unwrap();
       setConfirmedMsg(`Your seat reservation (${tickets} seat${tickets > 1 ? 's' : ''}) for "${activeEvent.title}" is confirmed!`);
       await refresh(true);
     } catch (err: unknown) {
-      const apiMsg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Unable to submit RSVP right now. Please try again.';
-      setErrorMsg(apiMsg);
-    } finally {
-      setSubmitting(false);
+      setErrorMsg(extractApiErrorMessage(err, 'Unable to submit RSVP right now. Please try again.'));
     }
   };
 

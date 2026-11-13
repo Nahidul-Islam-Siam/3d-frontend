@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import {
   Alert,
   Table,
@@ -45,7 +45,9 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import movementService, { type EventRsvpItem } from '@/lib/api/services/movement.service';
+import { useGetEventRsvpsQuery } from '@/redux/service/eventsApi';
+import { useUploadMediaMutation } from '@/redux/service/mediaApi';
+import type { EventRsvpItem } from '@/redux/service/types';
 import { formatBytes, optimizeImageForUpload } from '@/utils/mediaOptimizer';
 import type { EventItem } from '../types';
 import RichTextEditor from '@/components/common/RichTextEditor';
@@ -78,9 +80,6 @@ export default function EventsView({
   const [viewMode, setViewMode] = useState<'list' | 'cards' | 'create' | 'edit'>('list');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
-  const [eventRsvps, setEventRsvps] = useState<EventRsvpItem[]>([]);
-  const [rsvpsLoading, setRsvpsLoading] = useState(false);
-  const [rsvpsError, setRsvpsError] = useState<string | null>(null);
 
   // Filters & Search
   const [searchText, setSearchText] = useState('');
@@ -97,28 +96,17 @@ export default function EventsView({
   const [eventDescription, setEventDescription] = useState<string>('');
   const [selectedTicketType, setSelectedTicketType] = useState<'Free RSVP' | 'Paid Ticket' | 'Suggested Donation'>('Free RSVP');
 
-  const loadEventRsvps = useCallback(async (eventId: string) => {
-    setRsvpsLoading(true);
-    setRsvpsError(null);
-    try {
-      const list = await movementService.getEventRsvps(eventId);
-      setEventRsvps(list);
-    } catch {
-      setEventRsvps([]);
-      setRsvpsError('Could not load confirmed RSVP list from server.');
-    } finally {
-      setRsvpsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!selectedEvent?.id) {
-      setEventRsvps([]);
-      setRsvpsError(null);
-      return;
-    }
-    void loadEventRsvps(selectedEvent.id);
-  }, [selectedEvent?.id, loadEventRsvps]);
+  const [uploadMedia] = useUploadMediaMutation();
+  const {
+    data: eventRsvps = [],
+    isLoading: rsvpsLoading,
+    isFetching: rsvpsFetching,
+    isError: isRsvpsError,
+    refetch: refetchEventRsvps,
+  } = useGetEventRsvpsQuery(selectedEvent?.id ?? '', {
+    skip: !selectedEvent?.id,
+  });
+  const rsvpsError = isRsvpsError ? 'Could not load confirmed RSVP list from server.' : null;
 
   const handleExportRsvps = () => {
     if (!selectedEvent || eventRsvps.length === 0) return;
@@ -233,10 +221,10 @@ export default function EventsView({
         maxHeight: 1920,
         quality: 0.85,
       });
-      const uploaded = await movementService.uploadMedia(
-        [optimized.file],
-        (pct) => setBannerUploadProgress(pct),
-      );
+      const uploaded = await uploadMedia({
+        files: [optimized.file],
+        onProgress: (pct) => setBannerUploadProgress(pct),
+      }).unwrap();
       const url = uploaded[0]?.url;
       if (!url) {
         throw new Error('Upload completed without a media URL.');
@@ -1667,7 +1655,7 @@ export default function EventsView({
                 showIcon
                 message={rsvpsError}
                 action={
-                  <Button size="small" onClick={() => void loadEventRsvps(selectedEvent.id)}>
+                  <Button size="small" onClick={() => void refetchEventRsvps()}>
                     Retry
                   </Button>
                 }
@@ -1680,7 +1668,7 @@ export default function EventsView({
 
             <Table
               className="admin-saas-table"
-              loading={rsvpsLoading}
+              loading={rsvpsLoading || rsvpsFetching}
               dataSource={eventRsvps}
               rowKey="id"
               pagination={false}

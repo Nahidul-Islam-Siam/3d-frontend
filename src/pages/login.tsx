@@ -6,10 +6,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import Seo from '@/components/Seo';
 import AuthShowcaseShell from '@/components/auth/AuthShowcaseShell';
-import authService from '@/lib/api/services/auth.service';
-import { useAppDispatch, useAppSelector } from '@/lib/store';
-import { login } from '@/lib/store/thunks/auth.thunks';
-import { addToast } from '@/lib/store/slices/uiSlice';
+import { useForgotPasswordMutation, useLoginMutation } from '@/redux/api/authApi';
+import { useAppDispatch } from '@/redux/hooks';
+import { addToast } from '@/redux/features/uiSlice';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -22,7 +22,9 @@ export default function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const [loginMutation, { isLoading: loading, error: loginError }] = useLoginMutation();
+  const [forgotPasswordMutation] = useForgotPasswordMutation();
+  const error = loginError ? extractApiErrorMessage(loginError, 'Login failed') : null;
   const [showPassword, setShowPassword] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -39,7 +41,7 @@ export default function Login() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const auth = await dispatch(login(data)).unwrap();
+      const auth = await loginMutation(data).unwrap();
       dispatch(
         addToast({
           type: 'success',
@@ -57,7 +59,7 @@ export default function Login() {
         navigate('/', { replace: true });
       }
     } catch {
-      // Displayed cleanly via Redux error state
+      // Displayed cleanly via RTK Query error state
     }
   };
 
@@ -65,7 +67,7 @@ export default function Login() {
     e.preventDefault();
     setForgotStatus('sending');
     try {
-      await authService.forgotPassword(forgotEmail);
+      await forgotPasswordMutation({ email: forgotEmail }).unwrap();
       setForgotStatus('sent');
       setForgotMsg('If that account exists, a password reset link was sent to your inbox.');
     } catch {

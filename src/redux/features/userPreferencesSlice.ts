@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface UserPreferences {
+export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
   language: string;
   notifications: {
@@ -40,19 +40,25 @@ const userPreferencesSlice = createSlice({
   name: 'userPreferences',
   initialState,
   reducers: {
-    setTheme: (state, action: PayloadAction<'light' | 'dark' | 'system'>) => {
+    setTheme: (state, action: PayloadAction<UserPreferences['theme']>) => {
       state.theme = action.payload;
     },
     setLanguage: (state, action: PayloadAction<string>) => {
       state.language = action.payload;
     },
-    toggleNotification: (state, action: PayloadAction<keyof UserPreferences['notifications']>) => {
+    toggleNotification: (
+      state,
+      action: PayloadAction<keyof UserPreferences['notifications']>,
+    ) => {
       state.notifications[action.payload] = !state.notifications[action.payload];
     },
     toggleSidebar: (state) => {
       state.sidebar.collapsed = !state.sidebar.collapsed;
     },
-    setTablePreferences: (state, action: PayloadAction<Partial<UserPreferences['tablePreferences']>>) => {
+    setTablePreferences: (
+      state,
+      action: PayloadAction<Partial<UserPreferences['tablePreferences']>>,
+    ) => {
       state.tablePreferences = { ...state.tablePreferences, ...action.payload };
     },
   },
@@ -66,4 +72,5 @@ export const {
   setTablePreferences,
 } = userPreferencesSlice.actions;
 
-export default userPreferencesSlice.reducer; 
+export default userPreferencesSlice.reducer;
+

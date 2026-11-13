@@ -46,7 +46,7 @@ import {
 } from '@/utils/videoRegistry';
 import RichTextEditor from '@/components/common/RichTextEditor';
 import SafeHtmlContent from '@/components/common/SafeHtmlContent';
-import movementService from '@/lib/api/services/movement.service';
+import { useUploadMediaMutation } from '@/redux/service/mediaApi';
 import { formatBytes, optimizeImageForUpload } from '@/utils/mediaOptimizer';
 import { confirmDelete } from '@/utils/confirmDelete';
 import { Progress } from 'antd';
@@ -116,6 +116,7 @@ export default function VideosView({
 }: VideosViewProps) {
   // Page View Modes: 'list' | 'create' | 'edit'
   const [viewMode, setViewMode] = useState<'list' | 'create' | 'edit'>('list');
+  const [uploadMedia] = useUploadMediaMutation();
 
   const [statusFilter, setStatusFilter] = useState<'All' | 'Live' | 'Draft' | 'Empty'>('All');
   const [searchText, setSearchText] = useState('');
@@ -150,9 +151,12 @@ export default function VideosView({
     setUploadingVideo(true);
     setVideoUploadProgress(0);
     try {
-      const uploaded = await movementService.uploadMedia([file], (pct) => {
-        setVideoUploadProgress(pct);
-      });
+      const uploaded = await uploadMedia({
+        files: [file],
+        onProgress: (pct) => {
+          setVideoUploadProgress(pct);
+        },
+      }).unwrap();
       const url = uploaded[0]?.url;
       if (!url) throw new Error('Missing video URL');
       setUploadedVideoUrl(url);
@@ -186,7 +190,7 @@ export default function VideosView({
         maxHeight: 1600,
         quality: 0.85,
       });
-      const uploaded = await movementService.uploadMedia([optimized.file]);
+      const uploaded = await uploadMedia({ files: [optimized.file] }).unwrap();
       const url = uploaded[0]?.url;
       if (!url) throw new Error('Missing thumbnail URL');
       setUploadedThumbnailUrl(url);

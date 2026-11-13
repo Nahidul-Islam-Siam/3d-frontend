@@ -17,7 +17,12 @@ import {
 import Seo from '@/components/Seo';
 import PublicUpcomingEventsStrip from '@/components/events/PublicUpcomingEventsStrip';
 import auditionBanner from '@/assets/welcome/audition_banner.png';
-import movementService from '@/lib/api/services/movement.service';
+import { useApplyVolunteerMutation } from '@/redux/service/volunteersApi';
+import {
+  useApplyAuditionMutation,
+  useApplySponsorMutation,
+} from '@/redux/service/submissionsApi';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 type TabType = 'volunteer' | 'audition' | 'sponsor' | 'donate';
 
@@ -25,6 +30,9 @@ const SQUARE_DONATION_URL = 'https://square.link/u/D9O5AJW0';
 
 export default function SuicideAwarenessShowdownPage() {
   const location = useLocation();
+  const [applyVolunteer] = useApplyVolunteerMutation();
+  const [applyAudition] = useApplyAuditionMutation();
+  const [applySponsor] = useApplySponsorMutation();
   const [activeTab, setActiveTab] = useState<TabType>('audition');
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -87,28 +95,22 @@ export default function SuicideAwarenessShowdownPage() {
     dedication: '',
   });
 
-  const extractError = (err: unknown): string => {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const resp = (err as { response?: { data?: { message?: string } } }).response;
-      if (resp?.data?.message) return resp.data.message;
-    }
-    if (err instanceof Error && err.message) return err.message;
-    return 'Unable to submit right now. Please try again.';
-  };
+  const extractError = (err: unknown): string =>
+    extractApiErrorMessage(err, 'Unable to submit right now. Please try again.');
 
   const handleVolunteerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      await movementService.applyVolunteer({
+      await applyVolunteer({
         full_name: volunteerData.name,
         email: volunteerData.email,
         phone: volunteerData.phone,
         interests: [volunteerData.role, 'Suicide Awareness Showdown'],
         availability: volunteerData.availability,
         bio: volunteerData.message,
-      });
+      }).unwrap();
       setSubmittedMessage('Thank you for volunteering! Our production team will contact you shortly with schedules and orientation details.');
       setIsSubmitted(true);
     } catch (err) {
@@ -123,7 +125,7 @@ export default function SuicideAwarenessShowdownPage() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      await movementService.applyAudition(auditionData);
+      await applyAudition(auditionData).unwrap();
       setSubmittedMessage('Your audition registration has been received! Our casting director will review your details and reach out with audition time slots.');
       setIsSubmitted(true);
     } catch (err) {
@@ -138,10 +140,10 @@ export default function SuicideAwarenessShowdownPage() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      await movementService.applySponsor({
+      await applySponsor({
         ...sponsorData,
         program: 'Suicide Awareness Showdown',
-      });
+      }).unwrap();
       setSubmittedMessage('Thank you for your sponsorship interest! Our partnership director will reach out within 24 hours with package details and invoicing.');
       setIsSubmitted(true);
     } catch (err) {

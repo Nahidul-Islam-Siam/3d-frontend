@@ -1,17 +1,13 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface UIState {
-  modals: {
-    [key: string]: boolean;
-  };
-  toasts: {
+export interface UIState {
+  modals: Record<string, boolean>;
+  toasts: Array<{
     id: string;
     type: 'success' | 'error' | 'info' | 'warning';
     message: string;
-  }[];
-  loading: {
-    [key: string]: boolean;
-  };
+  }>;
+  loading: Record<string, boolean>;
   sidebar: {
     isOpen: boolean;
   };
@@ -38,20 +34,17 @@ const uiSlice = createSlice({
       action: PayloadAction<{
         type: 'success' | 'error' | 'info' | 'warning';
         message: string;
-      }>
+      }>,
     ) => {
       state.toasts.push({
-        id: Date.now().toString(),
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         ...action.payload,
       });
     },
     removeToast: (state, action: PayloadAction<string>) => {
       state.toasts = state.toasts.filter((toast) => toast.id !== action.payload);
     },
-    setLoading: (
-      state,
-      action: PayloadAction<{ key: string; isLoading: boolean }>
-    ) => {
+    setLoading: (state, action: PayloadAction<{ key: string; isLoading: boolean }>) => {
       state.loading[action.payload.key] = action.payload.isLoading;
     },
     toggleSidebar: (state) => {
@@ -60,7 +53,6 @@ const uiSlice = createSlice({
   },
 });
 
-export const { setModal, addToast, removeToast, setLoading, toggleSidebar } =
-  uiSlice.actions;
+export const { setModal, addToast, removeToast, setLoading, toggleSidebar } = uiSlice.actions;
+export default uiSlice.reducer;
 
-export default uiSlice.reducer; 

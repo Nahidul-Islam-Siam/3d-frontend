@@ -19,14 +19,20 @@ import {
   ReloadOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { AxiosError } from 'axios';
 import RichTextEditor from '@/components/common/RichTextEditor';
 import SafeHtmlContent from '@/components/common/SafeHtmlContent';
-import authService from '@/lib/api/services/auth.service';
-import movementService from '@/lib/api/services/movement.service';
-import { invalidatePublicSettingCache } from '@/lib/hooks/usePublicCms';
-import { useAppDispatch, useAppSelector } from '@/lib/store';
-import { getProfile, updateProfile } from '@/lib/store/thunks/auth.thunks';
+import {
+  useChangePasswordMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from '@/redux/api/authApi';
+import { useAppSelector } from '@/redux/hooks';
+import { useUploadMediaMutation } from '@/redux/service/mediaApi';
+import {
+  useGetSettingPageQuery,
+  useUpdateSettingPageMutation,
+} from '@/redux/service/settingsApi';
+import { extractApiErrorMessage } from '@/utils/apiError';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -121,13 +127,7 @@ function getInitials(name?: string): string {
 }
 
 function getApiErrorMessage(err: unknown, fallback: string): string {
-  if (err instanceof AxiosError) {
-    return err.response?.data?.message || err.message || fallback;
-  }
-  if (err instanceof Error && err.message) {
-    return err.message;
-  }
-  return fallback;
+  return extractApiErrorMessage(err, fallback);
 }
 
 function extractPlainTextLength(html: string): number {
@@ -142,32 +142,38 @@ interface CmsSettingSectionProps {
 }
 
 function CmsSettingSection({ config, isAuthenticated, onBack }: CmsSettingSectionProps) {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const {
+    data: pageData,
+    isLoading,
+    isFetching,
+    isError,
+    error: queryError,
+    refetch,
+  } = useGetSettingPageQuery(config.slug);
+  const [updateSettingPage, { isLoading: saving }] = useUpdateSettingPageMutation();
+
   const [isEditing, setIsEditing] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [savedHtml, setSavedHtml] = useState('');
   const [draftHtml, setDraftHtml] = useState('');
 
-  const fetchPage = useCallback(async () => {
-    setLoading(true);
-    setLoadError(null);
-    try {
-      const page = await movementService.getSettingPage(config.slug);
-      const html = page?.htmlContent || '';
-      setSavedHtml(html);
-      setDraftHtml(html);
-    } catch (err) {
-      setLoadError(getApiErrorMessage(err, `Failed to load ${config.title.toLowerCase()}.`));
-    } finally {
-      setLoading(false);
-    }
-  }, [config.slug, config.title]);
+  const loading = isLoading || isFetching;
+  const loadError = isError
+    ? getApiErrorMessage(queryError, `Failed to load ${config.title.toLowerCase()}.`)
+    : null;
 
   useEffect(() => {
     setIsEditing(false);
-    void fetchPage();
-  }, [fetchPage]);
+    setSavedHtml('');
+    setDraftHtml('');
+  }, [config.slug]);
+
+  useEffect(() => {
+    if (pageData) {
+      const html = pageData.htmlContent || '';
+      setSavedHtml(html);
+      setDraftHtml(html);
+    }
+  }, [pageData]);
 
   const handleStartEdit = () => {
     setDraftHtml(savedHtml);
@@ -191,12 +197,11 @@ function CmsSettingSection({ config, isAuthenticated, onBack }: CmsSettingSectio
       return;
     }
 
-    setSaving(true);
     try {
-      const updated = await movementService.updateSettingPage(config.slug, {
-        htmlContent: trimmedHtml,
-      });
-      invalidatePublicSettingCache(config.slug);
+      const updated = await updateSettingPage({
+        slug: config.slug,
+        body: { htmlContent: trimmedHtml },
+      }).unwrap();
       const nextHtml = updated?.htmlContent ?? trimmedHtml;
       setSavedHtml(nextHtml);
       setDraftHtml(nextHtml);
@@ -204,8 +209,6 @@ function CmsSettingSection({ config, isAuthenticated, onBack }: CmsSettingSectio
       message.success(`${config.saveLabel} updated successfully`);
     } catch (err) {
       message.error(getApiErrorMessage(err, `Failed to update ${config.title.toLowerCase()}.`));
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -300,7 +303,7 @@ function CmsSettingSection({ config, isAuthenticated, onBack }: CmsSettingSectio
           showIcon
           title={loadError}
           action={
-            <Button size="small" icon={<ReloadOutlined />} onClick={() => void fetchPage()}>
+            <Button size="small" icon={<ReloadOutlined />} onClick={() => void refetch()}>
               Retry
             </Button>
           }
@@ -341,9 +344,13 @@ export default function SettingsView({
   currentSubTab = 'settings-profile',
   onNavigateSubTab,
 }: SettingsViewProps) {
-  const dispatch = useAppDispatch();
   const { user, isAuthenticated, token } = useAppSelector((state) => state.auth);
   const canPersist = Boolean(isAuthenticated && token);
+
+  useGetProfileQuery(undefined, { skip: !canPersist });
+  const [updateProfileMutation] = useUpdateProfileMutation();
+  const [changePasswordMutation] = useChangePasswordMutation();
+  const [uploadMedia] = useUploadMediaMutation();
 
   const activeTab: SettingsSubTab =
     currentSubTab === 'settings' || currentSubTab === 'settings-profile'
@@ -374,12 +381,6 @@ export default function SettingsView({
   }, []);
 
   useEffect(() => revokePreviewObjectUrl, [revokePreviewObjectUrl]);
-
-  useEffect(() => {
-    if (canPersist) {
-      void dispatch(getProfile());
-    }
-  }, [canPersist, dispatch]);
 
   useEffect(() => {
     if (!user) return;
@@ -422,7 +423,7 @@ export default function SettingsView({
     setUploadingAvatar(true);
 
     try {
-      const uploaded = await movementService.uploadMedia([file]);
+      const uploaded = await uploadMedia({ files: [file] }).unwrap();
       const media = uploaded[0];
       if (!media?.url) {
         throw new Error('Upload succeeded without returning an image URL.');
@@ -434,7 +435,7 @@ export default function SettingsView({
       };
       setPendingAvatar(avatarPayload);
 
-      await dispatch(updateProfile({ avatar: avatarPayload })).unwrap();
+      await updateProfileMutation({ avatar: avatarPayload }).unwrap();
       revokePreviewObjectUrl();
       setAvatarPreviewUrl('');
       setPendingAvatar(null);
@@ -482,13 +483,11 @@ export default function SettingsView({
 
     setSavingProfile(true);
     try {
-      await dispatch(
-        updateProfile({
-          name: trimmedName,
-          phone: formattedPhone,
-          ...(pendingAvatar ? { avatar: pendingAvatar } : {}),
-        })
-      ).unwrap();
+      await updateProfileMutation({
+        name: trimmedName,
+        phone: formattedPhone,
+        ...(pendingAvatar ? { avatar: pendingAvatar } : {}),
+      }).unwrap();
       setPendingAvatar(null);
       message.success('Personal information updated successfully');
     } catch (err) {
@@ -533,7 +532,10 @@ export default function SettingsView({
 
     setSavingPassword(true);
     try {
-      await authService.changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+      await changePasswordMutation({
+        oldPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      }).unwrap();
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       message.success('Password updated successfully');
     } catch (err) {
