@@ -65,7 +65,7 @@ export default function RootLayout() {
   const isDarkPage = location.pathname === '/donate' || isStoriesPage;
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkPage ? 'bg-[#08070B] text-white' : 'bg-[#FAF4E6] text-stone-900'} ${isDarkPage ? 'overflow-x-clip' : 'overflow-x-hidden'} selection:bg-[#F97316] selection:text-white`}>
+    <div className={`min-h-screen flex flex-col ${isDarkPage ? 'bg-[#08070B] text-white' : 'bg-[#FAF4E6] text-stone-900'} overflow-x-clip selection:bg-[#F97316] selection:text-white`}>
       {/* Butter-smooth Lenis scroll across the entire application */}
       <SmoothScroll />
 
