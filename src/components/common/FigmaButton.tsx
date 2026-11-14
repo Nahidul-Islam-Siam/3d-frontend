@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import frame55Arrow from '@/assets/icons/Frame 55.png';
 import frame7Arrow from '@/assets/icons/Frame 7.png';
+import btnArrow from '@/assets/icons/btn-arrow.png';
 
 export interface FigmaButtonProps {
   children: React.ReactNode;
@@ -75,7 +76,9 @@ export default function FigmaButton({
   } else if (variant === 'outline-white' || variant === 'dark-outline') {
     containerStyles = "border border-white/70 bg-black/20 hover:bg-white/10 hover:border-white shadow-sm backdrop-blur-[2px]";
     textColor = "text-white";
-    // Keep activeArrowIcon undefined to render white currentColor SVG circular arrow
+    if (!activeArrowIcon) {
+      activeArrowIcon = btnArrow;
+    }
   } else {
     // white
     containerStyles = "bg-white hover:bg-stone-50 text-stone-900 border border-stone-200 shadow-sm";
