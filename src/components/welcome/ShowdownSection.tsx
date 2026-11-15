@@ -24,6 +24,9 @@ export interface ShowdownSectionProps {
   isStandaloneSection?: boolean;
   topCreamBand?: boolean;
   bottomCreamBand?: boolean;
+  title?: string;
+  subtitle?: string;
+  hideBadge?: boolean;
 }
 
 export default function ShowdownSection({ 
@@ -32,6 +35,9 @@ export default function ShowdownSection({
   isStandaloneSection = true,
   topCreamBand = false,
   bottomCreamBand = false,
+  title,
+  subtitle,
+  hideBadge = false,
 }: ShowdownSectionProps) {
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState<boolean>(false);
 
@@ -71,17 +77,19 @@ export default function ShowdownSection({
       {/* ─── 1. TOP HEADER: SUICIDE AWARENESS SHOWDOWN HIGHLIGHT ─── */}
       <div className="w-full flex flex-col lg:flex-row lg:items-end justify-between gap-4 shrink-0">
         <div className="space-y-1.5 text-left max-w-2xl">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F97316]/20 border border-[#F97316]/40 text-[#F97316] text-[11px] font-semibold uppercase tracking-widest">
-            <HeartHandshake className="w-3.5 h-3.5" /> Suicide Awareness Showdown
-          </span>
+          {!hideBadge && (
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F97316]/20 border border-[#F97316]/40 text-[#F97316] text-[11px] font-semibold uppercase tracking-widest">
+              <HeartHandshake className="w-3.5 h-3.5" /> Suicide Awareness Showdown
+            </span>
+          )}
           <h2 
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-white tracking-tight leading-tight"
           >
-            Where Are You Now? Letters to Etcetera
+            {title || "Where Are You Now? Letters to Etcetera"}
           </h2>
           <p className="text-xs sm:text-[13px] text-stone-300 font-sans leading-relaxed">
-            Sometimes hope begins with one conversation. Through storytelling, theatre, music, and dance, we break the silence and remind every person that tomorrow is worth seeing.
+            {subtitle || "Sometimes hope begins with one conversation. Through storytelling, theatre, music, and dance, we break the silence and remind every person that tomorrow is worth seeing."}
           </p>
         </div>
 
@@ -90,7 +98,7 @@ export default function ShowdownSection({
             to="/suicide-awareness-showdown"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-lg hover:shadow-[#F97316]/25 hover:scale-[1.02]"
           >
-            <span>Explore Dedicated Page & Forms</span>
+            <span>TICKETS OPEN NOW</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <FigmaButton
@@ -100,7 +108,7 @@ export default function ShowdownSection({
             showArrow={true}
             className="!border-white/30 !text-white !bg-white/10 hover:!bg-white/20"
           >
-            Audition Details
+            Audition
           </FigmaButton>
         </div>
       </div>

@@ -271,7 +271,7 @@ export default function MomentsWhyWeServeSection({
             transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="text-left sm:text-right shrink-0 self-start sm:self-auto"
           >
-            <p className="text-[#18181B] font-sans font-bold text-base sm:text-lg lg:text-[19px] leading-snug">
+            <p className="text-[#E06D1A] font-sans font-medium text-sm sm:text-base lg:text-[16px] leading-snug">
               Every person has a<br className="hidden sm:inline" /> part in the story.
             </p>
           </motion.div>
