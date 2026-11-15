@@ -32,7 +32,6 @@ export default function Navbar() {
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
   const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
-  const isServeBesideUsPage = location.pathname === '/how-we-serve/serve-beside-us' || location.pathname === '/serve-beside-us';
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
   const isDarkHeroPage = isDonatePage || isYouMatterPage || isWelcomeHomePage || isShowdownPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
