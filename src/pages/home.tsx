@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Seo from '../components/Seo';
 import StepInsideWelcomeSection from '@/components/welcome/StepInsideWelcomeSection';
 import TakingTheStageSection from '@/components/welcome/TakingTheStageSection';
@@ -11,10 +12,24 @@ import ShowdownSection from '@/components/welcome/ShowdownSection';
 // import ZAxisStage from '@/components/welcome/ZAxisStage';
 
 export default function Home() {
+  const location = useLocation();
+
   useEffect(() => {
     // Reveal global navbar for site redesign
     window.dispatchEvent(new CustomEvent('reveal-navbar'));
-  }, []);
+
+    // Handle hash deep link (e.g. #your-story or #visitor-interest-form)
+    if (location.hash) {
+      const hashId = location.hash.replace('#', '');
+      const timer = setTimeout(() => {
+        const target = document.getElementById(hashId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
 
   return (
     <>

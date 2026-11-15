@@ -1,27 +1,25 @@
 import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Seo from '@/components/Seo';
 import HowWeServeHeroSection from '@/components/how-we-serve/HowWeServeHeroSection';
 import FourDoorsSection from '@/components/welcome/FourDoorsSection';
 import HowWeServePillarsSection from '@/components/how-we-serve/HowWeServePillarsSection';
 import OneMissionSummarySection from '@/components/how-we-serve/OneMissionSummarySection';
 import NoSingleOrganizationBanner from '@/components/how-we-serve/NoSingleOrganizationBanner';
-// import { useRef } from 'react';
-// import ThreeHallway from '@/components/cinematic/ThreeHallway';
-// import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
-// import PlaceAtTheTableSection from '@/components/how-we-serve/PlaceAtTheTableSection';
-// import APlaceForThemSection from '@/components/how-we-serve/APlaceForThemSection';
-// import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
-// import PurePhotographySection from '@/components/how-we-serve/PurePhotographySection';
-// import StoriesFromTheTableSection from '@/components/how-we-serve/StoriesFromTheTableSection';
-// import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWaitingSection';
-// import NewBeginningSection from '@/components/how-we-serve/NewBeginningSection';
-// import ShowdownSection from '@/components/welcome/ShowdownSection';
 
 export default function HowWeServePage() {  
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Reveal global navbar for site redesign
     window.dispatchEvent(new CustomEvent('reveal-navbar'));
-  }, []);
+
+    // Deep link #your-story redirects to Home's Visitor Interest Form
+    if (location.hash === '#your-story') {
+      navigate('/#your-story', { replace: true });
+    }
+  }, [location.hash, navigate]);
 
   return (
     <>

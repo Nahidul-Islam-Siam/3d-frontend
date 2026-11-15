@@ -142,7 +142,7 @@ export default function Navbar() {
           doorNumber: 7, 
           label: "Your Story", 
           subtitle: "An open doorway inviting you to join", 
-          to: "/how-we-serve#your-story" 
+          to: "/#your-story" 
         },
       ]
     },
