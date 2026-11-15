@@ -15,11 +15,11 @@ export default function StepInsideWelcomeSection({
     <section
       id={id}
       style={{
-        backgroundImage: `url("${handsBg}")`,
+        backgroundImage: `linear-gradient(to bottom, rgba(255, 241, 211, 0.45), rgba(255, 238, 195, 0.45)), url("${handsBg}")`,
         backgroundPosition: "center top",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        backgroundColor: "#FAF4E6",
+        backgroundColor: "#FFF1D3",
       }}
       className={`relative w-full flex items-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-20 overflow-hidden select-none ${className}`}
     >

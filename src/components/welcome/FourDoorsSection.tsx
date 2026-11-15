@@ -122,6 +122,7 @@ export default function FourDoorsSection({
         id={id}
         className={`relative w-full bg-[#301F10] flex items-center justify-center overflow-hidden select-none ${className}`}
       >
+        
         <div className="relative w-full aspect-[1920/1188] flex items-center justify-center">
           {/* Exact Figma 1920x1188 composite doors graphic */}
           <img 

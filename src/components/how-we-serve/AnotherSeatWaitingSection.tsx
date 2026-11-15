@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { HeartHandshake } from 'lucide-react';
@@ -314,10 +313,10 @@ export default function AnotherSeatWaitingSection({
             </p>
 
             {/* Partner Pills Row with '+' separators */}
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-3xl mx-auto mb-10 sm:mb-12">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-2xl sm:max-w-3xl mx-auto px-2 mb-8 sm:mb-10">
               {partnerPills.map((pill, idx) => (
-                <React.Fragment key={pill}>
-                  <span className="px-3.5 sm:px-4 py-1.5 rounded-full border border-white/60 text-white text-[11.5px] sm:text-[12.5px] font-medium tracking-wide bg-white/10 backdrop-blur-sm shadow-sm select-none hover:bg-white/20 transition-colors">
+                <div key={pill} className="inline-flex items-center gap-2 sm:gap-2.5">
+                  <span className="px-3.5 sm:px-4 py-1.5 rounded-full border border-white/60 text-white text-[11.5px] sm:text-[12.5px] font-medium tracking-wide bg-white/10 backdrop-blur-sm shadow-sm select-none hover:bg-white/20 transition-colors whitespace-nowrap">
                     {pill}
                   </span>
                   {idx < partnerPills.length - 1 && (
@@ -325,7 +324,7 @@ export default function AnotherSeatWaitingSection({
                       +
                     </span>
                   )}
-                </React.Fragment>
+                </div>
               ))}
             </div>
 

@@ -14,7 +14,7 @@ export function OneMissionSummarySection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-14 sm:py-20 lg:py-28 px-4 sm:px-8 lg:px-12 xl:px-16 select-none overflow-hidden ${className}`}
+      className={`relative w-full bg-[#FAF4E6] pt-12 sm:pt-16 lg:pt-20 pb-6 sm:pb-8 lg:pb-10 px-4 sm:px-8 lg:px-12 xl:px-16 select-none overflow-hidden ${className}`}
     >
       <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto flex justify-center">
         {/* Card Container with exact Figma border, radius and warm canvas bg */}
