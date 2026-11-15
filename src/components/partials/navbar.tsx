@@ -27,8 +27,7 @@ export default function Navbar() {
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
   const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
-  const isHowWeServePage = location.pathname === '/how-we-serve';
-  const isDarkHeroPage = location.pathname === '/meet-us' || location.pathname === '/who-we-are' || isDonatePage || isYouMatterPage || isStoriesPage || isHowWeServePage || isWelcomeHomePage || isShowdownPage;
+  const isDarkHeroPage = location.pathname === '/meet-us' || isDonatePage || isYouMatterPage || isStoriesPage || isWelcomeHomePage || isShowdownPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const isDarkScrolled = (isDonatePage || isStoriesPage || isShowdownPage) && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;
@@ -110,8 +109,10 @@ export default function Navbar() {
             ? 'bg-transparent border-b border-transparent shadow-none'
             : isDarkScrolled
               ? 'bg-[#08070B]/90 backdrop-blur-md border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]'
-              : 'bg-[#FAF4E6] border-b border-[#e9dcbe]'
-        } ${hasScrolled && !isTransparent && !isDarkScrolled ? 'shadow-[0_4px_25px_rgba(0,0,0,0.03)]' : ''} ${
+              : hasScrolled
+                ? 'bg-[#FAF4E6]/95 backdrop-blur-md border-b border-[#e9dcbe] shadow-[0_4px_25px_rgba(0,0,0,0.03)]'
+                : 'bg-transparent border-b border-transparent shadow-none'
+        } ${
           isRevealed ? 'pointer-events-auto' : 'pointer-events-none'
         }`}
       >

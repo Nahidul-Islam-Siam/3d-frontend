@@ -25,7 +25,7 @@ const doorsData: DoorDefinition[] = [
     id: 'story', 
     title: 'Experience the Story', 
     subtitle: 'watch & feel it', 
-    path: '/about', 
+    path: '/experience-the-story', 
     tag: 'Documentary', 
     left: '13%', 
     width: '16%',
@@ -202,6 +202,22 @@ export default function FourDoorsSection({
               className="absolute z-20 cursor-pointer block group bg-transparent border-none outline-none focus:outline-none"
             />
           ))}
+
+          {/* ─── "STEP INSIDE" Badge on Center "How We Serve" Door (Figma 1:1) ─── */}
+          <div
+            className={`absolute z-30 pointer-events-none transition-all duration-300 ${
+              hoveredDoor === 'serve' ? 'opacity-100 scale-105' : 'opacity-90 scale-100'
+            }`}
+            style={{
+              left: '39.8%',
+              top: '47%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <div className="px-3.5 sm:px-4 py-1.5 sm:py-2 border border-white/80 bg-black/40 backdrop-blur-xs text-white text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase select-none shadow-md">
+              STEP INSIDE
+            </div>
+          </div>
         </div>
       </section>
 

@@ -1,13 +1,21 @@
 import Seo from '@/components/Seo';
 import WhoWeAreBanner from '@/components/who-we-are/WhoWeAreBanner';
-import WhoWeAreStorySection from '@/components/who-we-are/WhoWeAreStorySection';
-import WhoWeAreCoreValues from '@/components/who-we-are/WhoWeAreCoreValues';
-import LookingBeyondSection from '@/components/who-we-are/LookingBeyondSection';
-import MoreThanANameSection from '@/components/who-we-are/MoreThanANameSection';
-import PlaceForYouSection from '@/components/who-we-are/PlaceForYouSection';
-import WhoWeAreVideoSection from '@/components/who-we-are/WhoWeAreVideoSection';
-import PeopleMatterEveryDaySection from '@/components/who-we-are/PeopleMatterEveryDaySection';
+import WeSeePeopleDifferentlySection from '@/components/who-we-are/WeSeePeopleDifferentlySection';
+import OurNameIsOurInvitationSection from '@/components/who-we-are/OurNameIsOurInvitationSection';
+import WhatGuidesOurHeartsSection from '@/components/who-we-are/WhatGuidesOurHeartsSection';
+import TheLabWaySection from '@/components/who-we-are/TheLabWaySection';
+import WeBelieveInThePowerOfTogetherSection from '@/components/who-we-are/WeBelieveInThePowerOfTogetherSection';
+import TheHeartOfLabSection from '@/components/who-we-are/TheHeartOfLabSection';
+import TheresRoomForYouSection from '@/components/who-we-are/TheresRoomForYouSection';
+import WhoWeAreCtaBannerSection from '@/components/who-we-are/WhoWeAreCtaBannerSection';
 import ShowdownSection from '@/components/welcome/ShowdownSection';
+// import LookingBeyondSection from '@/components/who-we-are/LookingBeyondSection';
+// import MoreThanANameSection from '@/components/who-we-are/MoreThanANameSection';
+// import WhoWeAreCoreValues from '@/components/who-we-are/WhoWeAreCoreValues';
+// import WhoWeAreStorySection from '@/components/who-we-are/WhoWeAreStorySection';
+// import PlaceForYouSection from '@/components/who-we-are/PlaceForYouSection';
+// import WhoWeAreVideoSection from '@/components/who-we-are/WhoWeAreVideoSection';
+// import PeopleMatterEveryDaySection from '@/components/who-we-are/PeopleMatterEveryDaySection';
 
 export default function WhoWeArePage() {
   return (
@@ -17,33 +25,45 @@ export default function WhoWeArePage() {
         description="People Matter. It's That Simple. We believe extraordinary things happen when ordinary people choose to care. Every act of kindness has the power to restore dignity, renew hope, and change lives." 
       />
 
-      <div className="w-full">
-        {/* ─── Section 1: Who We Are Page Hero Banner ─── */}
+      <div className="w-full bg-[#FAF4E6]">
+        {/* ─── Redesign Section 1: Hero Banner ─── */}
         <WhoWeAreBanner />
 
-        {/* ─── Section 2: Who We Are Story & Community Mission ─── */}
-        <WhoWeAreStorySection />
+        {/* ─── Redesign Section 2: We See People Differently ─── */}
+        <WeSeePeopleDifferentlySection />
 
-        {/* ─── Section 3: Our Core Values (Frame 350) ─── */}
-        <WhoWeAreCoreValues />
+        {/* ─── Redesign Section 3: Our Name Is Our Invitation (LIVE. ACHIEVE. BELIEVE.) ─── */}
+        <OurNameIsOurInvitationSection />
 
-        {/* ─── Section 4: Looking Beyond the Surface ─── */}
-        <LookingBeyondSection />
+        {/* ─── Redesign Section 4: What Guides Our Hearts ─── */}
+        <WhatGuidesOurHeartsSection />
 
-        {/* ─── Section 5: More Than a Name. A Way of Life. (Frame 360) ─── */}
-        <MoreThanANameSection />
+        {/* ─── Redesign Section 5: The LAB Way (Think Higher. Feel Deeper. Act with Purpose.) ─── */}
+        <TheLabWaySection />
 
-        {/* ─── Section 6: There's a Place for You Here. (Subtract copy.png) ─── */}
-        <PlaceForYouSection />
+        {/* ─── Redesign Section 6: We Believe in the Power of Together ─── */}
+        <WeBelieveInThePowerOfTogetherSection />
 
-        {/* ─── Section 7: Cinematic 3D Video Experience ─── */}
-        <WhoWeAreVideoSection />
+        {/* ─── Redesign Section 7: The Heart of LAB (We are people who believe in people.) ─── */}
+        <TheHeartOfLabSection />
 
-        {/* ─── Section 8: People Matter. Every Day. Without Exception. ─── */}
-        <PeopleMatterEveryDaySection />
+        {/* ─── Redesign Section 8: There's Room for You in This Story ─── */}
+        <TheresRoomForYouSection />
 
-        {/* ─── Section 9: What's Coming Up Next (Showdown Section) ─── */}
+        {/* ─── Redesign Section 9: CTA Banner (Think Higher. Feel Deeper. Act with Purpose.) ─── */}
+        <WhoWeAreCtaBannerSection />
+
+        {/* ─── Redesign Section 10: Showdown Event (What's Coming Up Next) ─── */}
         <ShowdownSection id="what-coming-up-next" />
+
+        {/* ─── Legacy sections preserved in comments ─── */}
+        {/* WhoWeAreCoreValues */}
+        {/* WhoWeAreStorySection */}
+        {/* LookingBeyondSection */}
+        {/* MoreThanANameSection */}
+        {/* PlaceForYouSection */}
+        {/* WhoWeAreVideoSection */}
+        {/* PeopleMatterEveryDaySection */}
       </div>
     </>
   );

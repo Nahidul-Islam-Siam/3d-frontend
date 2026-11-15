@@ -275,18 +275,19 @@ export default function AnotherSeatWaitingSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-5xl mx-auto rounded-[32px] sm:rounded-[40px] px-4 sm:px-10 lg:px-16 pt-10 sm:pt-14 lg:pt-16 pb-10 sm:pb-14 lg:pb-16 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
+          className="relative w-full max-w-5xl mx-auto px-4 sm:px-10 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
           style={{
-            background:
-              'linear-gradient(180deg, #FD7646 0%, #FA7545 40%, #F57242 70%, #EA6635 100%)',
+            backgroundColor: '#FE6B35',
+            borderRadius: '56px',
+            opacity: 0.9,
           }}
         >
-          {/* Subtle diffused radiant white glow at bottom-center matching Figma */}
+          {/* Diffused radiant white & soft cream glow at bottom matching Figma inspect colors (#FFEBBE, #FBFBFB, white) */}
           <div
             className="absolute inset-0 pointer-events-none select-none"
             style={{
               background:
-                'radial-gradient(ellipse 70% 55% at 50% 85%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 70%)',
+                'radial-gradient(ellipse 75% 60% at 50% 90%, rgba(255, 235, 190, 0.5) 0%, rgba(251, 251, 251, 0.3) 35%, rgba(254, 107, 53, 0) 70%)',
             }}
             aria-hidden="true"
           />

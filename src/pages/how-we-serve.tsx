@@ -1,24 +1,27 @@
-import { useRef } from 'react';
+import { useEffect } from 'react';
 import Seo from '@/components/Seo';
-import ThreeHallway from '@/components/cinematic/ThreeHallway';
-import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
-import PlaceAtTheTableSection from '@/components/how-we-serve/PlaceAtTheTableSection';
-import APlaceForThemSection from '@/components/how-we-serve/APlaceForThemSection';
-import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
-import PurePhotographySection from '@/components/how-we-serve/PurePhotographySection';
-import StoriesFromTheTableSection from '@/components/how-we-serve/StoriesFromTheTableSection';
-import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWaitingSection';
-import NewBeginningSection from '@/components/how-we-serve/NewBeginningSection';
-import ShowdownSection from '@/components/welcome/ShowdownSection';
+import HowWeServeHeroSection from '@/components/how-we-serve/HowWeServeHeroSection';
+import FourDoorsSection from '@/components/welcome/FourDoorsSection';
+import HowWeServePillarsSection from '@/components/how-we-serve/HowWeServePillarsSection';
+import OneMissionSummarySection from '@/components/how-we-serve/OneMissionSummarySection';
+import NoSingleOrganizationBanner from '@/components/how-we-serve/NoSingleOrganizationBanner';
+// import { useRef } from 'react';
+// import ThreeHallway from '@/components/cinematic/ThreeHallway';
+// import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
+// import PlaceAtTheTableSection from '@/components/how-we-serve/PlaceAtTheTableSection';
+// import APlaceForThemSection from '@/components/how-we-serve/APlaceForThemSection';
+// import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
+// import PurePhotographySection from '@/components/how-we-serve/PurePhotographySection';
+// import StoriesFromTheTableSection from '@/components/how-we-serve/StoriesFromTheTableSection';
+// import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWaitingSection';
+// import NewBeginningSection from '@/components/how-we-serve/NewBeginningSection';
+// import ShowdownSection from '@/components/welcome/ShowdownSection';
 
-export default function HowWeServePage() {
-  const overviewRef = useRef<HTMLDivElement | null>(null);
-
-  const handleScrollToOverview = () => {
-    if (overviewRef.current) {
-      overviewRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+export default function HowWeServePage() {  
+  useEffect(() => {
+    // Reveal global navbar for site redesign
+    window.dispatchEvent(new CustomEvent('reveal-navbar'));
+  }, []);
 
   return (
     <>
@@ -27,39 +30,34 @@ export default function HowWeServePage() {
         description="Walk the walnut corridor of Live Achieve Believe. Seven doors, seven expressions of compassion, seven ways we stand beside people in their deepest moments." 
       />
 
-      <div className="w-full bg-[#0d0805]">
-        {/* ─── Realtime 3D Three.js Hallway of Hope ─── */}
-        <ThreeHallway onScrollToOverview={handleScrollToOverview} />
+      {/* ─── How We Serve Redesign Canvas ─── */}
+      <div className="w-full bg-[#FAF4E6]">
+        {/* ─── Redesign Section 1: Hero Banner (One Mission. Many Expressions.) ─── */}
+        <HowWeServeHeroSection />
 
-        {/* ─── Comprehensive Overview Sections Below Corridor ─── */}
-        <div ref={overviewRef} id="how-we-serve-overview" className="w-full bg-[#FAF4E6]">
-          {/* Section 1: Cinematic Dining / Table Hero Video */}
-          <HowWeServeHero />
+        {/* ─── Redesign Section 2: Hallway of Possibilities (4 Interactive Doors) ─── */}
+        <FourDoorsSection id="hallway-of-possibilities" />
 
-          {/* Section 2: A Place at the Table */}
-          <PlaceAtTheTableSection id="place-at-the-table" />
+        {/* ─── Redesign Section 3: All 7 Doors (Door One through Door Seven) ─── */}
+        <HowWeServePillarsSection />
 
-          {/* Section 3: You Matter (5 Step Cards) */}
-          <APlaceForThemSection id="you-matter" />
+        {/* ─── Redesign Section 4: Summary Card (One Mission. Many Expressions.) ─── */}
+        <OneMissionSummarySection />
 
-          {/* Section 4: Welcome Home (Partners & Network Map) */}
-          <ServingCommunityTogetherSection id="welcome-home" />
+        {/* ─── Redesign Section 5: Bottom Banner (No Single Organization Heals A City Alone) ─── */}
+        <NoSingleOrganizationBanner />
 
-          {/* Section 5: Pure photography, quiet moments, zero staged gloss. */}
-          <PurePhotographySection />
-
-          {/* Section 6: Stories That Save Lives (Testimonial Carousel) */}
-          <StoriesFromTheTableSection id="stories-that-save-lives" />
-
-          {/* Section 7: Serve Beside Us (Action Cards) */}
-          <AnotherSeatWaitingSection id="serve-beside-us" />
-
-          {/* Section 8: Door 5 — A New Beginning & One Mission Climax */}
-          <NewBeginningSection id="a-new-beginning" />
-
-          {/* Section 9: Suicide Awareness Showdown */}
-          <ShowdownSection id="what-coming-up-next" />
-        </div>
+        {/* Legacy components commented out for redesign */}
+        {/* <ThreeHallway onScrollToOverview={handleScrollToOverview} /> */}
+        {/* <HowWeServeHero /> */}
+        {/* <PlaceAtTheTableSection id="place-at-the-table" /> */}
+        {/* <APlaceForThemSection id="you-matter" /> */}
+        {/* <ServingCommunityTogetherSection id="welcome-home" /> */}
+        {/* <PurePhotographySection /> */}
+        {/* <StoriesFromTheTableSection id="stories-that-save-lives" /> */}
+        {/* <AnotherSeatWaitingSection id="serve-beside-us" /> */}
+        {/* <NewBeginningSection id="a-new-beginning" /> */}
+        {/* <ShowdownSection id="what-coming-up-next" /> */}
       </div>
     </>
   );
