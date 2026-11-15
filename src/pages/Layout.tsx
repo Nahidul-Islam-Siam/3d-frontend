@@ -79,8 +79,8 @@ export default function RootLayout() {
         <Outlet />
       </main>
 
-      {/* Global Footer: Rendered on inner pages when not suppressed by cinematic full-page video */}
-      {!isHomePage && !isFooterHidden && <Footer />}
+      {/* Global Footer: Rendered across all pages like Navbar */}
+      {!isFooterHidden && <Footer />}
     </div>
   );
 }
