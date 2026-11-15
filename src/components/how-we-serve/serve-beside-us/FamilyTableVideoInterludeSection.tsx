@@ -50,10 +50,10 @@ export default function FamilyTableVideoInterludeSection({ onScrollClick }: Fami
   return (
     <section 
       id="serve-video-interlude"
-      className="relative w-full min-h-[75vh] lg:min-h-screen bg-[#0A0706] text-white flex flex-col justify-between overflow-hidden select-none"
+      className="relative w-full min-h-[75vh] lg:min-h-screen bg-[#FAF4E6] text-white flex flex-col justify-between overflow-hidden select-none"
     >
       {/* ─── Full-Bleed Video Background ─── */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#0A0706]">
+      <div className="absolute inset-0 w-full h-full overflow-hidden bg-black">
         <video
           ref={videoRef}
           src={liveVideo.videoUrl}
@@ -65,19 +65,12 @@ export default function FamilyTableVideoInterludeSection({ onScrollClick }: Fami
           className="w-full h-full object-cover object-center scale-[1.01]"
         />
 
-        {/* Cinematic Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0706] via-transparent to-[#0A0706] pointer-events-none" />
+        {/* Cinematic Vignette Overlay (fades into creamy background) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF4E6] via-black/30 to-[#FAF4E6] pointer-events-none" />
       </div>
 
-      {/* Top Bar: Eyebrow + Controls */}
-      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-16 sm:pt-20 flex justify-between items-center">
-        <span 
-          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-          className="text-xs uppercase tracking-[0.25em] text-white/70 font-medium"
-        >
-          SERVE BESIDE US
-        </span>
-
+      {/* Top Bar: Controls */}
+      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-16 sm:pt-20 flex justify-end items-center">
         <div className="flex gap-3">
           <button
             type="button"

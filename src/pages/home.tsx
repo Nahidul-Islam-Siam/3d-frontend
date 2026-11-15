@@ -49,8 +49,9 @@ export default function Home() {
         {/* ─── 6. Story Invitation: Now There's Room for Your Story ─── */}
         <RoomForYourStorySection />
 
-        {/* ─── 7. Visitor Interest Form: Get Involved with LAB ─── */}
-        <VisitorInterestFormSection />
+        {/* ─── 7. Visitor Interest Form: Get Involved with LAB (Door 7: Your Story) ─── */}
+        <span id="your-story" className="block -mt-24 pt-24 pointer-events-none" />
+        <VisitorInterestFormSection id="visitor-interest-form" />
 
            <ShowdownSection id="what-coming-up-next" />
       </div>

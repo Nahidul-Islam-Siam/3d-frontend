@@ -112,29 +112,18 @@ export default function WaysWeWalkSection() {
   return (
     <section 
       id="ways-we-walk"
-      className="relative w-full min-h-screen bg-[#0A0706] text-white py-24 sm:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] py-24 sm:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
     >
       {/* Background Soft Amber Radial Glow */}
       <div 
         className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(249,115,22,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)',
           filter: 'blur(90px)',
         }}
       />
 
       <div className="relative z-10 w-full max-w-[1720px] mx-auto">
-        
-        {/* Eyebrow Tag at top-left */}
-        <div className="mb-8 sm:mb-12">
-          <span 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-xs uppercase tracking-[0.25em] text-white/60 font-medium"
-          >
-            SERVE BESIDE US
-          </span>
-        </div>
-
         {/* ─── Top Header Row (Figma 1:1) ─── */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8 mb-14 sm:mb-20">
           <motion.div
@@ -146,7 +135,7 @@ export default function WaysWeWalkSection() {
           >
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-[44px] font-normal tracking-tight text-white leading-[1.18]"
+              className="text-3xl sm:text-4xl lg:text-[44px] font-normal tracking-tight text-[#1C140D] leading-[1.18]"
             >
               Ways We Walk Beside Our<br />Community
             </h2>
@@ -159,7 +148,7 @@ export default function WaysWeWalkSection() {
             transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-md"
           >
-            <p className="text-stone-300 text-xs sm:text-sm lg:text-[14px] leading-relaxed font-light">
+            <p className="text-[#554637] text-xs sm:text-sm lg:text-[14px] leading-relaxed font-light">
               No administrative checklists or distant corporate committees. Choose the doorway that speaks to your gifts.
             </p>
           </motion.div>
@@ -175,16 +164,16 @@ export default function WaysWeWalkSection() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.7, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setActiveCardIdx(idx)}
-              className="group relative rounded-[22px] bg-[#16120F]/90 backdrop-blur-md border border-white/10 hover:border-[#F97316]/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_16px_50px_rgba(249,115,22,0.18)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
+              className="group relative rounded-[22px] bg-[#F4EBD9] border border-[#DBCAB0] hover:border-[#F97316] shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.14)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
             >
               {/* Card Photo with Hover Zoom */}
-              <div className="w-full h-[200px] sm:h-[220px] overflow-hidden bg-black/40 relative">
+              <div className="w-full h-[200px] sm:h-[220px] overflow-hidden bg-black/10 relative">
                 <img
                   src={item.image}
                   alt={item.title}
                   className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/15 group-hover:bg-transparent transition-colors pointer-events-none" />
+                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none" />
                 
                 {/* Hover Click Pill */}
                 <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] font-sans opacity-0 group-hover:opacity-100 transition-opacity">
@@ -197,11 +186,11 @@ export default function WaysWeWalkSection() {
                 <div>
                   <h3
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-lg sm:text-xl font-medium tracking-wide text-white group-hover:text-[#F97316] transition-colors mb-2"
+                    className="text-lg sm:text-xl font-medium tracking-wide text-[#1C140D] group-hover:text-[#F97316] transition-colors mb-2"
                   >
                     {item.title}
                   </h3>
-                  <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-light">
+                  <p className="text-[#554637] text-xs sm:text-[13px] leading-relaxed font-light">
                     {item.description}
                   </p>
                 </div>
@@ -231,7 +220,7 @@ export default function WaysWeWalkSection() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.94, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-2xl rounded-3xl overflow-hidden border border-white/20 bg-[#16120F] shadow-2xl flex flex-col"
+              className="relative w-full max-w-2xl rounded-3xl overflow-hidden border border-[#DBCAB0] bg-[#FAF4E6] shadow-2xl flex flex-col"
             >
               {/* Close Button */}
               <button
@@ -264,7 +253,7 @@ export default function WaysWeWalkSection() {
               </button>
 
               {/* Modal Image */}
-              <div className="w-full h-[260px] sm:h-[300px] overflow-hidden bg-black/50">
+              <div className="w-full h-[260px] sm:h-[300px] overflow-hidden bg-black/10">
                 <img
                   src={walkWays[activeCardIdx].image}
                   alt={walkWays[activeCardIdx].title}
@@ -276,12 +265,12 @@ export default function WaysWeWalkSection() {
               <div className="p-6 sm:p-8 space-y-4">
                 <div className="flex items-center justify-between text-xs text-[#F97316] font-semibold tracking-widest uppercase">
                   <span>Pathway {activeCardIdx + 1} of {walkWays.length}</span>
-                  <span className="text-white/40">Serve Beside Us</span>
+                  <span className="text-[#8F6629]">Serve Beside Us</span>
                 </div>
 
                 <h3
                   style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  className="text-2xl sm:text-3xl font-normal text-white"
+                  className="text-2xl sm:text-3xl font-normal text-[#1C140D]"
                 >
                   {walkWays[activeCardIdx].title}
                 </h3>
@@ -290,7 +279,7 @@ export default function WaysWeWalkSection() {
                   {walkWays[activeCardIdx].description}
                 </p>
 
-                <p className="text-stone-300 text-sm leading-relaxed font-light">
+                <p className="text-[#554637] text-sm leading-relaxed font-light">
                   {walkWays[activeCardIdx].extendedText}
                 </p>
 

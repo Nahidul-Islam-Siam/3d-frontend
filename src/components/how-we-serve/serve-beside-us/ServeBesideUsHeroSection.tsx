@@ -124,14 +124,7 @@ export default function ServeBesideUsHeroSection({ onScrollClick }: ServeBesideU
         />
 
         {/* Top Bar: Eyebrow + Pill Controls */}
-        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-24 sm:pt-28 flex justify-between items-center">
-          <span 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-xs uppercase tracking-[0.25em] text-white/70 font-medium"
-          >
-            SERVE BESIDE US
-          </span>
-
+        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-24 sm:pt-28 flex justify-end items-center">
           <div className="flex gap-3">
             <button
               type="button"
@@ -215,25 +208,15 @@ export default function ServeBesideUsHeroSection({ onScrollClick }: ServeBesideU
       ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="serve-intro-stage"
-        className="relative w-full min-h-[85vh] lg:min-h-screen bg-[#0A0706] text-white flex flex-col justify-center px-6 sm:px-12 lg:px-20 xl:px-28 py-24 sm:py-32 overflow-hidden select-none"
+        className="relative w-full min-h-[85vh] lg:min-h-screen bg-[#FAF4E6] text-[#2C261E] flex flex-col justify-center px-6 sm:px-12 lg:px-20 xl:px-28 py-24 sm:py-32 overflow-hidden select-none"
       >
-        {/* Soft Warm Radial Glow (Matches Figma 1:1) */}
+        {/* Soft Warm Radial Glow */}
         <div 
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 40% 50%, rgba(249,115,22,0.14) 0%, rgba(68,36,15,0.3) 45%, #0A0706 80%)',
+            background: 'radial-gradient(ellipse at 40% 50%, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.04) 45%, transparent 75%)',
           }}
         />
-
-        {/* Eyebrow Tag at top-left */}
-        <div className="relative z-10 w-full max-w-[1720px] mx-auto mb-12 sm:mb-16">
-          <span 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-xs uppercase tracking-[0.25em] text-white/60 font-medium"
-          >
-            SERVE BESIDE US
-          </span>
-        </div>
 
         <div className="relative z-10 w-full max-w-[1720px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
@@ -245,7 +228,7 @@ export default function ServeBesideUsHeroSection({ onScrollClick }: ServeBesideU
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-normal tracking-wide text-white mb-6 uppercase"
+              className="text-4xl sm:text-5xl lg:text-6xl font-normal tracking-wide text-[#1C140D] mb-6 uppercase"
             >
               SERVE BESIDE US
             </motion.h2>
@@ -255,15 +238,15 @@ export default function ServeBesideUsHeroSection({ onScrollClick }: ServeBesideU
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-4 text-stone-300 text-sm sm:text-base leading-relaxed font-light"
+              className="space-y-4 text-[#554637] text-sm sm:text-base leading-relaxed font-light"
             >
-              <p className="text-white font-normal italic">
+              <p className="text-[#8F6629] font-serif font-medium italic text-base sm:text-lg">
                 Sometimes purpose begins with saying yes.
               </p>
               <p>
                 You don&apos;t have to be extraordinary to make an extraordinary difference. You simply have to be willing.
               </p>
-              <p className="pt-2 text-stone-300">
+              <p className="pt-2 text-[#6F5E4E]">
                 Our volunteers come from every walk of life. Students, parents, veterans, teachers, business owners, retirees, artists, churches, and neighbors serve together with one shared purpose: helping people experience dignity, compassion, and hope.
               </p>
             </motion.div>
@@ -281,11 +264,11 @@ export default function ServeBesideUsHeroSection({ onScrollClick }: ServeBesideU
               {fourPills.map((pill) => (
                 <div
                   key={pill.id}
-                  className="px-6 py-3 rounded-full bg-[#16120F]/90 backdrop-blur-md border border-[#F97316]/50 shadow-[0_4px_20px_rgba(249,115,22,0.15)] flex items-center justify-center text-center transition-all duration-300 hover:border-[#F97316] hover:scale-105"
+                  className="px-6 py-3 rounded-full bg-[#F4EBD9] border border-[#DBCAB0] shadow-sm flex items-center justify-center text-center transition-all duration-300 hover:border-[#F97316] hover:bg-[#FAF4E6] hover:scale-105"
                 >
                   <span 
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-[#F97316] text-sm sm:text-[15px] font-medium tracking-wide"
+                    className="text-[#F97316] text-sm sm:text-[15px] font-semibold tracking-wide"
                   >
                     {pill.label}
                   </span>
