@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Seo from '@/components/Seo';
 import StoriesHeroSection from '@/components/how-we-serve/stories-that-save-lives/StoriesHeroSection';
 import CarryingAStorySection from '@/components/how-we-serve/stories-that-save-lives/CarryingAStorySection';
@@ -12,6 +12,11 @@ import StoriesFinaleSection from '@/components/how-we-serve/stories-that-save-li
 export default function StoriesThatSaveLivesPage() {
   const nextSectionRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    // Reveal global navbar for light creamy theme
+    window.dispatchEvent(new CustomEvent('reveal-navbar'));
+  }, []);
+
   const handleScrollClick = () => {
     nextSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -23,7 +28,7 @@ export default function StoriesThatSaveLivesPage() {
         description="Sometimes hope begins with one conversation. Discover how Live Achieve Believe elevates documentary storytelling, theatrical vulnerability, and community presence to save lives." 
       />
 
-      <div className="w-full bg-[#08070B] text-white selection:bg-[#F97316] selection:text-white overflow-x-hidden">
+      <div className="w-full bg-[#FAF4E6] text-[#2C261E] selection:bg-[#F97316] selection:text-white overflow-x-hidden">
         
         {/* ─── 1. HERO VIDEO & TITLE INTRO (Frames 1 & 2) ─── */}
         <StoriesHeroSection onScrollClick={handleScrollClick} />

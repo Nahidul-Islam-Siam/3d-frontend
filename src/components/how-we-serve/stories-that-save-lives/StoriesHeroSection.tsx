@@ -193,13 +193,13 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
       ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="stories-title-stage"
-        className="relative w-full min-h-[70vh] sm:min-h-[85vh] lg:min-h-screen bg-[#08070B] text-white flex flex-col items-center justify-center px-6 sm:px-12 lg:px-20 overflow-hidden select-none py-20"
+        className="relative w-full min-h-[60vh] sm:min-h-[75vh] bg-[#FAF4E6] text-[#2C261E] flex flex-col items-center justify-center px-6 sm:px-12 lg:px-20 overflow-hidden select-none py-20"
       >
         {/* Soft Amber Ambient Glow at bottom */}
         <div 
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at bottom, rgba(249,115,22,0.18) 0%, rgba(234,88,12,0.06) 45%, transparent 75%)',
+            background: 'radial-gradient(ellipse at bottom, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.04) 45%, transparent 75%)',
             filter: 'blur(70px)',
           }}
         />
@@ -212,7 +212,7 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[#2C261E] mb-6"
           >
             STORIES THAT SAVE LIVES
           </motion.h1>
@@ -225,8 +225,8 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
             transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-xl my-4 space-y-1"
           >
-            <div className="w-full border-t border-dashed border-white/20" />
-            <div className="w-full border-t border-dashed border-white/20" />
+            <div className="w-full border-t border-dashed border-[#2C261E]/20" />
+            <div className="w-full border-t border-dashed border-[#2C261E]/20" />
           </motion.div>
 
           {/* Subtitle */}
@@ -235,7 +235,7 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="text-stone-300 text-sm sm:text-base md:text-lg font-light tracking-wide max-w-lg mt-2"
+            className="text-[#5A5043] text-sm sm:text-base md:text-lg font-light tracking-wide max-w-lg mt-2"
           >
             Sometimes hope begins with one conversation.
           </motion.p>

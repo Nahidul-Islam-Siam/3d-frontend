@@ -32,13 +32,13 @@ export default function CarryingAStorySection() {
   return (
     <section 
       id="carrying-a-story"
-      className="relative w-full min-h-screen bg-[#08070B] text-white py-24 sm:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] py-24 sm:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
     >
       {/* Warm Ambient Glow from bottom-left */}
       <div 
         className="absolute bottom-0 left-0 w-[800px] h-[600px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle at bottom left, rgba(249,115,22,0.14) 0%, rgba(217,119,6,0.05) 45%, transparent 75%)',
+          background: 'radial-gradient(circle at bottom left, rgba(249,115,22,0.08) 0%, rgba(217,119,6,0.03) 45%, transparent 75%)',
           filter: 'blur(80px)',
         }}
       />
@@ -56,7 +56,7 @@ export default function CarryingAStorySection() {
           >
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-white leading-[1.18]"
+              className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#2C261E] leading-[1.18]"
             >
               Every person you meet is carrying a story.
             </h2>
@@ -69,7 +69,7 @@ export default function CarryingAStorySection() {
             transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-md"
           >
-            <p className="text-stone-300 text-sm sm:text-base leading-relaxed font-light">
+            <p className="text-[#5A5043] text-sm sm:text-base leading-relaxed font-light">
               Beneath every everyday encounter lies an entire unspoken landscape of experience, struggle, and untamed beauty.
             </p>
           </motion.div>
@@ -86,11 +86,11 @@ export default function CarryingAStorySection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className={`relative group rounded-[24px] bg-[#121017]/75 backdrop-blur-md border border-white/10 p-8 sm:p-9 flex flex-col justify-between min-h-[300px] sm:min-h-[340px] hover:border-[#F97316]/50 hover:bg-[#16131D]/90 hover:shadow-[0_16px_50px_rgba(249,115,22,0.15)] transition-all duration-300 ${dim.staggerClass}`}
+                className={`relative group rounded-[24px] bg-white/80 backdrop-blur-md border border-[#EADCC5] p-8 sm:p-9 flex flex-col justify-between min-h-[300px] sm:min-h-[340px] shadow-[0_8px_30px_rgba(44,38,30,0.06)] hover:border-[#F97316]/50 hover:bg-white hover:shadow-[0_16px_45px_rgba(249,115,22,0.12)] transition-all duration-300 ${dim.staggerClass}`}
               >
                 {/* Top: Icon */}
                 <div>
-                  <div className="w-12 h-12 rounded-full border border-[#F97316]/40 bg-[#F97316]/10 flex items-center justify-center mb-7 group-hover:scale-110 group-hover:border-[#F97316] transition-transform">
+                  <div className="w-12 h-12 rounded-full border border-[#F97316]/30 bg-[#F97316]/10 flex items-center justify-center mb-7 group-hover:scale-110 group-hover:border-[#F97316] transition-transform">
                     <Icon className="w-6 h-6 text-[#F97316]" strokeWidth={1.75} />
                   </div>
 
@@ -103,7 +103,7 @@ export default function CarryingAStorySection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-stone-300 text-sm sm:text-[15px] leading-relaxed font-light">
+                  <p className="text-[#5A5043] text-sm sm:text-[15px] leading-relaxed font-light">
                     {dim.description}
                   </p>
                 </div>

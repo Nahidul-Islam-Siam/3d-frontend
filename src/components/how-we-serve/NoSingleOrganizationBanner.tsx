@@ -36,7 +36,7 @@ export function NoSingleOrganizationBanner({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full px-6 sm:px-12 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 shadow-[0_24px_64px_rgba(249,115,22,0.22)] overflow-hidden rounded-[28px] sm:rounded-[36px] lg:rounded-[44px] box-border text-center flex flex-col items-center justify-center"
+          className="relative w-full px-6 sm:px-12 lg:px-16 pt-14 sm:pt-20 lg:pt-24 pb-14 sm:pb-20 lg:pb-24 shadow-[0_24px_64px_rgba(249,115,22,0.22)] overflow-hidden rounded-[28px] sm:rounded-[36px] lg:rounded-[44px] box-border text-center flex flex-col items-center justify-center"
           style={{
             backgroundColor: '#FE6B35',
           }}
@@ -55,47 +55,47 @@ export function NoSingleOrganizationBanner({
             {/* Title */}
             <h3
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-[44px] font-semibold text-white text-center leading-[1.2] tracking-tight mb-4 sm:mb-5 max-w-2xl mx-auto"
+              className="text-3xl sm:text-4xl md:text-[46px] lg:text-[52px] font-semibold text-white text-center leading-[1.38] sm:leading-[1.36] lg:leading-[1.38] tracking-tight mb-6 sm:mb-8 max-w-3xl mx-auto"
             >
               Every Door Opens Because
               <br />
               Someone Matters.
             </h3>
 
-            {/* Subtitle */}
+            {/* Subtitle with generous line spacing & readable font size */}
             <div
               style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}
-              className="text-xs sm:text-[13.5px] lg:text-[14px] text-white/95 font-normal text-center leading-relaxed max-w-xl sm:max-w-2xl mx-auto space-y-1 mb-8 sm:mb-10"
+              className="text-sm sm:text-base lg:text-[16px] text-white/95 font-normal text-center leading-relaxed max-w-2xl mx-auto space-y-2.5 sm:space-y-3 mb-10 sm:mb-12 lg:mb-14 px-4"
             >
-              <p>Think Higher. Feel Deeper. Act with Purpose.</p>
-              <p>Live Achieve Believe, Inc. | People Matter. Always.</p>
+              <p className="tracking-wide">Think Higher. Feel Deeper. Act with Purpose.</p>
+              <p className="tracking-wide text-white/90">Live Achieve Believe, Inc. | People Matter. Always.</p>
             </div>
 
             {/* Action Buttons Row (Figma 1:1) */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 w-full">
+            <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 w-full">
               <Link
                 to="/movement"
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-[13px] font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 <span>Continue The Journey</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </Link>
 
               <button
                 type="button"
                 onClick={handleScrollToDoors}
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-[13px] font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 <span>Step Through Another Door</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </button>
 
               <Link
                 to="/movement"
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-[13px] font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 <span>Become Part Of The Story</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </Link>
             </div>
           </div>

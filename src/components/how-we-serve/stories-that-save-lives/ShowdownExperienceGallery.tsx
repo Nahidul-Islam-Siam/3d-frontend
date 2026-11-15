@@ -65,13 +65,13 @@ export default function ShowdownExperienceGallery() {
   return (
     <section 
       id="showdown-experience"
-      className="relative w-full min-h-screen bg-[#08070B] text-white py-20 sm:py-28 lg:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] py-20 sm:py-28 lg:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
     >
       {/* Background Ambient Radial Glow */}
       <div 
         className="absolute top-1/2 right-0 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(249,115,22,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)',
           filter: 'blur(90px)',
         }}
       />
@@ -86,7 +86,7 @@ export default function ShowdownExperienceGallery() {
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-tight text-white mb-3.5 leading-snug"
+            className="text-2xl sm:text-3xl lg:text-[34px] font-medium tracking-tight text-[#2C261E] mb-3.5 leading-snug"
           >
             Life in Full Motion: The Showdown Experience
           </motion.h2>
@@ -96,7 +96,7 @@ export default function ShowdownExperienceGallery() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="text-stone-300 text-xs sm:text-sm lg:text-[14px] font-light leading-relaxed max-w-xl"
+            className="text-[#5A5043] text-xs sm:text-sm lg:text-[14px] font-light leading-relaxed max-w-xl"
           >
             Not a lecture. Not clinical detachment. A vibrant theater of human voices, genuine tears of relief, uncurated laughter, and community presence.
           </motion.p>
@@ -115,7 +115,7 @@ export default function ShowdownExperienceGallery() {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => setActivePhotoIdx(card.id)}
-                className={`relative w-full ${card.flexWidth} h-[240px] sm:h-[270px] lg:h-[300px] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#16131B] border border-white/10 hover:border-[#F97316]/60 shadow-[0_10px_35px_rgba(0,0,0,0.6)] hover:shadow-[0_16px_45px_rgba(249,115,22,0.18)] transition-all duration-300 cursor-pointer group`}
+                className={`relative w-full ${card.flexWidth} h-[240px] sm:h-[270px] lg:h-[300px] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-white/90 border border-[#EADCC5] hover:border-[#F97316]/60 shadow-[0_8px_30px_rgba(44,38,30,0.08)] hover:shadow-[0_16px_45px_rgba(249,115,22,0.16)] transition-all duration-300 cursor-pointer group`}
               >
                 {photoUrls[card.id] ? (
                   <img
@@ -124,9 +124,9 @@ export default function ShowdownExperienceGallery() {
                     className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full bg-[#1A1622] animate-pulse" />
+                  <div className="w-full h-full bg-[#EFE5D0] animate-pulse" />
                 )}
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors pointer-events-none" />
+                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none" />
               </motion.div>
             ))}
           </div>
@@ -141,7 +141,7 @@ export default function ShowdownExperienceGallery() {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.7, delay: (i + 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => setActivePhotoIdx(card.id)}
-                className={`relative w-full ${card.flexWidth} h-[240px] sm:h-[270px] lg:h-[300px] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#16131B] border border-white/10 hover:border-[#F97316]/60 shadow-[0_10px_35px_rgba(0,0,0,0.6)] hover:shadow-[0_16px_45px_rgba(249,115,22,0.18)] transition-all duration-300 cursor-pointer group`}
+                className={`relative w-full ${card.flexWidth} h-[240px] sm:h-[270px] lg:h-[300px] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-white/90 border border-[#EADCC5] hover:border-[#F97316]/60 shadow-[0_8px_30px_rgba(44,38,30,0.08)] hover:shadow-[0_16px_45px_rgba(249,115,22,0.16)] transition-all duration-300 cursor-pointer group`}
               >
                 {photoUrls[card.id] ? (
                   <img
@@ -150,9 +150,9 @@ export default function ShowdownExperienceGallery() {
                     className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full bg-[#1A1622] animate-pulse" />
+                  <div className="w-full h-full bg-[#EFE5D0] animate-pulse" />
                 )}
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors pointer-events-none" />
+                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none" />
               </motion.div>
             ))}
           </div>
