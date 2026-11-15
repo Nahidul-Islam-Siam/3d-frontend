@@ -105,7 +105,7 @@ export default function Navbar() {
           doorNumber: 1, 
           label: "A Place at the Table", 
           subtitle: "Community meals, listening & human dignity", 
-          to: "/how-we-serve#a-place-at-the-table" 
+          to: "/how-we-serve/a-place-at-the-table" 
         },
         { 
           doorNumber: 2, 

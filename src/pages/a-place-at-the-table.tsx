@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Seo from '@/components/Seo';
 import PlaceAtTheTableSection from '@/components/how-we-serve/PlaceAtTheTableSection';
 import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
@@ -7,6 +8,11 @@ import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWait
 import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
 
 export default function APlaceAtTheTablePage() {
+  useEffect(() => {
+    // Reveal global navbar
+    window.dispatchEvent(new CustomEvent('reveal-navbar'));
+  }, []);
+
   return (
     <>
       <Seo 
