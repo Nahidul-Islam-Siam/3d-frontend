@@ -15,13 +15,13 @@ export interface ThreeDoorData {
   color: number;
 }
 
-// 5 Dedicated Doors matching the 5 pages of the "How We Serve" dropdown
+// 7 Dedicated Doors matching the 7 programs of "How We Serve"
 const THREE_DOORS: ThreeDoorData[] = [
   {
     id: "door-1",
     number: 1,
     title: "A Place at the Table",
-    subtitle: "Sharing meals, listening, restoring human dignity",
+    subtitle: "A welcoming meal and community connection",
     quote: "Sometimes hope begins\nwith a meal.",
     href: "/how-we-serve/a-place-at-the-table",
     side: "left",
@@ -32,7 +32,7 @@ const THREE_DOORS: ThreeDoorData[] = [
     id: "door-2",
     number: 2,
     title: "Strong Foundations",
-    subtitle: "LEADS Youth Development, communication, respect, and resilience",
+    subtitle: "A hopeful space for youth growth",
     quote: "Sometimes hope begins\nwith guidance.",
     href: "/how-we-serve/you-matter",
     side: "right",
@@ -43,7 +43,7 @@ const THREE_DOORS: ThreeDoorData[] = [
     id: "door-3",
     number: 3,
     title: "Stories That Save Lives",
-    subtitle: "Suicide Awareness Showdown, theatre, music, and honest conversations",
+    subtitle: "A theatre stage filled with storytelling",
     quote: "Sometimes hope begins\nwith one conversation.",
     href: "/how-we-serve/stories-that-save-lives",
     side: "left",
@@ -54,7 +54,7 @@ const THREE_DOORS: ThreeDoorData[] = [
     id: "door-4",
     number: 4,
     title: "Welcome Home",
-    subtitle: "Furnished housing, moving assistance, and deep honor for veterans",
+    subtitle: "A furnished living room and a new beginning",
     quote: "Sometimes hope begins\nwith a key.",
     href: "/how-we-serve/welcome-home",
     side: "right",
@@ -65,12 +65,34 @@ const THREE_DOORS: ThreeDoorData[] = [
     id: "door-5",
     number: 5,
     title: "A New Beginning",
-    subtitle: "Household essentials, linens, clothing, and simple new starts",
+    subtitle: "Everyday essentials thoughtfully prepared",
     quote: "Sometimes hope begins\nwith the little things.",
     href: "/how-we-serve#a-new-beginning",
     side: "left",
     zPos: -56,
     color: 0x170f09,
+  },
+  {
+    id: "door-6",
+    number: 6,
+    title: "Serve Beside Us",
+    subtitle: "People working together with purpose",
+    quote: "Sometimes hope begins with\nsomeone who says yes.",
+    href: "/how-we-serve#serve-beside-us",
+    side: "right",
+    zPos: -70,
+    color: 0x150e08,
+  },
+  {
+    id: "door-7",
+    number: 7,
+    title: "Your Story",
+    subtitle: "An open doorway inviting the visitor to participate",
+    quote: "Every story has the power to\nchange another.",
+    href: "/how-we-serve#your-story",
+    side: "left",
+    zPos: -84,
+    color: 0x18100a,
   },
 ];
 
@@ -95,6 +117,28 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
     setIsTransitioning(true);
     targetZRef.current = door.zPos + 0.8;
     setTimeout(() => {
+      // If destination has an anchor ID (e.g. /how-we-serve#serve-beside-us)
+      if (door.href.includes("#")) {
+        const hashId = door.href.split("#")[1];
+        if (location.pathname === "/how-we-serve") {
+          const el = document.getElementById(hashId);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+          setIsTransitioning(false);
+          if (onClose) onClose();
+          return;
+        }
+        navigate(door.href);
+        setTimeout(() => {
+          const el = document.getElementById(hashId);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 120);
+        setIsTransitioning(false);
+        if (onClose) onClose();
+        return;
+      }
+
       // If already on /how-we-serve, smoothly scroll to top video section (HowWeServeHero)
       if (location.pathname === "/how-we-serve" && door.href === "/how-we-serve") {
         if (onScrollToOverview) {
@@ -293,10 +337,10 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
     const ambientLight = new THREE.AmbientLight(0xfff1de, 0.45);
     scene.add(ambientLight);
 
-    // Hallway Dimensions (5 Doors corridor)
+    // Hallway Dimensions (7 Doors extended corridor)
     const hallWidth = 6.4;
     const hallHeight = 4.8;
-    const hallLength = 90;
+    const hallLength = 120;
 
     // Walnut Plank Wood Floor
     const floorGeo = new THREE.PlaneGeometry(hallWidth, hallLength);
@@ -482,6 +526,13 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
       if (!isLeft) {
         doorGroup.rotation.y = Math.PI;
       }
+
+      // Door 7: "An open doorway inviting the visitor to participate"
+      if (doorData.id === "door-7") {
+        doorLeaf.rotation.y = 0.6;
+        roomGlow.intensity = 1.6;
+      }
+
       scene.add(doorGroup);
 
       doorsMeshRef.current.push({
@@ -551,12 +602,29 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       const delta = e.deltaY * 0.032;
-      targetZRef.current = Math.max(-64, Math.min(5.8, targetZRef.current - delta));
+      targetZRef.current = Math.max(-92, Math.min(5.8, targetZRef.current - delta));
+    };
+
+    // Mobile touch swipe to walk through hallway
+    let touchStartY = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const delta = (e.touches[0].clientY - touchStartY) * 0.08;
+        touchStartY = e.touches[0].clientY;
+        targetZRef.current = Math.max(-92, Math.min(5.8, targetZRef.current + delta));
+      }
     };
 
     container.addEventListener("mousemove", onMouseMove);
     container.addEventListener("click", onClick);
     container.addEventListener("wheel", onWheel, { passive: false });
+    container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchmove", onTouchMove, { passive: true });
 
     // Window Resize
     const onResize = () => {
@@ -598,12 +666,17 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
       camera.rotation.y = -mouseRef.current.x * 0.08;
       camera.rotation.x = mouseRef.current.y * 0.05;
 
-      // Animate doors opening smoothly on hover
+      // Animate doors opening smoothly on hover (Door 7 is naturally inviting and open)
       doorsMeshRef.current.forEach((doorItem) => {
         const isHovered = hoveredDoorRef.current?.id === doorItem.data.id;
-        const targetAngle = isHovered ? (doorItem.data.side === "left" ? 0.78 : -0.78) : 0;
+        const isOpenDoor = doorItem.data.id === "door-7";
+        const defaultAngle = isOpenDoor ? 0.6 : 0;
+        const targetAngle = isHovered
+          ? (doorItem.data.side === "left" ? 0.85 : -0.85)
+          : defaultAngle;
         doorItem.doorLeaf.rotation.y += (targetAngle - doorItem.doorLeaf.rotation.y) * 0.09;
-        doorItem.light.intensity += ((isHovered ? 2.8 : 0.25) - doorItem.light.intensity) * 0.09;
+        const defaultLight = isOpenDoor ? 1.6 : 0.25;
+        doorItem.light.intensity += ((isHovered ? 2.8 : defaultLight) - doorItem.light.intensity) * 0.09;
       });
 
       // Dust motes drift
@@ -620,6 +693,8 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
       container.removeEventListener("mousemove", onMouseMove);
       container.removeEventListener("click", onClick);
       container.removeEventListener("wheel", onWheel);
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
       if (rendererRef.current && rendererRef.current.domElement) {
         container.removeChild(rendererRef.current.domElement);
         rendererRef.current.dispose();

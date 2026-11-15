@@ -1,17 +1,23 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { CiMenuFries } from "react-icons/ci";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SideNav from "./side-nav";
 import logoWithText from "@/assets/logo/logo-with-text.png";
 import logoIconWhite from "@/assets/logo/logo-icon-white.png";
 import btnArrow from "@/assets/icons/btn-arrow.png";
 
+interface ProgramChild {
+  label: string;
+  subtitle: string;
+  to: string;
+  doorNumber: number;
+}
+
 interface NavItem {
   label: string;
   to: string;
-  children?: { label: string; to: string }[];
+  children?: ProgramChild[];
 }
 
 export default function Navbar() {
@@ -74,6 +80,19 @@ export default function Navbar() {
     };
   }, [isHomePage]);
 
+  const handleChildClick = (to: string) => {
+    setOpenDropdown(null);
+    if (to.includes('#')) {
+      const [path, hash] = to.split('#');
+      if (location.pathname === path) {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
   const navItems: NavItem[] = [
     { label: "Welcome", to: "/" },
     { label: "Experience the Story", to: "/experience-the-story" },
@@ -82,11 +101,48 @@ export default function Navbar() {
       label: "How We Serve", 
       to: "/how-we-serve",
       children: [
-        { label: "A Place at the Table", to: "/how-we-serve/a-place-at-the-table" },
-        { label: "Strong Foundations (You Matter)", to: "/how-we-serve/you-matter" },
-        { label: "Stories That Save Lives (Showdown)", to: "/how-we-serve/stories-that-save-lives" },
-        { label: "Welcome Home", to: "/how-we-serve/welcome-home" },
-        { label: "A New Beginning", to: "/how-we-serve#a-new-beginning" },
+        { 
+          doorNumber: 1, 
+          label: "A Place at the Table", 
+          subtitle: "Community meals, listening & human dignity", 
+          to: "/how-we-serve#a-place-at-the-table" 
+        },
+        { 
+          doorNumber: 2, 
+          label: "Strong Foundations", 
+          subtitle: "Youth development, respect & guidance", 
+          to: "/how-we-serve/you-matter" 
+        },
+        { 
+          doorNumber: 3, 
+          label: "Stories That Save Lives", 
+          subtitle: "Theatre, music & honest conversations", 
+          to: "/how-we-serve/stories-that-save-lives" 
+        },
+        { 
+          doorNumber: 4, 
+          label: "Welcome Home", 
+          subtitle: "Furnished housing & moves for veterans", 
+          to: "/how-we-serve/welcome-home" 
+        },
+        { 
+          doorNumber: 5, 
+          label: "A New Beginning", 
+          subtitle: "Household essentials & fresh starts", 
+          to: "/how-we-serve#a-new-beginning" 
+        },
+        { 
+          doorNumber: 6, 
+          label: "Serve Beside Us", 
+          subtitle: "Volunteers working together with purpose", 
+          to: "/how-we-serve#serve-beside-us" 
+        },
+        { 
+          doorNumber: 7, 
+          label: "Your Story", 
+          subtitle: "An open doorway inviting you to join", 
+          to: "/how-we-serve#your-story" 
+        },
       ]
     },
     { label: "Join the Movement", to: "/movement" },
@@ -185,21 +241,17 @@ export default function Navbar() {
                     )}
                   </Link>
 
-                  {/* Dropdown Menu */}
+                  {/* Clean, Natural & Smooth Creamy Dropdown */}
                   <AnimatePresence>
                     {hasDropdown && isDropdownOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 4, scale: 0.96 }}
-                        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                        exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
                         className="absolute top-full left-1/2 -translate-x-1/2 pt-2.5 z-50 pointer-events-auto"
                       >
-                        <div className={`w-[245px] rounded-2xl p-2 border shadow-2xl ${
-                          isDarkTheme
-                            ? 'bg-[#0E0D12]/95 backdrop-blur-xl border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)]'
-                            : 'bg-[#FAF4E6]/95 backdrop-blur-xl border-[#e9dcbe] shadow-[0_20px_45px_rgba(116,99,67,0.18)]'
-                        }`}>
+                        <div className="w-[285px] rounded-2xl p-2 bg-[#FAF4E6] border border-[#DECDB0] shadow-[0_16px_40px_rgba(40,25,10,0.12),0_2px_6px_rgba(40,25,10,0.04)]">
                           <div className="flex flex-col space-y-0.5">
                             {item.children?.map((child) => {
                               const isChildActive = child.to.includes('#')
@@ -210,25 +262,22 @@ export default function Navbar() {
                                 <Link
                                   key={child.label}
                                   to={child.to}
-                                  onClick={() => setOpenDropdown(null)}
+                                  onClick={() => handleChildClick(child.to)}
                                   className={`group/child relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] leading-snug transition-all duration-150 ${
-                                    isDarkTheme
-                                      ? isChildActive
-                                        ? 'bg-white/10 text-[#F97316] font-medium'
-                                        : 'text-white/80 hover:text-white hover:bg-white/10'
-                                      : isChildActive
-                                        ? 'bg-[#F2E5CA] text-[#ea580c] font-medium'
-                                        : 'text-[#746343] hover:text-[#ea580c] hover:bg-[#F3E7CD]'
+                                    isChildActive
+                                      ? 'bg-[#F2E5CA] text-[#E06D28] font-semibold'
+                                      : 'text-[#272624] hover:text-[#E06D28] hover:bg-[#F2E5CA]'
                                   }`}
                                 >
                                   <span className="whitespace-nowrap font-normal group-hover/child:font-medium transition-all">
                                     {child.label}
                                   </span>
+
                                   <span 
-                                    className={`w-1.5 h-1.5 rounded-full transition-all duration-150 ${
+                                    className={`w-1.5 h-1.5 rounded-full transition-all duration-150 flex-shrink-0 ${
                                       isChildActive
-                                        ? 'bg-[#F97316] opacity-100 scale-100'
-                                        : 'bg-[#F97316] opacity-0 group-hover/child:opacity-50 scale-75 group-hover/child:scale-100'
+                                        ? 'bg-[#E06D28] opacity-100 scale-100'
+                                        : 'bg-[#E06D28] opacity-0 group-hover/child:opacity-80 scale-75 group-hover/child:scale-100'
                                     }`} 
                                   />
                                 </Link>
@@ -275,14 +324,15 @@ export default function Navbar() {
           {/* Mobile Hamburger */}
           <button
             onClick={toggleOpen}
+            type="button"
             aria-label="Open navigation menu"
-            className={`lg:hidden ml-4 p-2 rounded-xl transition-colors ${
+            className={`lg:hidden ml-3 sm:ml-4 p-2 rounded-xl transition-all cursor-pointer ${
               isDarkTheme 
-                ? 'text-white hover:text-[#F97316] hover:bg-white/10' 
-                : 'text-stone-800 hover:text-[#ea580c] hover:bg-orange-100/50'
+                ? 'text-white hover:text-[#F97316] hover:bg-white/10 active:scale-95' 
+                : 'text-[#1A1612] hover:text-[#ea580c] hover:bg-[#F2E5CA] active:scale-95'
             }`}
           >
-            <CiMenuFries className="w-6 h-6" />
+            <Menu className="w-6 h-6 stroke-[2.2]" />
           </button>
         </div>
       </motion.nav>

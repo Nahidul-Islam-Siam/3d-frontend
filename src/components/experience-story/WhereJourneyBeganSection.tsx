@@ -1,56 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 import subtractImg from "@/assets/experience-story/Subtract.png";
-import slide2Img from "@/assets/experience-story/Subtract-slide-2.png";
-import slide3Img from "@/assets/experience-story/Subtract-slide-3.png";
 
 export interface WhereJourneyBeganSectionProps {
   id?: string;
   className?: string;
-  customImages?: Array<{ src: string; alt?: string; caption?: string }>;
+  customImage?: string;
 }
 
 export default function WhereJourneyBeganSection({
   id = "where-the-journey-began",
   className = "",
-  customImages,
+  customImage,
 }: WhereJourneyBeganSectionProps) {
-  const images = customImages && customImages.length > 0 ? customImages : [
-    {
-      src: subtractImg,
-      alt: "Founder sitting by the window reflecting on the journey",
-      caption: "Where the journey began",
-    },
-    {
-      src: slide2Img,
-      alt: "Community moments and leadership throughout the mission",
-      caption: "A foundation of compassion and faith",
-    },
-    {
-      src: slide3Img,
-      alt: "Discovering purpose and empowering future generations",
-      caption: "Discovering purpose along the way",
-    },
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  }, [images.length]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  }, [images.length]);
-
-  // Auto-play timer (advances every 5s, pauses on hover)
-  useEffect(() => {
-    if (isPaused || images.length <= 1) return;
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
-  }, [isPaused, nextSlide, images.length]);
+  const imageSrc = customImage || subtractImg;
 
   return (
     <section
@@ -73,83 +35,22 @@ export default function WhereJourneyBeganSection({
           
           {/* ─── Left Column: Sticky Pinned Container (Sticks while right story scrolls) ─── */}
           <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 xl:top-28 z-20 self-start">
-            <div 
-              className="relative isolate w-full max-w-[390px] sm:max-w-[430px] lg:max-w-[410px] xl:max-w-[450px] mx-auto lg:mx-0 group"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
+            <div className="relative isolate w-full max-w-[390px] sm:max-w-[430px] lg:max-w-[410px] xl:max-w-[450px] mx-auto lg:mx-0 group">
               {/* Orange Geometric Accent Card (Behind) */}
               <div 
                 className="absolute -top-3 -bottom-3 -left-4 sm:-left-6 right-8 sm:right-10 bg-[#E06A26] rounded-[24px] sm:rounded-[32px] z-0 transform -rotate-1 shadow-md transition-transform duration-300 group-hover:-rotate-2" 
                 aria-hidden="true"
               />
 
-              {/* Slider Image Container (No Background Color, Pure Transparent Cutout) */}
+              {/* Single Static Image Container */}
               <div className="relative z-10 w-full aspect-[635/912] drop-shadow-[0_16px_36px_rgba(0,0,0,0.12)]">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={currentIndex}
-                    src={images[currentIndex].src}
-                    alt={images[currentIndex].alt || "Story photograph"}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full h-full object-contain block select-none pointer-events-none"
-                    loading="eager"
-                    decoding="async"
-                  />
-                </AnimatePresence>
-
-                {/* Navigation Arrows (Visible on hover or mobile) */}
-                {images.length > 1 && (
-                  <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-between pointer-events-none px-1">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        prevSlide();
-                      }}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 pointer-events-auto cursor-pointer shadow-md"
-                      aria-label="Previous story photo"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        nextSlide();
-                      }}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 pointer-events-auto cursor-pointer shadow-md"
-                      aria-label="Next story photo"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
-
-                {/* Minimal Bottom Indicators (No Counting Badge) */}
-                {images.length > 1 && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/30 backdrop-blur-sm">
-                    {images.map((_, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentIndex(idx);
-                        }}
-                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                          idx === currentIndex
-                            ? "w-5 bg-[#E06A26]"
-                            : "w-1.5 bg-white/60 hover:bg-white"
-                        }`}
-                        aria-label={`Go to slide ${idx + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
+                <img
+                  src={imageSrc}
+                  alt="Founder sitting by the window reflecting on the journey"
+                  className="w-full h-full object-contain block select-none pointer-events-none"
+                  loading="eager"
+                  decoding="async"
+                />
               </div>
 
               {/* Floating Quote Callout (Bottom-Right Overlap) */}

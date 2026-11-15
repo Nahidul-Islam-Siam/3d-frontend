@@ -23,15 +23,17 @@ export default function MovementPage() {
         {/* ─── Section 1: Hero Cinema Video (WhatsApp Video 2026-10-31 at 11.04.42 AM) ─── */}
         <MovementHeroBanner />
 
+            <MovementTitleSection />
+
         {/* ─── Section 2: Second Cinema Video (join-the-movement-2.mp4) ─── */}
-        <MovementSecondVideo />
+     
 
         {/* ─── Section 3: "JOIN THE MOVEMENT" Title & Flourish Leaves ─── */}
-        <MovementTitleSection />
+    
 
         {/* ─── Section 4: "Someone Notices" Dark Cinematic Card ─── */}
         <SomeoneNoticesSection />
-
+   <MovementSecondVideo />
         {/* ─── Section 5: "Never Meant To Be Built By One Person" Community Pillars ─── */}
         <BuiltByCommunitySection />
 

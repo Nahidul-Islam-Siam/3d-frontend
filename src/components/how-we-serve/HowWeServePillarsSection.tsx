@@ -26,6 +26,7 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR ONE: A PLACE AT THE TABLE
         ══════════════════════════════════════════════════════════ */}
+        <span id="a-place-at-the-table" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-one"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
@@ -160,6 +161,8 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR TWO: STRONG FOUNDATIONS
         ══════════════════════════════════════════════════════════ */}
+        <span id="strong-foundations" className="block -mt-28 pt-28 pointer-events-none" />
+        <span id="you-matter" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-two"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
@@ -292,6 +295,8 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR THREE: STORIES THAT SAVE LIVES
         ══════════════════════════════════════════════════════════ */}
+        <span id="stories-that-save-lives" className="block -mt-28 pt-28 pointer-events-none" />
+        <span id="suicide-awareness-showdown" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-three"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
@@ -439,6 +444,7 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR FOUR: WELCOME HOME
         ══════════════════════════════════════════════════════════ */}
+        <span id="welcome-home" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-four"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
@@ -568,6 +574,7 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR FIVE: A NEW BEGINNING
         ══════════════════════════════════════════════════════════ */}
+        <span id="a-new-beginning" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-five"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
@@ -697,6 +704,7 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR SIX: SERVE BESIDE US
         ══════════════════════════════════════════════════════════ */}
+        <span id="serve-beside-us" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-six"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
@@ -826,6 +834,7 @@ export function HowWeServePillarsSection({
         {/* ══════════════════════════════════════════════════════════
             DOOR SEVEN: YOUR STORY
         ══════════════════════════════════════════════════════════ */}
+        <span id="your-story" className="block -mt-28 pt-28 pointer-events-none" />
         <div
           id="door-seven"
           className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"

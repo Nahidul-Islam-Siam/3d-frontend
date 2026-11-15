@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring, useTransform, useScroll, AnimatePresence } from 'framer-motion';
-import { Utensils, HeartHandshake, Sparkles } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
 import FigmaButton from '@/components/common/FigmaButton';
 import communityBg from '@/assets/meet-us/Meet Us.png';
 
@@ -9,48 +8,11 @@ export interface OneMovementSectionProps {
   className?: string;
 }
 
-interface CommunityStoryPin {
-  id: string;
-  top: string;
-  left: string;
-  title: string;
-  subtitle: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const storyPins: CommunityStoryPin[] = [
-  {
-    id: 'meals',
-    top: '44%',
-    left: '22%',
-    title: 'Family Feasts',
-    subtitle: 'Nourishing dignity & food security',
-    icon: Utensils,
-  },
-  {
-    id: 'belonging',
-    top: '70%',
-    left: '50%',
-    title: 'Belonging Circles',
-    subtitle: 'A seat at the table for everyone',
-    icon: Sparkles,
-  },
-  {
-    id: 'mentorship',
-    top: '48%',
-    left: '78%',
-    title: 'Youth Mentorship',
-    subtitle: 'Unlocking potential through guidance',
-    icon: HeartHandshake,
-  },
-];
-
 export default function OneMovementSection({
   id = 'one-movement',
   className = '',
 }: OneMovementSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
-  const [activePin, setActivePin] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
 
   // Scroll scrub for cinematic expansion
@@ -92,7 +54,6 @@ export default function OneMovementSection({
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setActivePin(null);
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -150,62 +111,6 @@ export default function OneMovementSection({
           className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/80 pointer-events-none z-0"
           aria-hidden="true"
         />
-
-        {/* ─── Interactive Community Touchpoint Pins on Table ─── */}
-        <div className="absolute inset-0 pointer-events-none z-10 hidden sm:block">
-          {storyPins.map((pin) => {
-            const Icon = pin.icon;
-            const isOpen = activePin === pin.id;
-
-            return (
-              <div
-                key={pin.id}
-                style={{ top: pin.top, left: pin.left }}
-                className="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2"
-              >
-                {/* Pulsing Beacon Dot */}
-                <button
-                  type="button"
-                  onClick={() => setActivePin(isOpen ? null : pin.id)}
-                  onMouseEnter={() => setActivePin(pin.id)}
-                  className="relative group flex items-center justify-center p-2 rounded-full cursor-pointer focus:outline-none"
-                  aria-label={pin.title}
-                >
-                  <span className="absolute inset-0 rounded-full bg-[#F97316]/30 animate-ping" />
-                  <span className="relative w-4 h-4 rounded-full bg-[#F97316] border-2 border-white shadow-[0_0_18px_rgba(249,115,22,0.9)] group-hover:scale-125 transition-transform duration-200" />
-                </button>
-
-                {/* Floating Glassmorphic Tooltip Card */}
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.92 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                      transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-60 p-3.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/20 shadow-2xl text-left pointer-events-auto select-none"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-5 h-5 rounded-full bg-[#F97316]/20 border border-[#F97316]/50 flex items-center justify-center shrink-0">
-                          <Icon className="w-3 h-3 text-[#F97316]" />
-                        </div>
-                        <span
-                          style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                          className="text-xs font-bold text-white tracking-wide"
-                        >
-                          {pin.title}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-stone-300 font-sans leading-relaxed pl-7">
-                        {pin.subtitle}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
 
         {/* ─── Central Content (Expansive Width & Height) ─── */}
         <div className="relative z-10 w-full max-w-5xl sm:max-w-6xl xl:max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 text-center flex flex-col items-center justify-center py-20 sm:py-24 lg:py-32">

@@ -87,15 +87,21 @@ export default function FourDoorsSection({
   const [hoveredDoor, setHoveredDoor] = useState<string | null>(null);
   const [is3DHallwayOpen, setIs3DHallwayOpen] = useState<boolean>(false);
 
-  // Close 3D overlay with Escape key
+  // Close 3D overlay with Escape key; open on external trigger
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && is3DHallwayOpen) {
         setIs3DHallwayOpen(false);
       }
     };
+    const handleOpen = () => setIs3DHallwayOpen(true);
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-3d-hallway', handleOpen);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-3d-hallway', handleOpen);
+    };
   }, [is3DHallwayOpen]);
 
   const navigate = useNavigate();
