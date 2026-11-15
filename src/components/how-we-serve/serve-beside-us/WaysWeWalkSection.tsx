@@ -1,4 +1,7 @@
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import cardImg1 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109.png';
 import cardImg2 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy.png';
 import cardImg3 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy 2.png';
@@ -10,6 +13,9 @@ interface WalkWayCard {
   id: string;
   title: string;
   description: string;
+  extendedText: string;
+  ctaText: string;
+  ctaLink: string;
   image: string;
 }
 
@@ -18,41 +24,91 @@ const walkWays: WalkWayCard[] = [
     id: 'serving-meals',
     title: 'Serving Meals',
     description: 'Because everyone deserves a place at the table.',
+    extendedText:
+      'From prepping fresh ingredients to sharing warmth across a dinner table, our meal volunteers create moments where community members feel seen, honored, and deeply cared for.',
+    ctaText: 'Help Serve Meals',
+    ctaLink: '/how-we-serve/a-place-at-the-table',
     image: cardImg1,
   },
   {
     id: 'welcoming-veterans',
     title: 'Welcoming Veterans Home',
     description: 'Because everyone deserves a place to begin again.',
+    extendedText:
+      'Standing shoulder-to-shoulder with veterans during transitions, helping furnish apartments, carrying household boxes, and handing over the keys to a fresh start.',
+    ctaText: 'Support Veterans',
+    ctaLink: '/how-we-serve/welcome-home',
     image: cardImg2,
   },
   {
     id: 'supporting-experience',
     title: 'Supporting the Experience',
     description: 'Helping create conversations that inspire hope.',
+    extendedText:
+      'Serving behind the scenes at our theatrical showcases, community gatherings, and musical productions that break the silence around mental health and suicide awareness.',
+    ctaText: 'Experience The Show',
+    ctaLink: '/how-we-serve/stories-that-save-lives',
     image: cardImg3,
   },
   {
     id: 'investing-youth',
     title: 'Investing in Young People',
     description: 'Helping students discover their worth.',
+    extendedText:
+      'Mentoring middle and high school students through the LEADS program, instilling leadership, dignity, and self-worth so the next generation thrives.',
+    ctaText: 'Explore Youth Mentorship',
+    ctaLink: '/how-we-serve/you-matter',
     image: cardImg4,
   },
   {
     id: 'organizing-donations',
     title: 'Organizing Donations',
     description: 'Turning generosity into new beginnings.',
+    extendedText:
+      'Receiving, sorting, and delivering furniture, beddings, pantry goods, and essentials to families taking their first courageous steps into stable housing.',
+    ctaText: 'Donate Essentials',
+    ctaLink: '/donate?category=supplies',
     image: cardImg5,
   },
   {
     id: 'simply-showing-up',
     title: 'Simply Showing Up',
     description: '— Sometimes the greatest gift we can give is our presence.',
+    extendedText:
+      'You don\'t need specialized training or clinical credentials. Being a faithful, compassionate friend who sits down to listen can literally save someone\'s life.',
+    ctaText: 'Join The Movement',
+    ctaLink: '/movement',
     image: cardImg6,
   },
 ];
 
 export default function WaysWeWalkSection() {
+  const [activeCardIdx, setActiveCardIdx] = useState<number | null>(null);
+
+  // Keyboard navigation for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeCardIdx === null) return;
+      if (e.key === 'Escape') setActiveCardIdx(null);
+      if (e.key === 'ArrowRight') setActiveCardIdx((activeCardIdx + 1) % walkWays.length);
+      if (e.key === 'ArrowLeft') setActiveCardIdx((activeCardIdx - 1 + walkWays.length) % walkWays.length);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeCardIdx]);
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activeCardIdx === null) return;
+    setActiveCardIdx((activeCardIdx + 1) % walkWays.length);
+  };
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (activeCardIdx === null) return;
+    setActiveCardIdx((activeCardIdx - 1 + walkWays.length) % walkWays.length);
+  };
+
   return (
     <section 
       id="ways-we-walk"
@@ -118,15 +174,22 @@ export default function WaysWeWalkSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.7, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className="group relative rounded-[22px] bg-[#16120F]/90 backdrop-blur-md border border-white/10 hover:border-[#F97316]/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_16px_50px_rgba(249,115,22,0.18)] transition-all duration-300 overflow-hidden flex flex-col justify-between"
+              onClick={() => setActiveCardIdx(idx)}
+              className="group relative rounded-[22px] bg-[#16120F]/90 backdrop-blur-md border border-white/10 hover:border-[#F97316]/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:shadow-[0_16px_50px_rgba(249,115,22,0.18)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
             >
-              {/* Card Photo */}
-              <div className="w-full h-[200px] sm:h-[220px] overflow-hidden bg-black/40">
+              {/* Card Photo with Hover Zoom */}
+              <div className="w-full h-[200px] sm:h-[220px] overflow-hidden bg-black/40 relative">
                 <img
                   src={item.image}
                   alt={item.title}
                   className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-black/15 group-hover:bg-transparent transition-colors pointer-events-none" />
+                
+                {/* Hover Click Pill */}
+                <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] font-sans opacity-0 group-hover:opacity-100 transition-opacity">
+                  Click to explore
+                </div>
               </div>
 
               {/* Card Bottom Content */}
@@ -144,13 +207,108 @@ export default function WaysWeWalkSection() {
                 </div>
 
                 {/* Subtle Bottom Accent Indicator on Hover */}
-                <div className="w-8 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-14 group-hover:bg-[#F97316] transition-all duration-300 mt-5" />
+                <div className="w-8 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-16 group-hover:bg-[#F97316] transition-all duration-300 mt-5" />
               </div>
             </motion.div>
           ))}
         </div>
 
       </div>
+
+      {/* ─── Interactive Lightbox Dialog on Card Click ─── */}
+      <AnimatePresence>
+        {activeCardIdx !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setActiveCardIdx(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-black/85 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-2xl rounded-3xl overflow-hidden border border-white/20 bg-[#16120F] shadow-2xl flex flex-col"
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setActiveCardIdx(null)}
+                aria-label="Close dialog"
+                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Prev Button */}
+              <button
+                type="button"
+                onClick={handlePrev}
+                aria-label="Previous card"
+                className="absolute left-4 top-1/3 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                type="button"
+                onClick={handleNext}
+                aria-label="Next card"
+                className="absolute right-4 top-1/3 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+
+              {/* Modal Image */}
+              <div className="w-full h-[260px] sm:h-[300px] overflow-hidden bg-black/50">
+                <img
+                  src={walkWays[activeCardIdx].image}
+                  alt={walkWays[activeCardIdx].title}
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+
+              {/* Modal Text Content */}
+              <div className="p-6 sm:p-8 space-y-4">
+                <div className="flex items-center justify-between text-xs text-[#F97316] font-semibold tracking-widest uppercase">
+                  <span>Pathway {activeCardIdx + 1} of {walkWays.length}</span>
+                  <span className="text-white/40">Serve Beside Us</span>
+                </div>
+
+                <h3
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-2xl sm:text-3xl font-normal text-white"
+                >
+                  {walkWays[activeCardIdx].title}
+                </h3>
+
+                <p className="text-[#F97316] text-sm font-medium">
+                  {walkWays[activeCardIdx].description}
+                </p>
+
+                <p className="text-stone-300 text-sm leading-relaxed font-light">
+                  {walkWays[activeCardIdx].extendedText}
+                </p>
+
+                <div className="pt-3 flex items-center justify-end">
+                  <Link
+                    to={walkWays[activeCardIdx].ctaLink}
+                    onClick={() => setActiveCardIdx(null)}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#F97316] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-medium tracking-wide shadow-md transition-all hover:scale-105"
+                  >
+                    <span>{walkWays[activeCardIdx].ctaText}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

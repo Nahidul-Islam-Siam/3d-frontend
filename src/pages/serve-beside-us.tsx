@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Seo from '@/components/Seo';
 import ServeBesideUsHeroSection from '@/components/how-we-serve/serve-beside-us/ServeBesideUsHeroSection';
 import WaysWeWalkSection from '@/components/how-we-serve/serve-beside-us/WaysWeWalkSection';
@@ -9,6 +9,12 @@ import ServeHopeTogetherFinaleSection from '@/components/how-we-serve/serve-besi
 
 export default function ServeBesideUsPage() {
   const introStageRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Reveal global navbar and scroll to top
+    window.dispatchEvent(new CustomEvent('reveal-navbar'));
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleScrollClick = () => {
     introStageRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -21,7 +27,7 @@ export default function ServeBesideUsPage() {
         description="Sometimes purpose begins with saying yes. Discover how volunteers from every walk of life serve together to bring hope, dignity, and compassion to our community." 
       />
 
-      <div className="w-full bg-[#0A0706] text-white selection:bg-[#F97316] selection:text-white overflow-x-hidden">
+      <div className="w-full bg-[#FAF4E6] text-[#2C261E] selection:bg-[#F97316] selection:text-white overflow-x-hidden">
         {/* ─── 1. VIDEO HERO & INTRO STAGE (Figma Frames 1 & 2) ─── */}
         <ServeBesideUsHeroSection onScrollClick={handleScrollClick} />
 

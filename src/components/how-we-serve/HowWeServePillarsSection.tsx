@@ -803,9 +803,18 @@ export function HowWeServePillarsSection({
 
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <FigmaButton
-                to="/movement?tab=volunteer"
+                to="/how-we-serve/serve-beside-us"
                 variant="primary"
                 size="md"
+              >
+                Step Inside Door 6
+              </FigmaButton>
+
+              <FigmaButton
+                to="/movement?tab=volunteer"
+                variant="outline"
+                size="md"
+                className="!border-[#DFCCA7] !text-[#121010] hover:!border-[#F97316] hover:!text-[#F97316] hover:!bg-[#F97316]/5"
               >
                 Become A Volunteer
               </FigmaButton>
