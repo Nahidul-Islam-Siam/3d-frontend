@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import cardImg1 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109.png';
-import cardImg2 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy.png';
-import cardImg3 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy 2.png';
-import cardImg4 from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy 3.png';
-import cardImg5 from '@/assets/how-we-serve/image 52.png';
-import cardImg6 from '@/assets/how-we-serve/image 53.png';
+
+// Exact 1:1 Figma assets matching user screenshot
+import cardMealsImg from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy.png';
+import cardVeteransImg from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy 2.png';
+import cardExperienceImg from '@/assets/meet-us/gallery/figma-card-children.png';
+import cardYouthImg from '@/assets/how-we-serve/serve-beside-us/card-investing-youth.png';
+import cardDonationsImg from '@/assets/how-we-serve/serve-beside-us/Rectangle 109.png';
+import cardShowingUpImg from '@/assets/how-we-serve/serve-beside-us/Rectangle 109 copy 3.png';
 
 interface WalkWayCard {
   id: string;
@@ -28,7 +30,7 @@ const walkWays: WalkWayCard[] = [
       'From prepping fresh ingredients to sharing warmth across a dinner table, our meal volunteers create moments where community members feel seen, honored, and deeply cared for.',
     ctaText: 'Help Serve Meals',
     ctaLink: '/how-we-serve/a-place-at-the-table',
-    image: cardImg1,
+    image: cardMealsImg,
   },
   {
     id: 'welcoming-veterans',
@@ -38,7 +40,7 @@ const walkWays: WalkWayCard[] = [
       'Standing shoulder-to-shoulder with veterans during transitions, helping furnish apartments, carrying household boxes, and handing over the keys to a fresh start.',
     ctaText: 'Support Veterans',
     ctaLink: '/how-we-serve/welcome-home',
-    image: cardImg2,
+    image: cardVeteransImg,
   },
   {
     id: 'supporting-experience',
@@ -48,7 +50,7 @@ const walkWays: WalkWayCard[] = [
       'Serving behind the scenes at our theatrical showcases, community gatherings, and musical productions that break the silence around mental health and suicide awareness.',
     ctaText: 'Experience The Show',
     ctaLink: '/how-we-serve/stories-that-save-lives',
-    image: cardImg3,
+    image: cardExperienceImg,
   },
   {
     id: 'investing-youth',
@@ -58,7 +60,7 @@ const walkWays: WalkWayCard[] = [
       'Mentoring middle and high school students through the LEADS program, instilling leadership, dignity, and self-worth so the next generation thrives.',
     ctaText: 'Explore Youth Mentorship',
     ctaLink: '/how-we-serve/you-matter',
-    image: cardImg4,
+    image: cardYouthImg,
   },
   {
     id: 'organizing-donations',
@@ -68,7 +70,7 @@ const walkWays: WalkWayCard[] = [
       'Receiving, sorting, and delivering furniture, beddings, pantry goods, and essentials to families taking their first courageous steps into stable housing.',
     ctaText: 'Donate Essentials',
     ctaLink: '/donate?category=supplies',
-    image: cardImg5,
+    image: cardDonationsImg,
   },
   {
     id: 'simply-showing-up',
@@ -78,7 +80,7 @@ const walkWays: WalkWayCard[] = [
       'You don\'t need specialized training or clinical credentials. Being a faithful, compassionate friend who sits down to listen can literally save someone\'s life.',
     ctaText: 'Join The Movement',
     ctaLink: '/movement',
-    image: cardImg6,
+    image: cardShowingUpImg,
   },
 ];
 
@@ -108,6 +110,51 @@ export default function WaysWeWalkSection() {
     if (activeCardIdx === null) return;
     setActiveCardIdx((activeCardIdx - 1 + walkWays.length) % walkWays.length);
   };
+
+  const renderCard = (item: WalkWayCard, idx: number, imgAspectClass: string) => (
+    <motion.div
+      key={item.id}
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.7, delay: (idx % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      onClick={() => setActiveCardIdx(idx)}
+      className="group relative rounded-[22px] sm:rounded-[26px] bg-[#2A1D14] border border-[#3E2B1F] hover:border-[#F97316]/70 shadow-[0_12px_40px_rgba(0,0,0,0.18)] hover:shadow-[0_16px_50px_rgba(249,115,22,0.16)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
+    >
+      {/* Card Photo with Hover Zoom */}
+      <div className={`w-full ${imgAspectClass} overflow-hidden bg-black/40 relative`}>
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors pointer-events-none" />
+        
+        {/* Hover Pill */}
+        <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] font-sans opacity-0 group-hover:opacity-100 transition-opacity">
+          Click to explore
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <div className="p-6 sm:p-7 flex flex-col justify-between flex-1">
+        <div>
+          <h3
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-lg sm:text-xl font-normal tracking-wide text-white group-hover:text-[#F97316] transition-colors mb-2.5"
+          >
+            {item.title}
+          </h3>
+          <p className="text-[#C4A992] text-xs sm:text-[13px] leading-relaxed font-light">
+            {item.description}
+          </p>
+        </div>
+
+        {/* Bottom Accent */}
+        <div className="w-8 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-16 group-hover:bg-[#F97316] transition-all duration-300 mt-5" />
+      </div>
+    </motion.div>
+  );
 
   return (
     <section 
@@ -154,52 +201,27 @@ export default function WaysWeWalkSection() {
           </motion.div>
         </div>
 
-        {/* ─── 6 Cards in 3x2 Grid (Figma 1:1) ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-          {walkWays.map((item, idx) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.7, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              onClick={() => setActiveCardIdx(idx)}
-              className="group relative rounded-[22px] bg-[#F4EBD9] border border-[#DBCAB0] hover:border-[#F97316] shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.14)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
-            >
-              {/* Card Photo with Hover Zoom */}
-              <div className="w-full h-[200px] sm:h-[220px] overflow-hidden bg-black/10 relative">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none" />
-                
-                {/* Hover Click Pill */}
-                <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] font-sans opacity-0 group-hover:opacity-100 transition-opacity">
-                  Click to explore
-                </div>
-              </div>
+        {/* ─── 3 Columns Asymmetrical Bento Grid (Figma 1:1) ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8 items-start">
+          
+          {/* ─── Column 1 (Left) ─── */}
+          <div className="flex flex-col gap-6 sm:gap-7 lg:gap-8">
+            {renderCard(walkWays[0], 0, 'aspect-[16/9.5] sm:aspect-[16/9]')}  {/* Serving Meals */}
+            {renderCard(walkWays[3], 3, 'aspect-[16/12] sm:aspect-[16/11]')} {/* Investing in Young People (Taller!) */}
+          </div>
 
-              {/* Card Bottom Content */}
-              <div className="p-6 sm:p-7 flex flex-col justify-between flex-1">
-                <div>
-                  <h3
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-lg sm:text-xl font-medium tracking-wide text-[#1C140D] group-hover:text-[#F97316] transition-colors mb-2"
-                  >
-                    {item.title}
-                  </h3>
-                  <p className="text-[#554637] text-xs sm:text-[13px] leading-relaxed font-light">
-                    {item.description}
-                  </p>
-                </div>
+          {/* ─── Column 2 (Middle - Staggered Offset Downwards) ─── */}
+          <div className="flex flex-col gap-6 sm:gap-7 lg:gap-8 lg:pt-10 xl:pt-14">
+            {renderCard(walkWays[1], 1, 'aspect-[16/11] sm:aspect-[16/10]')} {/* Welcoming Veterans Home */}
+            {renderCard(walkWays[4], 4, 'aspect-[16/11] sm:aspect-[16/10]')} {/* Organizing Donations */}
+          </div>
 
-                {/* Subtle Bottom Accent Indicator on Hover */}
-                <div className="w-8 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-16 group-hover:bg-[#F97316] transition-all duration-300 mt-5" />
-              </div>
-            </motion.div>
-          ))}
+          {/* ─── Column 3 (Right) ─── */}
+          <div className="flex flex-col gap-6 sm:gap-7 lg:gap-8">
+            {renderCard(walkWays[2], 2, 'aspect-[16/9.5] sm:aspect-[16/9]')}  {/* Supporting the Experience */}
+            {renderCard(walkWays[5], 5, 'aspect-[16/12] sm:aspect-[16/11]')} {/* Simply Showing Up (Taller!) */}
+          </div>
+
         </div>
 
       </div>
