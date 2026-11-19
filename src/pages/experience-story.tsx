@@ -1,6 +1,7 @@
 import Seo from "@/components/Seo";
 import StoryHeroBanner from "@/components/experience-story/StoryHeroBanner";
 import JourneyStorySection from "@/components/experience-story/JourneyStorySection";
+import ShowdownSection from "@/components/welcome/ShowdownSection";
 import WhereJourneyBeganSection from "@/components/experience-story/WhereJourneyBeganSection";
 import PeopleWhoChangedLivesSection from "@/components/experience-story/PeopleWhoChangedLivesSection";
 import ThreeJourneysSection from "@/components/experience-story/ThreeJourneysSection";
@@ -11,7 +12,7 @@ import OurStoryStillWrittenSection from "@/components/experience-story/OurStoryS
 import ThinkFeelActSection from "@/components/experience-story/ThinkFeelActSection";
 import PlaceForYouCardSection from "@/components/experience-story/PlaceForYouCardSection";
 
-export default function About() {
+export default function ExperienceTheStoryPage() {
   return (
     <>
       <Seo
@@ -25,6 +26,16 @@ export default function About() {
 
         {/* ─── Section 2: Journey Story Section ("Life has a way of taking us on journeys...") ─── */}
         <JourneyStorySection />
+
+        {/* ─── Section 2.5: What's Coming Up Next (Showdown Rounded Card) ─── */}
+        <ShowdownSection 
+          id="showdown-section"
+          rounded
+          title="What's Coming Up Next"
+          subtitle="Discover our next event — an inspiring experience filled with meaningful stories, connection, and hope."
+          hideBadge
+          hideEventsStrip
+        />
 
         {/* ─── Section 3: Where the Journey Began (Subtract.png + Founder's Story) ─── */}
         <WhereJourneyBeganSection />

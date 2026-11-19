@@ -22,8 +22,21 @@ export default function BestWayOutSection({
     <section
       id={id}
       style={{ backgroundColor: "#F9731608" }}
-      className={`relative w-full py-20 sm:py-28 lg:py-32 overflow-hidden scroll-mt-24 select-none ${className}`}
+      className={`relative w-full py-16 sm:py-24 lg:py-28 overflow-hidden scroll-mt-24 select-none ${className}`}
     >
+      {/* ─── Top Stage Reflection Quote (Figma Image 5) ─── */}
+      <div className="w-full max-w-4xl mx-auto px-6 text-center mb-14 sm:mb-20 relative z-10">
+        <p className="font-sans text-xs sm:text-[13px] text-[#555555] leading-relaxed mb-1.5">
+          Because the most powerful stories don&apos;t simply stay on the stage.
+        </p>
+        <p className="font-sans text-xs sm:text-[13px] text-[#555555] leading-relaxed mb-3">
+          They carry forward with us. They inspire us to live more gently, listen more deeply, and recognize the extraordinary value of every human life.
+        </p>
+        <p className="font-sans text-xs sm:text-[13.5px] font-semibold text-[#141414] tracking-wide">
+          Every life deserves to be seen. Every voice deserves to be heard. Every story matters.
+        </p>
+      </div>
+
       {/* ─── Bottom-Left Decorative Leaf Flourish (Group.png) ─── */}
       <motion.img
         initial={{ opacity: 0, x: -20, y: 20 }}
@@ -92,7 +105,7 @@ export default function BestWayOutSection({
             {/* Narrative Paragraphs */}
             <div className="space-y-1 font-sans text-xs sm:text-[12.5px] lg:text-[13px] text-[#444444] leading-[1.7] max-w-lg">
               <p>Moving forward does not mean every day will be easy.</p>
-              <p>It doesn't mean we have to walk alone, or that asking for help makes us less capable.</p>
+              <p>It doesn&apos;t mean we have to walk alone, or that asking for help makes us less capable.</p>
               <p>It means believing that another step is possible.</p>
               <p>That support can make a difference.</p>
               <p>That our lives have meaning beyond the challenges we face.</p>
@@ -139,7 +152,7 @@ export default function BestWayOutSection({
               <p>A welcoming home can provide a foundation for a fresh start.</p>
               <p>A few words of encouragement can inspire a young person to believe in their potential.</p>
               <p>A story told onstage can open a conversation.</p>
-              <p>And one person's willingness to show up can remind another that they matter.</p>
+              <p>And one person&apos;s willingness to show up can remind another that they matter.</p>
             </div>
           </motion.div>
         </div>
@@ -147,4 +160,3 @@ export default function BestWayOutSection({
     </section>
   );
 }
-

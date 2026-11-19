@@ -209,7 +209,12 @@ export default function PeopleWhoChangedLivesSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[rgba(242,226,203,0.30)] rounded-[12px] p-6 sm:p-8"
+            style={{
+              borderRadius: "12px",
+              border: "1px solid rgba(227, 182, 143, 0.40)",
+              backgroundColor: "#FFF3D9",
+            }}
+            className="p-6 sm:p-8"
           >
             <h4 className="font-serif font-bold text-lg sm:text-xl text-[#141414] mb-2.5">
               They Were Individuals.
@@ -250,7 +255,12 @@ export default function PeopleWhoChangedLivesSection({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  className="bg-[#FFF3E3] border border-[#F97316] rounded-[12px] p-6 sm:p-7 lg:p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-start items-start text-left"
+                  style={{
+                    borderRadius: "12px",
+                    border: "1px solid rgba(227, 182, 143, 0.40)",
+                    backgroundColor: "#FFF3D9",
+                  }}
+                  className="p-6 sm:p-7 lg:p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-start items-start text-left"
                 >
                   <div className="mb-4 sm:mb-5">
                     <IconComponent className="w-7 h-7 sm:w-8 sm:h-8 text-[#F97316]" strokeWidth={1.5} />
