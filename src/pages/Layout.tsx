@@ -14,10 +14,22 @@ export default function RootLayout() {
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
   const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage || isWelcomeHomePage || isShowdownPage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
+  const [shouldShowPreloader, setShouldShowPreloader] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const isDone = Boolean(
+      (window as unknown as { __preloaderDone?: boolean }).__preloaderDone ||
+      sessionStorage.getItem('lab_preloader_seen') === 'true'
+    );
+    return !isDone;
+  });
 
   useEffect(() => {
     if (!isHomePage && typeof window !== 'undefined') {
       (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+      try {
+        sessionStorage.setItem('lab_preloader_seen', 'true');
+      } catch {}
+      setShouldShowPreloader(false);
     }
   }, [isHomePage]);
 
@@ -69,8 +81,20 @@ export default function RootLayout() {
       {/* Butter-smooth Lenis scroll across the entire application */}
       <SmoothScroll />
 
-      {/* Theatrical Preloader only on home page */}
-      {isHomePage && <Preloader />}
+      {/* Theatrical Preloader only on first visit to home page */}
+      {isHomePage && shouldShowPreloader && (
+        <Preloader
+          onComplete={() => {
+            setShouldShowPreloader(false);
+            if (typeof window !== 'undefined') {
+              (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+              try {
+                sessionStorage.setItem('lab_preloader_seen', 'true');
+              } catch {}
+            }
+          }}
+        />
+      )}
 
       {/* Global Fixed Navbar */}
       <Navbar />   

@@ -108,7 +108,7 @@ export default function SideNav({ isOpen, handleClose }: SideNavProps) {
                   <img 
                     src={logoWithText} 
                     alt="Live Achieve Believe" 
-                    className="h-7 w-auto object-contain"
+                    className="h-9 sm:h-10 w-auto object-contain"
                   />
                 </Link>
 

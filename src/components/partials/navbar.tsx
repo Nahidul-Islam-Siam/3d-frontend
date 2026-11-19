@@ -4,7 +4,6 @@ import { ChevronDown, Menu } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SideNav from "./side-nav";
 import logoWithText from "@/assets/logo/logo-with-text.png";
-import logoIconWhite from "@/assets/logo/logo-icon-white.png";
 import btnArrow from "@/assets/icons/btn-arrow.png";
 
 interface ProgramChild {
@@ -179,15 +178,15 @@ export default function Navbar() {
             <Link to="/" className="flex items-center">
               {isDarkTheme ? (
                 <img 
-                  src={logoIconWhite} 
+                  src={logoWithText} 
                   alt="Live Achieve Believe" 
-                  className="h-[30px] w-auto object-contain transition-opacity duration-300" 
+                  className="h-[34px] sm:h-[38px] lg:h-[42px] w-auto object-contain brightness-0 invert transition-all duration-300" 
                 />
               ) : (
                 <img 
                   src={logoWithText} 
                   alt="Live Achieve Believe" 
-                  className="h-[27px] w-auto object-contain transition-opacity duration-300" 
+                  className="h-[34px] sm:h-[38px] lg:h-[42px] w-auto object-contain transition-all duration-300" 
                 />
               )}
             </Link>

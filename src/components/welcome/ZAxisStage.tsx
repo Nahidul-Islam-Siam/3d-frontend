@@ -147,7 +147,10 @@ export default function ZAxisStage() {
 
   // Video starts when preloader completes
   useEffect(() => {
-    const isAlreadyDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
+    const isAlreadyDone = typeof window !== 'undefined' && (
+      (window as unknown as { __preloaderDone?: boolean }).__preloaderDone ||
+      sessionStorage.getItem('lab_preloader_seen') === 'true'
+    );
 
     if (isAlreadyDone) {
       startVideoPlayback();

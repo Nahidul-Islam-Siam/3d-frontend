@@ -132,7 +132,7 @@ export default function AuthShowcaseShell({
             <img
               src={logoWithText}
               alt="Live Achieve Believe"
-              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+              className="h-9 sm:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
             />
           </Link>
 

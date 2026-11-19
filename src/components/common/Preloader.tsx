@@ -6,10 +6,30 @@ interface PreloaderProps {
 }
 
 export default function Preloader({ onComplete }: PreloaderProps) {
+  const [alreadyDone] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return Boolean(
+      (window as unknown as { __preloaderDone?: boolean }).__preloaderDone ||
+      sessionStorage.getItem('lab_preloader_seen') === 'true'
+    );
+  });
+
   const [progress, setProgress] = useState(0);
-  const [isDone, setIsDone] = useState(false);
+  const [isDone, setIsDone] = useState(alreadyDone);
 
   useEffect(() => {
+    if (alreadyDone) {
+      if (typeof window !== 'undefined') {
+        (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+        try {
+          sessionStorage.setItem('lab_preloader_seen', 'true');
+        } catch {}
+        window.dispatchEvent(new CustomEvent('preloader-complete'));
+      }
+      if (onComplete) onComplete();
+      return;
+    }
+
     let current = 0;
     // Paced for cinematic ~3.2s duration (Edolus pace)
     const interval = setInterval(() => {
@@ -29,11 +49,20 @@ export default function Preloader({ onComplete }: PreloaderProps) {
         clearInterval(interval);
         setTimeout(() => {
           setIsDone(true);
+          if (typeof window !== 'undefined') {
+            (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+            try {
+              sessionStorage.setItem('lab_preloader_seen', 'true');
+            } catch {}
+          }
           if (onComplete) onComplete();
           // Dispatch right when the wipe starts revealing the screen
           setTimeout(() => {
             if (typeof window !== 'undefined') {
               (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+              try {
+                sessionStorage.setItem('lab_preloader_seen', 'true');
+              } catch {}
               window.dispatchEvent(new CustomEvent('preloader-complete'));
             }
           }, 600); // Halfway through the 1.2s wipe so screen is clear
@@ -42,7 +71,11 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     }, 28);
 
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, [onComplete, alreadyDone]);
+
+  if (alreadyDone) {
+    return null;
+  }
 
   return (
     <AnimatePresence 
@@ -50,6 +83,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       onExitComplete={() => {
         if (typeof window !== 'undefined') {
           (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
+          try {
+            sessionStorage.setItem('lab_preloader_seen', 'true');
+          } catch {}
           window.dispatchEvent(new CustomEvent('preloader-complete'));
         }
       }}

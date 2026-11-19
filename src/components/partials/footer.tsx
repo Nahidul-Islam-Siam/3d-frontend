@@ -24,7 +24,7 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
               <img 
                 src={logoWithText} 
                 alt="Live Achieve Believe" 
-                className="h-[32px] sm:h-[36px] w-auto object-contain"
+                className="h-[42px] sm:h-[46px] w-auto object-contain"
               />
             </Link>
 

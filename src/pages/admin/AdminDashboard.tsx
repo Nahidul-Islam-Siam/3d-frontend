@@ -36,7 +36,7 @@ import {
   FormOutlined,
 } from '@ant-design/icons';
 
-import logoIconWhite from '@/assets/logo/logo-icon-white.png';
+import theLabsLogo from '@/assets/logo/The Labs Live Achieve Believe Logo (1) 1.png';
 import { useLogoutSessionMutation } from '@/redux/api/authApi';
 import { useAppSelector } from '@/redux/hooks';
 import {
@@ -505,49 +505,29 @@ export default function AdminDashboard() {
         onClick={() => handleTabChange('overview')}
         aria-label="Live Achieve Believe Admin Overview"
         style={{
+          height: 68,
+          boxSizing: 'border-box',
           justifyContent: isSiderCompact ? 'center' : 'flex-start',
-          padding: isSiderCompact ? '14px 10px' : '14px 18px',
+          padding: isSiderCompact ? '0 12px' : '0 20px',
+          backgroundColor: '#FFFFFF',
+          borderBottom: '1px solid #E2E8F0',
+          borderRight: '1px solid #E2E8F0',
+          display: 'flex',
+          alignItems: 'center',
+          cursor: 'pointer',
         }}
       >
-        <div
+        <img
+          src={theLabsLogo}
+          alt="Live Achieve Believe"
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 11,
-            background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
-            border: '1px solid rgba(255,255,255,0.18)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            boxShadow: '0 6px 16px rgba(234, 88, 12, 0.34)',
+            height: isSiderCompact ? 28 : 38,
+            width: 'auto',
+            objectFit: 'contain',
+            display: 'block',
+            transition: 'height 0.2s ease',
           }}
-        >
-          <img
-            src={logoIconWhite}
-            alt="Live Achieve Believe logo"
-            style={{ width: 24, height: 24, objectFit: 'contain', display: 'block' }}
-          />
-        </div>
-        {!isSiderCompact && (
-          <div style={{ lineHeight: 1.25, overflow: 'hidden' }}>
-            <div
-              style={{
-                color: '#FAF4E6',
-                fontFamily: '"Playfair Display", Georgia, serif',
-                fontWeight: 700,
-                fontSize: 15,
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.01em',
-              }}
-            >
-              Live Achieve Believe
-            </div>
-            <div style={{ color: '#94A3B8', fontSize: 11, fontWeight: 500, marginTop: 1 }}>
-              Admin Operations Hub
-            </div>
-          </div>
-        )}
+        />
       </button>
 
       {/* Navigation Menu */}
@@ -861,7 +841,7 @@ export default function AdminDashboard() {
               borderBottom: '1px solid #E2E8F0',
             }}
           >
-            <Space size="middle">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {/* Mobile Drawer Trigger or Desktop Collapse Button */}
               {isMobile ? (
                 <Button
@@ -869,7 +849,15 @@ export default function AdminDashboard() {
                   icon={<MenuOutlined style={{ fontSize: 18 }} />}
                   onClick={() => setMobileDrawerOpen(true)}
                   aria-label="Open navigation menu"
-                  style={{ fontSize: 18, width: 40, height: 40 }}
+                  style={{
+                    fontSize: 18,
+                    width: 38,
+                    height: 38,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 8,
+                  }}
                 />
               ) : (
                 <Button
@@ -877,14 +865,42 @@ export default function AdminDashboard() {
                   icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                   onClick={() => setCollapsed(!collapsed)}
                   aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                  style={{ fontSize: 16, width: 40, height: 40 }}
+                  style={{
+                    fontSize: 16,
+                    width: 38,
+                    height: 38,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 8,
+                  }}
                 />
               )}
 
               {/* Breadcrumb Navigation */}
               <Breadcrumb
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: 13.5,
+                  lineHeight: 1,
+                }}
                 items={[
-                  { title: <Link to="/" style={{ color: '#475569' }}>Website</Link> },
+                  {
+                    title: (
+                      <Link
+                        to="/"
+                        style={{
+                          color: '#475569',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        Website
+                      </Link>
+                    ),
+                  },
                   {
                     title: (
                       <button
@@ -896,10 +912,24 @@ export default function AdminDashboard() {
                       </button>
                     ),
                   },
-                  { title: <span style={{ fontWeight: 600, color: '#0F172A' }}>{activeTitleMap[activeTab] || 'Overview'}</span> },
+                  {
+                    title: (
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          color: '#0F172A',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        {activeTitleMap[activeTab] || 'Overview'}
+                      </span>
+                    ),
+                  },
                 ]}
               />
-            </Space>
+            </div>
 
             <Space size={isMobile ? 'small' : 'middle'}>
               {!isMobile && (
@@ -976,7 +1006,7 @@ export default function AdminDashboard() {
               overflowX: 'hidden',
             }}
           >
-            <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }}>
+            <div style={{ width: '100%', maxWidth: 1600 }}>
               {activeTab === 'overview' && (
                 <OverviewView
                   overviewData={overviewData}

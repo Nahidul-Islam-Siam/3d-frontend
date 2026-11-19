@@ -66,7 +66,10 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
         });
     };
 
-    const isDone = typeof window !== 'undefined' && (window as unknown as { __preloaderDone?: boolean }).__preloaderDone;
+    const isDone = typeof window !== 'undefined' && (
+      (window as unknown as { __preloaderDone?: boolean }).__preloaderDone ||
+      sessionStorage.getItem('lab_preloader_seen') === 'true'
+    );
     if (isDone) {
       startPlaybackWithSound();
       return () => {

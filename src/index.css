@@ -174,21 +174,22 @@ body::-webkit-scrollbar,
 
 .admin-brand-trigger {
   width: 100%;
-  min-height: 68px;
-  padding: 14px 18px;
+  height: 68px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: transparent;
+  background: #FFFFFF;
   border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #E2E8F0;
+  border-right: 1px solid #E2E8F0;
   cursor: pointer;
   text-align: left;
   transition: background-color 0.18s ease;
+  box-sizing: border-box;
 }
 
 .admin-brand-trigger:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: #F8FAFC;
 }
 
 .admin-sider-footer-btn {
@@ -235,15 +236,22 @@ body::-webkit-scrollbar,
 .admin-breadcrumb-btn {
   border: 0;
   background: transparent;
-  padding: 2px 4px;
+  padding: 0;
+  margin: 0;
   border-radius: 4px;
   color: #475569;
   font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
   cursor: pointer;
+  transition: color 0.15s ease;
 }
 
 .admin-breadcrumb-btn:hover {
-  color: #C2410C;
+  color: #F97316;
 }
 
 .admin-notif-item {
