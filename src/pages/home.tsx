@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Seo from '../components/Seo';
+import WelcomeExperience from '@/components/welcome/WelcomeExperience';
 import StepInsideWelcomeSection from '@/components/welcome/StepInsideWelcomeSection';
 import TakingTheStageSection from '@/components/welcome/TakingTheStageSection';
 import { TakeAMomentSection } from '@/components/welcome/TakeAMomentSection';
@@ -9,17 +10,14 @@ import OneMissionManyExpressionsSection from '@/components/welcome/OneMissionMan
 import RoomForYourStorySection from '@/components/welcome/RoomForYourStorySection';
 import VisitorInterestFormSection from '@/components/welcome/VisitorInterestFormSection';
 import ShowdownSection from '@/components/welcome/ShowdownSection';
-// import ZAxisStage from '@/components/welcome/ZAxisStage';
 
 export default function Home() {
   const location = useLocation();
 
   useEffect(() => {
-    // Reveal global navbar for site redesign
-    window.dispatchEvent(new CustomEvent('reveal-navbar'));
-
     // Handle hash deep link (e.g. #your-story or #visitor-interest-form)
     if (location.hash) {
+      window.dispatchEvent(new CustomEvent('reveal-navbar'));
       const hashId = location.hash.replace('#', '');
       const timer = setTimeout(() => {
         const target = document.getElementById(hashId);
@@ -38,11 +36,11 @@ export default function Home() {
         description="An invitation to experience a place where compassion becomes action, hope becomes visible, and every story matters." 
       />
 
+      {/* ─── 0. Welcome Video Hero (Cinematic Entrance) ─── */}
+      <WelcomeExperience />
+
       {/* ─── Root Page Redesign Canvas ─── */}
       <div className="w-full bg-[#FAF4E6]">
-        {/* Previous root components preserved (commented out) for site redesign */}
-        {/* <ZAxisStage /> */}
-
         {/* ─── 1. Hero Section: Step Inside. You Matter Here. ─── */}
         <StepInsideWelcomeSection />
 
@@ -68,7 +66,7 @@ export default function Home() {
         <span id="your-story" className="block -mt-24 pt-24 pointer-events-none" />
         <VisitorInterestFormSection id="visitor-interest-form" />
 
-           <ShowdownSection id="what-coming-up-next" />
+        <ShowdownSection id="what-coming-up-next" bottomCreamBand />
       </div>
     </>
   );

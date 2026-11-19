@@ -290,7 +290,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
       onEnterHallway();
       return;
     }
-    const target = document.getElementById('story-start');
+    const target = document.getElementById('welcome-hero') || document.getElementById('story-start');
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
     } else {
@@ -307,7 +307,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className={`w-full transition-colors duration-1000 ${isRevealed ? 'bg-[#FAF4E6] py-3 md:py-6 px-4 sm:px-6 lg:px-8' : 'bg-black p-0'}`}>
+    <div className={`w-full transition-colors duration-1000 ${isRevealed ? 'bg-[#FAF4E6] pt-[84px] pb-4 md:pb-8 px-4 sm:px-6 lg:px-8' : 'bg-black p-0'}`}>
       <div className={`w-full ${isRevealed ? 'max-w-[1856px] mx-auto' : ''}`}>
         
         {/* SINGLE CONTINUOUS CINEMA CONTAINER */}
@@ -328,7 +328,8 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
           {/* THE SINGLE CONTINUOUS HTML5 VIDEO */}
           <video
             ref={videoRef}
-            src={welcomeVideo}
+            src={liveWelcomeVideo.videoUrl}
+            poster={liveWelcomeVideo.posterUrl}
             playsInline
             preload="auto"
             muted={isMuted}
