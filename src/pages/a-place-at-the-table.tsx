@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import Seo from '@/components/Seo';
-import PlaceAtTheTableSection from '@/components/how-we-serve/PlaceAtTheTableSection';
+import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
+import ShowdownSection from '@/components/welcome/ShowdownSection';
+import APlaceForThemSection from '@/components/how-we-serve/APlaceForThemSection';
 import ServingCommunityTogetherSection from '@/components/how-we-serve/ServingCommunityTogetherSection';
 import PurePhotographySection from '@/components/how-we-serve/PurePhotographySection';
 import StoriesFromTheTableSection from '@/components/how-we-serve/StoriesFromTheTableSection';
 import AnotherSeatWaitingSection from '@/components/how-we-serve/AnotherSeatWaitingSection';
-import HowWeServeHero from '@/components/how-we-serve/HowWeServeHero';
+import tableHeroVideo from '@/assets/video/gemini_generated_video_fd16485a.mp4.mp4';
 
 export default function APlaceAtTheTablePage() {
   useEffect(() => {
@@ -22,21 +24,31 @@ export default function APlaceAtTheTablePage() {
 
       <div className="w-full bg-[#FAF4E6] text-[#2C261E] selection:bg-[#F97316] selection:text-white">
         {/* ─── 1. Cinematic Dining Hero Video ─── */}
-        <HowWeServeHero />
+        <HowWeServeHero videoSrc={tableHeroVideo} />
 
-        {/* ─── 2. A Place at the Table Narrative ─── */}
-        <PlaceAtTheTableSection id="place-at-the-table" />
+        {/* ─── 2. Showdown Event (What's Coming Up Next) ─── */}
+        <ShowdownSection 
+          id="what-coming-up-next"
+          rounded={true}
+          title="What's Coming Up Next"
+          subtitle="Discover our next event—an inspiring experience filled with meaningful stories, connection, and hope."
+          hideBadge
+          hideEventsStrip
+        />
 
-        {/* ─── 3. Community Collaboration in Action ─── */}
+        {/* ─── 3. A Place at the Table Narrative & 5 Photos ─── */}
+        <APlaceForThemSection id="place-at-the-table" />
+
+        {/* ─── 4. Community Collaboration in Action ─── */}
         <ServingCommunityTogetherSection id="community-together" />
 
-        {/* ─── 4. Authentic Moments Gallery ─── */}
+        {/* ─── 5. Authentic Moments Gallery ─── */}
         <PurePhotographySection />
 
-        {/* ─── 5. Lived Experiences & Stories From the Table ─── */}
+        {/* ─── 6. Lived Experiences & Stories From the Table ─── */}
         <StoriesFromTheTableSection id="table-stories" />
 
-        {/* ─── 6. Finale: Another Seat Waiting & Return to Hallway ─── */}
+        {/* ─── 7. Finale: Another Seat Waiting & Return to Hallway ─── */}
         <AnotherSeatWaitingSection id="another-seat-waiting" />
       </div>
     </>

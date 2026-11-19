@@ -320,7 +320,7 @@ export default function AnotherSeatWaitingSection({
             {/* Navigation Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 w-full sm:w-auto">
               <FigmaButton
-                to="/#doors"
+                to="/how-we-serve#hallway-of-possibilities"
                 variant="outline-white"
                 size="md"
                 className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
@@ -329,7 +329,7 @@ export default function AnotherSeatWaitingSection({
               </FigmaButton>
 
               <FigmaButton
-                to="/movement"
+                to="/how-we-serve#door-two"
                 variant="outline-white"
                 size="md"
                 className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"

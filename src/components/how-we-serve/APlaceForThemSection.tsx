@@ -8,7 +8,7 @@ export interface APlaceForThemSectionProps {
 const tableCards = [
   {
     id: 'seeing-people',
-    title: 'Seeing People.',
+    title: 'It is about seeing people.',
     image: '/who/table-seeing-people.png',
     alt: 'Close-up of eyes seeing each individual with dignity and compassion',
     offsetClass: 'mt-3 sm:mt-8 lg:mt-16',
@@ -50,21 +50,46 @@ export default function APlaceForThemSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-14 sm:py-20 lg:py-28 px-4 sm:px-10 lg:px-16 overflow-hidden select-none ${className}`}
+      className={`relative w-full bg-[#FAF4E6] pt-14 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-24 overflow-hidden select-none ${className}`}
     >
-      {/* ─── Undulating Wave Container Background Layer (values-wave-bg.png) ─── */}
-      <div 
-        className="absolute inset-0 w-full h-full pointer-events-none select-none z-0"
-        aria-hidden="true"
+      {/* ─── Section Header (Matching Figma Image 2) ─── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 px-4"
       >
-        <img
-          src="/who/values-wave-bg.png"
-          alt=""
-          className="w-full h-full object-fill object-center"
-        />
-      </div>
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            color: '#121010',
+            lineHeight: '1.2',
+          }}
+          className="text-3xl sm:text-4xl lg:text-[44px] font-semibold tracking-tight mb-2 sm:mb-2.5"
+        >
+          A Place At The Table
+        </h2>
+        <p className="text-xs sm:text-[13.5px] text-[#746343] font-sans">
+          Sometimes hope begins with a meal.
+        </p>
+      </motion.div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto">
+      {/* ─── Undulating Wave Container with 5 Photos ─── */}
+      <div className="relative w-full py-10 sm:py-14 lg:py-18 px-4 sm:px-10 lg:px-16">
+        {/* ─── Undulating Wave Container Background Layer (values-wave-bg.png) ─── */}
+        <div 
+          className="absolute inset-0 w-full h-full pointer-events-none select-none z-0"
+          aria-hidden="true"
+        >
+          <img
+            src="/who/values-wave-bg.png"
+            alt=""
+            className="w-full h-full object-fill object-center"
+          />
+        </div>
+
+        <div className="relative z-10 w-full max-w-7xl mx-auto">
         
         {/* ─── Top Row: Headline & Narrative Principle ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start justify-between">
@@ -156,7 +181,8 @@ export default function APlaceForThemSection({
         </div>
 
       </div>
-    </section>
+    </div>
+  </section>
   );
 }
 

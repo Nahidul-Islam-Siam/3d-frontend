@@ -95,15 +95,18 @@ export default function HowWeServeHero({
           {/* Video (Fades out smoothly on completion to reveal verbiage) */}
           <video
             ref={videoRef}
-            src={liveVideo.videoUrl}
-            poster={liveVideo.posterUrl}
+            src={effectiveVideoUrl}
+            poster={posterSrc || liveVideo.posterUrl}
             autoPlay
+            loop={loop}
             muted={isMuted}
             playsInline
             preload="auto"
             onEnded={() => {
-              setIsEnded(true);
-              setIsPlaying(false);
+              if (!loop) {
+                setIsEnded(true);
+                setIsPlaying(false);
+              }
             }}
             className={`w-full h-full object-cover transition-opacity duration-1000 ${
               isEnded ? 'opacity-0' : 'opacity-100'
