@@ -112,12 +112,21 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
 
   // Trigger the grand reveal sequence (navbar glides in, video docks into card, footer unlocks)
   const triggerReveal = useCallback(() => {
+    hasRevealedOnceInSpa = true;
     setIsRevealed(true);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('reveal-navbar'));
       document.body.style.overflow = '';
     }
   }, []);
+
+  // Sync navbar if already revealed in current session
+  useEffect(() => {
+    if (isRevealed && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('reveal-navbar'));
+      document.body.style.overflow = '';
+    }
+  }, [isRevealed]);
   
 
   // Lock body scroll during full cinema intro, but detect scroll intent to trigger reveal
