@@ -30,7 +30,14 @@ export default function WhoWeArePage() {
         <WhoWeAreBanner />
 
         {/* ─── Redesign Section 2: Showdown Event (What's Coming Up Next) ─── */}
-        <ShowdownSection id="what-coming-up-next" rounded={true} />
+        <ShowdownSection 
+          id="what-coming-up-next" 
+          rounded={true}
+          title="What's Coming Up Next"
+          subtitle="Discover our next event—an inspiring experience filled with meaningful stories, connection, and hope."
+          hideBadge
+          hideEventsStrip
+        />
 
         {/* ─── Redesign Section 3: We See People Differently ─── */}
         <WeSeePeopleDifferentlySection />

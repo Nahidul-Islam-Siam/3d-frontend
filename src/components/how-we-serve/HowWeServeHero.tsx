@@ -4,15 +4,22 @@ import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { howWeServeManifesto } from '@/data/officialVerbiage';
 import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
+import defaultTableVideo from '@/assets/video/gemini_generated_video_fd16485a.mp4.mp4';
 
 export interface HowWeServeHeroProps {
   id?: string;
   className?: string;
+  videoSrc?: string;
+  posterSrc?: string;
+  loop?: boolean;
 }
 
 export default function HowWeServeHero({
   id = 'how-we-serve-hero',
   className = '',
+  videoSrc = defaultTableVideo,
+  posterSrc,
+  loop = true,
 }: HowWeServeHeroProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -21,10 +28,12 @@ export default function HowWeServeHero({
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
   const liveVideo = usePublicVideoSlot({
-    pagePaths: ['/how-we-serve'],
-    slotMatchers: ['serve', 'hero'],
-    fallbackUrl: '/who/how-we-serve-hero.mp4',
+    pagePaths: ['/how-we-serve/a-place-at-the-table', '/how-we-serve'],
+    slotMatchers: ['table', 'serve', 'hero'],
+    fallbackUrl: videoSrc,
   });
+
+  const effectiveVideoUrl = videoSrc || liveVideo.videoUrl || defaultTableVideo;
 
   const handleReplay = () => {
     const video = videoRef.current;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import FigmaButton from '@/components/common/FigmaButton';
 
 interface NoSingleOrganizationBannerProps {
   id?: string;
@@ -61,32 +60,31 @@ export function NoSingleOrganizationBanner({
               <p className="tracking-wide text-white/90">Live Achieve Believe, Inc. | People Matter. Always.</p>
             </div>
 
-            {/* Action Buttons Row (Figma 1:1) */}
+            {/* Action Buttons Row (Reusable FigmaButton) */}
             <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 w-full">
-              <Link
+              <FigmaButton
                 to="/movement"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/80 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-transparent hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer"
+                variant="outline-white"
+                size="md"
               >
-                <span>Continue The Journey</span>
-                <ArrowRight className="w-4 h-4 shrink-0" />
-              </Link>
+                Continue The Journey
+              </FigmaButton>
 
-              <button
-                type="button"
+              <FigmaButton
                 onClick={handleScrollToDoors}
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/80 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-transparent hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer"
+                variant="outline-white"
+                size="md"
               >
-                <span>Step Through Another Door</span>
-                <ArrowRight className="w-4 h-4 shrink-0" />
-              </button>
+                Step Through Another Door
+              </FigmaButton>
 
-              <Link
+              <FigmaButton
                 to="/movement"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/80 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-transparent hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer"
+                variant="outline-white"
+                size="md"
               >
-                <span>Become Part Of The Story</span>
-                <ArrowRight className="w-4 h-4 shrink-0" />
-              </Link>
+                Become Part Of The Story
+              </FigmaButton>
             </div>
           </div>
         </motion.div>

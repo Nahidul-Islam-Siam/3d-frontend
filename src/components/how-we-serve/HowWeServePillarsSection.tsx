@@ -20,17 +20,18 @@ export function HowWeServePillarsSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FAF4E6] py-16 sm:py-20 lg:py-28 px-6 sm:px-10 lg:px-16 xl:px-20 select-none overflow-hidden ${className}`}
+      className={`relative w-full select-none overflow-hidden ${className}`}
     >
-      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto space-y-20 sm:space-y-24 lg:space-y-32">
-        {/* ══════════════════════════════════════════════════════════
-            DOOR ONE: A PLACE AT THE TABLE
-        ══════════════════════════════════════════════════════════ */}
-        <span id="a-place-at-the-table" className="block -mt-28 pt-28 pointer-events-none" />
-        <div
-          id="door-one"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+      {/* ══════════════════════════════════════════════════════════
+          DOOR ONE: A PLACE AT THE TABLE (Canvas Cream: #FAF4E6)
+      ══════════════════════════════════════════════════════════ */}
+      <div className="w-full bg-[#FAF4E6] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20">
+        <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
+          <div
+            id="door-one"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="a-place-at-the-table" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Narrative Copy */}
           <motion.div
             initial={{ opacity: 0, y: 22 }}
@@ -102,18 +103,9 @@ export function HowWeServePillarsSection({
 
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <FigmaButton
-                to="/how-we-serve/a-place-at-the-table"
+                to="/movement?tab=volunteer"
                 variant="primary"
                 size="md"
-              >
-                Step Inside Door 1
-              </FigmaButton>
-
-              <FigmaButton
-                to="/movement?tab=volunteer"
-                variant="outline"
-                size="md"
-                className="!border-[#DFCCA7] !text-[#121010] hover:!border-[#F97316] hover:!text-[#F97316] hover:!bg-[#F97316]/5"
               >
                 Volunteer
               </FigmaButton>
@@ -166,16 +158,20 @@ export function HowWeServePillarsSection({
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            DOOR TWO: STRONG FOUNDATIONS
-        ══════════════════════════════════════════════════════════ */}
-        <span id="strong-foundations" className="block -mt-28 pt-28 pointer-events-none" />
-        <span id="you-matter" className="block -mt-28 pt-28 pointer-events-none" />
+    {/* ══════════════════════════════════════════════════════════
+        DOOR TWO: STRONG FOUNDATIONS (Warm Cream: #FFF3D9)
+    ══════════════════════════════════════════════════════════ */}
+    <div className="w-full bg-[#FFF3D9] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20 border-y border-[rgba(227,182,143,0.35)]">
+      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
         <div
           id="door-two"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="strong-foundations" className="absolute -top-24 pointer-events-none" />
+          <span id="you-matter" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Photo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98, y: 22 }}
@@ -184,7 +180,7 @@ export function HowWeServePillarsSection({
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 flex justify-center lg:justify-start items-center order-2 lg:order-1"
           >
-            <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] aspect-[663/566] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] bg-[#FAF4E6]">
+            <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] aspect-[663/566] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] bg-[#FFF3D9]">
               <img
                 src={doorTwoPhoto}
                 alt="Mentor guiding youth in library during LEADS youth development session"
@@ -300,16 +296,20 @@ export function HowWeServePillarsSection({
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            DOOR THREE: STORIES THAT SAVE LIVES
-        ══════════════════════════════════════════════════════════ */}
-        <span id="stories-that-save-lives" className="block -mt-28 pt-28 pointer-events-none" />
-        <span id="suicide-awareness-showdown" className="block -mt-28 pt-28 pointer-events-none" />
+    {/* ══════════════════════════════════════════════════════════
+        DOOR THREE: STORIES THAT SAVE LIVES (Canvas Cream: #FAF4E6)
+    ══════════════════════════════════════════════════════════ */}
+    <div className="w-full bg-[#FAF4E6] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
         <div
           id="door-three"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="stories-that-save-lives" className="absolute -top-24 pointer-events-none" />
+          <span id="suicide-awareness-showdown" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Narrative Copy */}
           <motion.div
             initial={{ opacity: 0, y: 22 }}
@@ -449,15 +449,19 @@ export function HowWeServePillarsSection({
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            DOOR FOUR: WELCOME HOME
-        ══════════════════════════════════════════════════════════ */}
-        <span id="welcome-home" className="block -mt-28 pt-28 pointer-events-none" />
+    {/* ══════════════════════════════════════════════════════════
+        DOOR FOUR: WELCOME HOME (Warm Cream: #FFF3D9)
+    ══════════════════════════════════════════════════════════ */}
+    <div className="w-full bg-[#FFF3D9] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20 border-y border-[rgba(227,182,143,0.35)]">
+      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
         <div
           id="door-four"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="welcome-home" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Photo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98, y: 22 }}
@@ -466,7 +470,7 @@ export function HowWeServePillarsSection({
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 flex justify-center lg:justify-start items-center order-2 lg:order-1"
           >
-            <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] aspect-[663/566] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] bg-[#FAF4E6]">
+            <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] aspect-[663/566] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] bg-[#FFF3D9]">
               <img
                 src={doorFourPhoto}
                 alt="Sunlit warm living room with furniture for veteran housing initiative"
@@ -579,15 +583,19 @@ export function HowWeServePillarsSection({
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            DOOR FIVE: A NEW BEGINNING
-        ══════════════════════════════════════════════════════════ */}
-        <span id="a-new-beginning" className="block -mt-28 pt-28 pointer-events-none" />
+    {/* ══════════════════════════════════════════════════════════
+        DOOR FIVE: A NEW BEGINNING (Canvas Cream: #FAF4E6)
+    ══════════════════════════════════════════════════════════ */}
+    <div className="w-full bg-[#FAF4E6] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
         <div
           id="door-five"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="a-new-beginning" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Narrative Copy */}
           <motion.div
             initial={{ opacity: 0, y: 22 }}
@@ -709,15 +717,19 @@ export function HowWeServePillarsSection({
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            DOOR SIX: SERVE BESIDE US
-        ══════════════════════════════════════════════════════════ */}
-        <span id="serve-beside-us" className="block -mt-28 pt-28 pointer-events-none" />
+    {/* ══════════════════════════════════════════════════════════
+        DOOR SIX: SERVE BESIDE US (Warm Cream: #FFF3D9)
+    ══════════════════════════════════════════════════════════ */}
+    <div className="w-full bg-[#FFF3D9] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20 border-y border-[rgba(227,182,143,0.35)]">
+      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
         <div
           id="door-six"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="serve-beside-us" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Photo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98, y: 22 }}
@@ -726,7 +738,7 @@ export function HowWeServePillarsSection({
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 flex justify-center lg:justify-start items-center order-2 lg:order-1"
           >
-            <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] aspect-[663/566] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] bg-[#FAF4E6]">
+            <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] aspect-[663/566] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] bg-[#FFF3D9]">
               <img
                 src={doorSixPhoto}
                 alt="Cheerful volunteers packing fresh produce boxes and community meal kits together"
@@ -812,18 +824,9 @@ export function HowWeServePillarsSection({
 
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <FigmaButton
-                to="/how-we-serve/serve-beside-us"
+                to="/movement?tab=volunteer"
                 variant="primary"
                 size="md"
-              >
-                Step Inside Door 6
-              </FigmaButton>
-
-              <FigmaButton
-                to="/movement?tab=volunteer"
-                variant="outline"
-                size="md"
-                className="!border-[#DFCCA7] !text-[#121010] hover:!border-[#F97316] hover:!text-[#F97316] hover:!bg-[#F97316]/5"
               >
                 Become A Volunteer
               </FigmaButton>
@@ -848,15 +851,19 @@ export function HowWeServePillarsSection({
             </div>
           </motion.div>
         </div>
+      </div>
+    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            DOOR SEVEN: YOUR STORY
-        ══════════════════════════════════════════════════════════ */}
-        <span id="your-story" className="block -mt-28 pt-28 pointer-events-none" />
+    {/* ══════════════════════════════════════════════════════════
+        DOOR SEVEN: YOUR STORY (Canvas Cream: #FAF4E6)
+    ══════════════════════════════════════════════════════════ */}
+    <div className="w-full bg-[#FAF4E6] py-12 sm:py-16 lg:py-20 px-6 sm:px-10 lg:px-16 xl:px-20">
+      <div className="w-full max-w-[1240px] xl:max-w-[1280px] mx-auto">
         <div
           id="door-seven"
-          className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
+          className="relative scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center"
         >
+          <span id="your-story" className="absolute -top-24 pointer-events-none" />
           {/* Left Column: Narrative Copy */}
           <motion.div
             initial={{ opacity: 0, y: 22 }}
@@ -941,18 +948,9 @@ export function HowWeServePillarsSection({
 
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <FigmaButton
-                to="/#your-story"
+                to="/movement?tab=volunteer"
                 variant="primary"
                 size="md"
-              >
-                Share Your Story
-              </FigmaButton>
-
-              <FigmaButton
-                to="/movement?tab=volunteer"
-                variant="outline"
-                size="md"
-                className="!border-[#DFCCA7] !text-[#121010] hover:!border-[#F97316] hover:!text-[#F97316] hover:!bg-[#F97316]/5"
               >
                 Volunteer
               </FigmaButton>
@@ -1015,7 +1013,8 @@ export function HowWeServePillarsSection({
           </motion.div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
   );
 }
 
