@@ -41,7 +41,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR ONE: A PLACE AT THE TABLE
             </span>
@@ -61,12 +61,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               Community Meals &amp; Outreach
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>No one should have to wonder if there is a place for them.</p>
               <p>
                 Every meal we share is an opportunity to restore dignity, create
@@ -77,11 +77,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 LAB works alongside community partners and through direct outreach to provide
                 meals, encouragement, and meaningful human connection...
               </p>
@@ -90,11 +90,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 You can help create another place at the table by preparing meals, serving alongside
                 volunteers, donating food or supplies, sponsoring...
               </p>
@@ -102,11 +102,11 @@ export function HowWeServePillarsSection({
 
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <FigmaButton
-                to="/#your-story"
+                to="/how-we-serve/a-place-at-the-table"
                 variant="primary"
                 size="md"
               >
-                Share Your Story
+                Step Inside Door 1
               </FigmaButton>
 
               <FigmaButton
@@ -205,7 +205,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR TWO: STRONG FOUNDATIONS
             </span>
@@ -225,12 +225,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               LEADS Youth Development
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>
                 Every young person deserves to know that their voice matters, their choices
                 have meaning, and their future holds possibilities.
@@ -248,11 +248,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 Through our partnership with Life Skills, Empowerment and Development Services, the
                 LEADS youth-development initiative helps....
               </p>
@@ -261,11 +261,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 Community members and organizations can support youth development by volunteering,
                 sharing appropriate professional skills...
               </p>
@@ -320,7 +320,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR THREE: STORIES THAT SAVE LIVES
             </span>
@@ -340,12 +340,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               Suicide Awareness Showdown
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>Some of the most important stories are the ones people find hardest to tell.</p>
               <p>
                 Behind everyday smiles and conversations, individuals may be navigating struggles
@@ -360,11 +360,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 LAB is developing an original theatrical production: Suicide Awareness Showdown:
                 Where Are You Now? Letters to Etcetera....
               </p>
@@ -373,11 +373,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 There are opportunities for performers, production volunteers, creative
                 professionals, sponsors, community partners...
               </p>
@@ -487,7 +487,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR FOUR: WELCOME HOME
             </span>
@@ -507,12 +507,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               Veteran Housing Initiatives
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>A key can represent so much more than the ability to open a door.</p>
               <p>
                 It can represent stability. Independence. Comfort. A place to rest. And the
@@ -527,11 +527,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 LAB works to support veterans in securing and settling into housing, with a focus on
                 helping transform living spaces into welcoming homes...
               </p>
@@ -540,11 +540,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 Property owners and landlords can explore housing partnerships. Individuals and
                 businesses can donate suitable furniture, household...
               </p>
@@ -598,7 +598,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR FIVE: A NEW BEGINNING
             </span>
@@ -618,12 +618,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               Household Essentials, Clothing &amp; Shoes
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>A fresh beginning often starts with the everyday things many of us take for granted.</p>
               <p>
                 A clean set of sheets. A pair of comfortable shoes. A warm blanket. A kitchen
@@ -638,11 +638,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 LAB collects and distributes practical items to help individuals and families meet
                 everyday needs and move forward...
               </p>
@@ -651,11 +651,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 You can contribute clean, usable clothing, shoes, household goods, and other
                 requested necessities. Businesses, schools, churches, and community groups can...
               </p>
@@ -747,7 +747,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR SIX: SERVE BESIDE US
             </span>
@@ -767,12 +767,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               Volunteer Opportunities
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>You don&apos;t have to have extraordinary resources to make an extraordinary difference.</p>
               <p>
                 Sometimes the most meaningful thing you can offer is your time. Your energy. Your skills.
@@ -787,11 +787,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 Volunteer opportunities may include community meal preparation and service, outreach
                 activities, donation sorting, home-furnishing projects...
               </p>
@@ -800,11 +800,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 Tell us what you enjoy doing, what skills you would like to share, and how you hope to
                 make a difference. Whether you have a few hours, an occasional weekend,...
               </p>
@@ -867,7 +867,7 @@ export function HowWeServePillarsSection({
           >
             <span
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[12.5px] font-semibold text-[#121010] uppercase tracking-[0.18em] mb-3 block"
+              className="text-xs sm:text-[13px] font-bold text-[#8F6629] uppercase tracking-[0.18em] mb-3 block"
             >
               DOOR SEVEN: YOUR STORY
             </span>
@@ -887,12 +887,12 @@ export function HowWeServePillarsSection({
 
             <p
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-              className="text-xs sm:text-[13px] font-medium text-[#121010] mb-3"
+              className="text-base sm:text-lg font-semibold text-[#1C140D] mb-3.5"
             >
               Join the Movement
             </p>
 
-            <div className="space-y-2.5 max-w-xl font-sans text-xs sm:text-[12.5px] text-[#272624] leading-relaxed mb-4">
+            <div className="space-y-3.5 max-w-xl font-sans text-[15px] sm:text-base lg:text-[16.5px] text-[#3E342B] leading-relaxed mb-6">
               <p>
                 You&apos;ve walked through our hallway. You&apos;ve discovered different ways compassion
                 can become action. And now there is one more door. This one is yours.
@@ -911,11 +911,11 @@ export function HowWeServePillarsSection({
             <div className="mb-3 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How We Serve
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 <span className="font-semibold text-[#121010]">Volunteer:</span> Share your time,
                 talents, and willingness to serve.
                 <br />
@@ -928,11 +928,11 @@ export function HowWeServePillarsSection({
             <div className="mb-6 max-w-xl">
               <h3
                 style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
-                className="text-xs font-bold text-[#121010] mb-1"
+                className="text-[15px] sm:text-base font-bold text-[#1C140D] mb-1.5"
               >
                 How You Can Help
               </h3>
-              <p className="font-sans text-xs sm:text-[12px] text-[#272624] leading-relaxed">
+              <p className="font-sans text-[14.5px] sm:text-[15.5px] text-[#554637] leading-relaxed">
                 You don&apos;t need to do everything. You simply need to find the something that
                 speaks to your heart. We don&apos;t believe everyone has to do everything. We
                 believe everyone...

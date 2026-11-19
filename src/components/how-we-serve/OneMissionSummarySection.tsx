@@ -51,7 +51,7 @@ export function OneMissionSummarySection({
             </h2>
 
             {/* Narrative Body */}
-            <div className="space-y-3 font-sans text-xs sm:text-[13px] lg:text-[13.5px] text-[#272624] leading-relaxed max-w-4xl mb-6 sm:mb-8">
+            <div className="space-y-3.5 font-sans text-sm sm:text-base text-[#3E342B] leading-relaxed max-w-4xl mb-6 sm:mb-8">
               <p>
                 Every door represents a different opportunity. Every opportunity begins with
                 compassion. And every act of compassion reminds us why we are here.

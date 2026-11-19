@@ -72,7 +72,7 @@ export default function UnfilteredHumanVoicesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[#554637] text-xs sm:text-sm lg:text-[14px] leading-relaxed font-light max-w-xl mx-auto"
+            className="text-[#554637] text-sm sm:text-base leading-relaxed font-normal max-w-xl mx-auto"
           >
             Not institutional praise. Real people recounting how showing up changed their own inner landscape.
           </motion.p>
@@ -121,7 +121,7 @@ export default function UnfilteredHumanVoicesSection() {
                 </p>
 
                 {/* Quote */}
-                <p className="text-[#443324] text-xs sm:text-[13.5px] leading-relaxed font-light italic">
+                <p className="text-[#443324] text-sm sm:text-[15px] leading-relaxed font-normal italic">
                   {card.quote}
                 </p>
               </div>

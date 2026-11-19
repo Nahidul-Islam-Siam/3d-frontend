@@ -27,7 +27,7 @@ export default function ServeHopeTogetherFinaleSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="space-y-1.5 text-[#554637] font-serif text-sm sm:text-base leading-relaxed italic mb-6"
+            className="space-y-2 text-[#554637] font-serif text-base sm:text-lg leading-relaxed italic mb-6"
           >
             <p>Every act of kindness begins with one decision.</p>
             <p>Every movement begins with one person.</p>

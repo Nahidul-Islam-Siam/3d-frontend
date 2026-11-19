@@ -40,7 +40,7 @@ export function HowWeServeHeroSection({
             </h1>
 
             {/* Narrative Paragraphs */}
-            <div className="space-y-3.5 sm:space-y-4 max-w-xl font-sans text-xs sm:text-[13px] lg:text-[13.5px] text-[#272624] leading-relaxed">
+            <div className="space-y-3.5 sm:space-y-4 max-w-xl font-sans text-sm sm:text-base text-[#3E342B] leading-relaxed">
               <p className="font-medium text-[#121010]">
                 Every door opens because someone matters.
               </p>

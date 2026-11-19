@@ -145,7 +145,7 @@ export default function WaysWeWalkSection() {
           >
             {item.title}
           </h3>
-          <p className="text-[#C4A992] text-xs sm:text-[13px] leading-relaxed font-light">
+          <p className="text-[#D6C2AF] text-[13.5px] sm:text-[14.5px] leading-relaxed font-normal">
             {item.description}
           </p>
         </div>
@@ -195,7 +195,7 @@ export default function WaysWeWalkSection() {
             transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-md"
           >
-            <p className="text-[#554637] text-xs sm:text-sm lg:text-[14px] leading-relaxed font-light">
+            <p className="text-[#554637] text-sm sm:text-base leading-relaxed font-normal">
               No administrative checklists or distant corporate committees. Choose the doorway that speaks to your gifts.
             </p>
           </motion.div>

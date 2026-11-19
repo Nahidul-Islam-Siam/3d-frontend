@@ -48,7 +48,7 @@ export default function WillingHeartCalloutSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[#554637] text-xs sm:text-sm lg:text-base font-light tracking-wide max-w-3xl mb-12"
+            className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[#554637] text-sm sm:text-base lg:text-[17px] font-normal tracking-wide max-w-3xl mb-12"
           >
             {audiences.map((aud, i) => (
               <span key={aud} className="inline-flex items-center gap-3">
@@ -75,7 +75,7 @@ export default function WillingHeartCalloutSection() {
               Maybe... YOU.
             </h3>
 
-            <p className="text-[#554637] text-xs sm:text-sm lg:text-[15px] font-light leading-relaxed max-w-xl mx-auto">
+            <p className="text-[#554637] text-sm sm:text-base lg:text-[17px] font-normal leading-relaxed max-w-xl mx-auto">
               Because changing someone&apos;s life doesn&apos;t require having all the answers. It begins by being willing to show up.
             </p>
           </motion.div>
