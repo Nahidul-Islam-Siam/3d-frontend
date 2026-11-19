@@ -33,7 +33,7 @@ export default function Navbar() {
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const isDarkScrolled = isDarkHeroPage && hasScrolled;
   const isDarkTheme = isDarkHeroPage;
-  const isCreamPage = location.pathname.startsWith('/how-we-serve') || location.pathname === '/welcome-home' || location.pathname === '/you-matter' || location.pathname === '/strong-foundations';
+  const isCreamPage = location.pathname.startsWith('/how-we-serve') || location.pathname === '/welcome-home' || location.pathname === '/you-matter' || location.pathname === '/strong-foundations' || location.pathname === '/serve-beside-us' || location.pathname === '/stories-that-save-lives' || location.pathname === '/your-story';
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
   const toggleOpen = () => setIsOpen(!isOpen);
@@ -138,7 +138,7 @@ export default function Navbar() {
           doorNumber: 7, 
           label: "Your Story", 
           subtitle: "An open doorway inviting you to join", 
-          to: "/#your-story" 
+          to: "/how-we-serve/your-story" 
         },
       ]
     },

@@ -15,9 +15,9 @@ export default function HowWeServePage() {
     // Reveal global navbar for site redesign
     window.dispatchEvent(new CustomEvent('reveal-navbar'));
 
-    // Deep link #your-story redirects to Home's Visitor Interest Form
+    // Deep link #your-story redirects to dedicated Your Story page
     if (location.hash === '#your-story') {
-      navigate('/#your-story', { replace: true });
+      navigate('/how-we-serve/your-story', { replace: true });
     }
   }, [location.hash, navigate]);
 

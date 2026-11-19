@@ -1,13 +1,19 @@
-import { useState, useRef } from 'react';
-import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import interludeVideo from '@/assets/how-we-serve/serve-beside-us/Untitled design (2).mp4.mp4';
 import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
-interface FamilyTableVideoInterludeSectionProps {
+export interface FamilyTableVideoInterludeSectionProps {
+  id?: string;
+  className?: string;
   onScrollClick?: () => void;
 }
 
-export default function FamilyTableVideoInterludeSection({ onScrollClick }: FamilyTableVideoInterludeSectionProps) {
+export default function FamilyTableVideoInterludeSection({
+  id = 'serve-video-interlude',
+  className = '',
+}: FamilyTableVideoInterludeSectionProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
@@ -19,119 +25,106 @@ export default function FamilyTableVideoInterludeSection({ onScrollClick }: Fami
     fallbackUrl: interludeVideo,
   });
 
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
+  const togglePlay = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
     } else {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
+      video.pause();
+      setIsPlaying(false);
     }
   };
 
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
+  const toggleMute = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
 
-  const handleScrollDown = () => {
-    if (onScrollClick) {
-      onScrollClick();
-      return;
-    }
-    const el = document.getElementById('serve-finale');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    const nextMuted = !isMuted;
+    video.muted = nextMuted;
+    setIsMuted(nextMuted);
+
+    if (!nextMuted && video.paused) {
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
     }
   };
 
   return (
     <section 
-      id="serve-video-interlude"
-      className="relative w-full min-h-[75vh] lg:min-h-screen bg-[#FAF4E6] text-white flex flex-col justify-between overflow-hidden select-none"
+      id={id}
+      className={`relative w-full bg-[#FAF4E6] py-10 sm:py-14 lg:py-18 px-4 sm:px-8 lg:px-12 xl:px-16 overflow-hidden select-none ${className}`}
     >
-      {/* ─── Full-Bleed Video Background ─── */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden bg-black">
-        <video
-          ref={videoRef}
-          src={liveVideo.videoUrl}
-          poster={liveVideo.posterUrl}
-          autoPlay
-          loop
-          muted={isMuted}
-          playsInline
-          className="w-full h-full object-cover object-center scale-[1.01]"
-        />
-
-        {/* Cinematic Vignette Overlay (fades into creamy background) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF4E6] via-black/30 to-[#FAF4E6] pointer-events-none" />
-      </div>
-
-      {/* Top Bar: Controls */}
-      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pt-16 sm:pt-20 flex justify-end items-center">
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={togglePlay}
-            aria-label={isPlaying ? 'Pause video' : 'Play video'}
-            className="h-10 px-4 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center gap-2 transition-all cursor-pointer hover:scale-105 text-xs font-sans uppercase tracking-wider"
-          >
-            {isPlaying ? (
-              <>
-                <Pause className="w-3.5 h-3.5" />
-                <span>Pause</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-3.5 h-3.5 ml-0.5" />
-                <span>Play</span>
-              </>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={toggleMute}
-            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-            className="h-10 px-4 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white flex items-center gap-2 transition-all cursor-pointer hover:scale-105 text-xs font-sans uppercase tracking-wider"
-          >
-            {isMuted ? (
-              <>
-                <VolumeX className="w-3.5 h-3.5" />
-                <span>Unmute</span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-3.5 h-3.5" />
-                <span>Mute</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Center Space */}
-      <div className="flex-1" />
-
-      {/* Bottom Bar: Scroll Indicator */}
-      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pb-10 sm:pb-12 flex justify-center">
-        <button
-          type="button"
-          onClick={handleScrollDown}
-          className="inline-flex items-center gap-2.5 text-white/90 hover:text-white transition-colors cursor-pointer group"
+      <div className="w-full max-w-[1720px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          onClick={() => togglePlay()}
+          className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10] min-h-[360px] sm:min-h-[480px] lg:min-h-[640px] max-h-[86vh] rounded-[24px] sm:rounded-[32px] md:rounded-[40px] overflow-hidden bg-black shadow-[0_20px_60px_rgba(44,36,29,0.12)] cursor-pointer group select-none"
         >
-          <span className="w-7 h-7 rounded-full border border-white/70 group-hover:border-white flex items-center justify-center transition-colors">
-            <ArrowDown className="w-3.5 h-3.5 text-white group-hover:translate-y-0.5 transition-transform" />
-          </span>
-          <span 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-[13px] uppercase tracking-[0.22em] text-white font-medium"
-          >
-            SCROLL TO CONTINUE
-          </span>
-        </button>
+          <video
+            ref={videoRef}
+            src={liveVideo.videoUrl}
+            poster={liveVideo.posterUrl}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover object-center scale-[1.01]"
+          />
+
+          {/* Ambient Subtle Vignette */}
+          <div 
+            className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_65%,rgba(18,12,8,0.3)_100%)]" 
+            aria-hidden="true"
+          />
+
+          {/* Floating Controls */}
+          <div className="absolute top-5 right-5 sm:top-7 sm:right-7 z-30 flex items-center gap-2.5 pointer-events-auto">
+            <button
+              onClick={togglePlay}
+              type="button"
+              className="flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-black/55 hover:bg-black/75 backdrop-blur-md border border-white/20 text-white text-xs sm:text-[13px] font-sans font-medium transition-all duration-200 shadow-xl"
+              aria-label={isPlaying ? 'Pause video' : 'Play video'}
+            >
+              {isPlaying ? (
+                <>
+                  <Pause className="w-3.5 h-3.5" />
+                  <span>Pause</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 ml-0.5" />
+                  <span>Play</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={toggleMute}
+              type="button"
+              className="flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-black/55 hover:bg-black/75 backdrop-blur-md border border-white/20 text-white text-xs sm:text-[13px] font-sans font-medium transition-all duration-200 shadow-xl"
+              aria-label={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+            >
+              {isMuted ? (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-white/80" />
+                  <span>Unmute</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-[#F97316] animate-pulse" />
+                  <span className="text-white">Sound Active</span>
+                </>
+              )}
+            </button>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

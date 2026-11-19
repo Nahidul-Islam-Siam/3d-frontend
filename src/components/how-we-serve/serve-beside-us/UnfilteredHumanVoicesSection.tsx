@@ -87,12 +87,12 @@ export default function UnfilteredHumanVoicesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="group relative rounded-[24px] bg-[#F4EBD9] border border-[#DBCAB0] hover:border-[#F97316] shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.12)] p-7 sm:p-8 flex flex-col justify-between transition-all duration-300"
+              className="group relative rounded-[24px] bg-[#FFF3D9] border border-[#F97316] shadow-[0_4px_24px_rgba(249,115,22,0.06)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.12)] p-7 sm:p-8 flex flex-col justify-between transition-all duration-300"
             >
               <div>
                 {/* Author Info */}
                 <div className="flex items-center gap-3.5 mb-5">
-                  <div className="w-10 h-10 rounded-full overflow-hidden border border-[#DBCAB0] bg-white flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-[#F97316]/40 bg-white flex-shrink-0">
                     <img 
                       src={card.avatar} 
                       alt={card.name} 
@@ -102,7 +102,7 @@ export default function UnfilteredHumanVoicesSection() {
                   <div>
                     <h3 
                       style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                      className="text-base font-semibold text-[#1C140D] tracking-wide"
+                      className="text-base sm:text-lg font-bold text-[#1C140D] tracking-wide"
                     >
                       {card.name}
                     </h3>
@@ -114,20 +114,19 @@ export default function UnfilteredHumanVoicesSection() {
 
                 {/* Orange Eyebrow Tag */}
                 <p 
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  className="text-[11px] uppercase tracking-[0.16em] text-[#F97316] font-semibold mb-3.5"
+                  className="text-[11px] uppercase tracking-[0.14em] text-[#F97316] font-sans font-semibold mb-3.5"
                 >
                   {card.eyebrow}
                 </p>
 
                 {/* Quote */}
-                <p className="text-[#443324] text-sm sm:text-[15px] leading-relaxed font-normal italic">
+                <p className="text-[#443324] text-xs sm:text-[13.5px] leading-relaxed font-sans font-light">
                   {card.quote}
                 </p>
               </div>
 
               {/* Bottom Subtle Amber Accent */}
-              <div className="w-8 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-14 group-hover:bg-[#F97316] transition-all duration-300 mt-6" />
+              <div className="w-8 h-0.5 rounded-full bg-[#F97316]/40 group-hover:w-14 group-hover:bg-[#F97316] transition-all duration-300 mt-6" />
             </motion.div>
           ))}
         </div>

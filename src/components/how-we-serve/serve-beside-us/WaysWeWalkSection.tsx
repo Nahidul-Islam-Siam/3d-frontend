@@ -119,16 +119,16 @@ export default function WaysWeWalkSection() {
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, delay: (idx % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
       onClick={() => setActiveCardIdx(idx)}
-      className="group relative rounded-[22px] sm:rounded-[26px] bg-[#2A1D14] border border-[#3E2B1F] hover:border-[#F97316]/70 shadow-[0_12px_40px_rgba(0,0,0,0.18)] hover:shadow-[0_16px_50px_rgba(249,115,22,0.16)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
+      className="group relative rounded-[22px] sm:rounded-[26px] bg-[#F8ECDD] border border-[#EBD6C1] hover:border-[#F97316] shadow-[0_4px_24px_rgba(44,38,30,0.06)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.12)] transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer"
     >
       {/* Card Photo with Hover Zoom */}
-      <div className={`w-full ${imgAspectClass} overflow-hidden bg-black/40 relative`}>
+      <div className={`w-full ${imgAspectClass} overflow-hidden bg-black/10 relative`}>
         <img
           src={item.image}
           alt={item.title}
           className="w-full h-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors pointer-events-none" />
+        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors pointer-events-none" />
         
         {/* Hover Pill */}
         <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] font-sans opacity-0 group-hover:opacity-100 transition-opacity">
@@ -141,17 +141,17 @@ export default function WaysWeWalkSection() {
         <div>
           <h3
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-lg sm:text-xl font-normal tracking-wide text-white group-hover:text-[#F97316] transition-colors mb-2.5"
+            className="text-lg sm:text-xl font-medium tracking-tight text-[#2C261E] group-hover:text-[#F97316] transition-colors mb-2"
           >
             {item.title}
           </h3>
-          <p className="text-[#D6C2AF] text-[13.5px] sm:text-[14.5px] leading-relaxed font-normal">
+          <p className="text-[#746343] text-xs sm:text-[13px] leading-relaxed font-sans font-light">
             {item.description}
           </p>
         </div>
 
         {/* Bottom Accent */}
-        <div className="w-8 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-16 group-hover:bg-[#F97316] transition-all duration-300 mt-5" />
+        <div className="w-8 h-0.5 rounded-full bg-[#F97316]/40 group-hover:w-16 group-hover:bg-[#F97316] transition-all duration-300 mt-5" />
       </div>
     </motion.div>
   );

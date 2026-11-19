@@ -19,6 +19,7 @@ import StoriesThatSaveLives from "./pages/stories-that-save-lives";
 import APlaceAtTheTable from "./pages/a-place-at-the-table";
 import WelcomeHome from "./pages/welcome-home";
 import ServeBesideUs from "./pages/serve-beside-us";
+import YourStory from "./pages/your-story";
 import SuicideAwarenessShowdown from "./pages/suicide-awareness-showdown";
 import CmsSettingPublicPage from "./pages/legal-cms";
 import ErrorPage from "./pages/error";
@@ -159,6 +160,14 @@ export const router = createBrowserRouter([
       {
         path: "/serve-beside-us",
         element: <ServeBesideUs />,
+      },
+      {
+        path: "/how-we-serve/your-story",
+        element: <YourStory />,
+      },
+      {
+        path: "/your-story",
+        element: <YourStory />,
       },
       {
         path: "/meet-us",
