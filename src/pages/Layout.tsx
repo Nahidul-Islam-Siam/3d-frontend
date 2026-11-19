@@ -8,10 +8,8 @@ import SmoothScroll from "../components/common/SmoothScroll";
 export default function RootLayout() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
-  const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isWelcomeHomePage || isShowdownPage;
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isShowdownPage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
   const [shouldShowPreloader, setShouldShowPreloader] = useState(() => {
     if (typeof window === 'undefined') return false;

@@ -28,13 +28,12 @@ export default function Navbar() {
 
   const isHomePage = location.pathname === '/';
   const isDonatePage = location.pathname === '/donate';
-  const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
-  const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
-  const isDarkHeroPage = isDonatePage || isWelcomeHomePage || isShowdownPage;
+  const isDarkHeroPage = isDonatePage || isShowdownPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
-  const isDarkScrolled = (isDonatePage || isShowdownPage) && hasScrolled;
-  const isDarkTheme = isTransparent || isDarkScrolled;
+  const isDarkScrolled = isDarkHeroPage && hasScrolled;
+  const isDarkTheme = isDarkHeroPage;
+  const isCreamPage = location.pathname.startsWith('/how-we-serve') || location.pathname === '/welcome-home' || location.pathname === '/you-matter' || location.pathname === '/strong-foundations';
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
   const toggleOpen = () => setIsOpen(!isOpen);
@@ -163,7 +162,7 @@ export default function Navbar() {
             ? 'bg-transparent border-b border-transparent shadow-none'
             : isDarkScrolled
               ? 'bg-[#08070B]/90 backdrop-blur-md border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]'
-              : (hasScrolled || isStoriesPage)
+              : (hasScrolled || isCreamPage)
                 ? 'bg-[#FAF4E6]/95 backdrop-blur-md border-b border-[#e9dcbe] shadow-[0_4px_25px_rgba(0,0,0,0.03)]'
                 : 'bg-transparent border-b border-transparent shadow-none'
         } ${
