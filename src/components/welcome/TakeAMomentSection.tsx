@@ -72,7 +72,7 @@ export function TakeAMomentSection({
   return (
     <section
       id={id}
-      className={`relative w-full bg-[#FFF3D9] pt-14 sm:pt-18 lg:pt-24 pb-16 sm:pb-20 lg:pb-28 px-6 sm:px-10 lg:px-16 xl:px-20 select-none overflow-hidden ${className}`}
+      className={`relative w-full  pt-14 sm:pt-18 lg:pt-24 pb-16 sm:pb-20 lg:pb-28 px-6 sm:px-10 lg:px-16 xl:px-20 select-none overflow-hidden ${className}`}
     >
       <div className="w-full max-w-[1240px] xl:max-w-[1300px] mx-auto">
         {/* ─── Top Heading & Intro ─── */}

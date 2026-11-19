@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import handsBg from "@/assets/welcome/image 9.png";
 import FigmaButton from "@/components/common/FigmaButton";
 
 export interface StepInsideWelcomeSectionProps {
@@ -14,24 +13,17 @@ export default function StepInsideWelcomeSection({
   return (
     <section
       id={id}
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(255, 241, 211, 0.45), rgba(255, 238, 195, 0.45)), url("${handsBg}")`,
-        backgroundPosition: "center top",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundColor: "#FFF1D3",
-      }}
-      className={`relative w-full flex items-center pt-24 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 lg:pb-20 overflow-hidden select-none ${className}`}
+      className={`relative w-full flex items-center bg-[#FAF4E6] pt-16 sm:pt-20 lg:pt-24 pb-14 sm:pb-18 lg:pb-24 overflow-hidden select-none ${className}`}
     >
       {/* ─── Foreground Content ─── */}
-      <div className="relative z-10 w-full max-w-[1280px] xl:max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-20">
-        <div className="max-w-2xl lg:max-w-[640px]">
+      <div className="relative z-10 w-full max-w-[1280px] xl:max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-20 text-center">
+        <div className="max-w-2xl lg:max-w-[760px] mx-auto text-center">
           {/* Eyebrow Label */}
           <motion.p
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="font-sans text-xs sm:text-[13px] uppercase tracking-[0.18em] text-[#6E6259] font-medium mb-4 sm:mb-5"
+            className="font-sans text-xs sm:text-[13px] uppercase tracking-[0.18em] text-[#6E6259] font-medium mb-3 sm:mb-4 text-center"
           >
             WELCOME TO LIVE ACHIEVE BELIEVE
           </motion.p>
@@ -46,7 +38,7 @@ export default function StepInsideWelcomeSection({
               lineHeight: "1.15",
               color: "#272624",
             }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[60px] font-semibold tracking-tight mb-6 sm:mb-8"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] xl:text-[58px] font-semibold tracking-tight mb-5 sm:mb-7 text-center"
           >
             Step Inside. You Matter Here.
           </motion.h1>
@@ -56,7 +48,7 @@ export default function StepInsideWelcomeSection({
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="space-y-4 font-sans text-xs sm:text-[13.5px] lg:text-[14px] text-[#444444] leading-[1.75]"
+            className="space-y-3.5 font-sans text-xs sm:text-[13.5px] lg:text-[14px] text-[#555555] leading-[1.8] text-center max-w-xl mx-auto"
           >
             <p>
               Before we tell you what we do, there&apos;s something we want you to know.
@@ -84,7 +76,7 @@ export default function StepInsideWelcomeSection({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className="font-sans text-xs sm:text-[13.5px] lg:text-[14px] text-[#F97316] font-medium mt-5 sm:mt-6 mb-7 sm:mb-9"
+            className="font-sans text-xs sm:text-[13.5px] lg:text-[14px] text-[#F97316] font-medium mt-5 sm:mt-6 mb-7 sm:mb-8 text-center"
           >
             People Matter. It&apos;s That Simple.
           </motion.p>
@@ -94,7 +86,7 @@ export default function StepInsideWelcomeSection({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-wrap items-center gap-3.5 sm:gap-4"
+            className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4"
           >
             <FigmaButton to="/who-we-are" variant="primary" size="md">
               Explore LAB

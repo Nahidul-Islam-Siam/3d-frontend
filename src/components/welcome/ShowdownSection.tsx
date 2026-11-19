@@ -22,22 +22,28 @@ export interface ShowdownSectionProps {
   id?: string;
   className?: string;
   isStandaloneSection?: boolean;
+  asCard?: boolean;
+  rounded?: boolean;
   topCreamBand?: boolean;
   bottomCreamBand?: boolean;
   title?: string;
   subtitle?: string;
   hideBadge?: boolean;
+  hideEventsStrip?: boolean;
 }
 
 export default function ShowdownSection({ 
   id = 'chapter-04',
   className = '',
   isStandaloneSection = true,
+  asCard = false,
+  rounded = true,
   topCreamBand = false,
   bottomCreamBand = false,
   title,
   subtitle,
   hideBadge = false,
+  hideEventsStrip = false,
 }: ShowdownSectionProps) {
   const [isFlyerModalOpen, setIsFlyerModalOpen] = useState<boolean>(false);
 
@@ -71,8 +77,8 @@ export default function ShowdownSection({
 
   const content = (
     <div 
-      className="w-full space-y-4 sm:space-y-6 px-4 sm:px-6 mx-auto flex flex-col items-center"
-      style={{ width: isStandaloneSection ? 'min(1240px, 94vw)' : 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' }}
+      className="w-full space-y-4 sm:space-y-6 px-2 sm:px-4 mx-auto flex flex-col items-center"
+      style={{ width: asCard ? '100%' : isStandaloneSection ? 'min(1240px, 94vw)' : 'min(1420px, 94vw, calc((100vh - 165px) * (1978 / 1620)))' }}
     >
       {/* ─── 1. TOP HEADER: SUICIDE AWARENESS SHOWDOWN HIGHLIGHT ─── */}
       <div className="w-full flex flex-col lg:flex-row lg:items-end justify-between gap-4 shrink-0">
@@ -131,7 +137,7 @@ export default function ShowdownSection({
         </div>
       </div>
 
-      {isStandaloneSection && <PublicUpcomingEventsStrip compact className="pt-2" />}
+      {isStandaloneSection && !asCard && !hideEventsStrip && <PublicUpcomingEventsStrip compact className="pt-2" />}
     </div>
   );
 
@@ -141,17 +147,33 @@ export default function ShowdownSection({
         <div className="w-full h-10 sm:h-14 lg:h-16 bg-[#FAF4E6]" aria-hidden="true" />
       )}
 
-      {isStandaloneSection ? (
+      {asCard ? (
+        <div className="w-full py-6 sm:py-10 px-4 sm:px-6">
+          <div 
+            id={id}
+            className={`relative max-w-[1240px] mx-auto rounded-[28px] sm:rounded-[36px] bg-gradient-to-b from-[#251236] via-[#1A0B26] to-[#12071C] border border-purple-500/20 py-8 sm:py-12 px-4 sm:px-8 shadow-2xl overflow-hidden select-none ${className}`}
+          >
+            {/* Ambient glows inside card */}
+            <div className="absolute top-1/2 -left-20 sm:-left-32 -translate-y-1/2 w-[420px] sm:w-[540px] h-[650px] sm:h-[800px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.42)_0%,_rgba(234,88,12,0.18)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
+            <div className="absolute top-1/2 -right-20 sm:-right-32 -translate-y-1/2 w-[400px] sm:w-[500px] h-[620px] sm:h-[750px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.32)_0%,_rgba(234,88,12,0.12)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#8b5cf6]/10 rounded-full blur-[140px] pointer-events-none" />
+
+            {content}
+          </div>
+        </div>
+      ) : isStandaloneSection ? (
         <section 
           id={id}
-          className={`relative w-full min-h-screen bg-gradient-to-b from-[#251236] via-[#1A0B26] to-[#12071C] flex items-center justify-center py-14 sm:py-20 px-4 sm:px-6 overflow-hidden select-none ${className}`}
+          className={`relative w-full ${rounded ? "bg-[#FAF4E6] pt-4 sm:pt-6 pb-2" : ""} select-none overflow-visible ${className}`}
         >
-          {/* Intense ambient stage lighting glows matching Figma 1:1 */}
-          <div className="absolute top-1/2 -left-20 sm:-left-32 -translate-y-1/2 w-[420px] sm:w-[540px] h-[650px] sm:h-[800px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.42)_0%,_rgba(234,88,12,0.18)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
-          <div className="absolute top-1/2 -right-20 sm:-right-32 -translate-y-1/2 w-[400px] sm:w-[500px] h-[620px] sm:h-[750px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.32)_0%,_rgba(234,88,12,0.12)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#8b5cf6]/10 rounded-full blur-[140px] pointer-events-none" />
-          
-          {content}
+          <div className={`relative w-full bg-gradient-to-b from-[#251236] via-[#1A0B26] to-[#12071C] ${rounded ? "rounded-[36px] sm:rounded-[52px] lg:rounded-[60px] shadow-2xl" : ""} flex items-center justify-center py-12 sm:py-16 lg:py-20 px-4 sm:px-6 overflow-hidden`}>
+            {/* Intense ambient stage lighting glows matching Figma 1:1 */}
+            <div className="absolute top-1/2 -left-20 sm:-left-32 -translate-y-1/2 w-[420px] sm:w-[540px] h-[650px] sm:h-[800px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.42)_0%,_rgba(234,88,12,0.18)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
+            <div className="absolute top-1/2 -right-20 sm:-right-32 -translate-y-1/2 w-[400px] sm:w-[500px] h-[620px] sm:h-[750px] bg-[radial-gradient(ellipse_at_center,_rgba(249,115,22,0.32)_0%,_rgba(234,88,12,0.12)_45%,_transparent_75%)] blur-[85px] pointer-events-none" />
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#8b5cf6]/10 rounded-full blur-[140px] pointer-events-none" />
+            
+            {content}
+          </div>
         </section>
       ) : (
         content
