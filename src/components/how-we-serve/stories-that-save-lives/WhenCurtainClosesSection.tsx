@@ -23,36 +23,27 @@ export default function WhenCurtainClosesSection() {
   return (
     <section 
       id="when-the-curtain-closes"
-      className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] py-24 sm:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full bg-[#FFF3D9] text-[#2C261E] py-20 sm:py-28 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden border-y border-[rgba(227,182,143,0.35)]"
     >
-      {/* Background Subtle Amber Horizon Glow */}
-      <div 
-        className="absolute bottom-10 left-1/4 w-[600px] h-[400px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)',
-          filter: 'blur(90px)',
-        }}
-      />
-
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-24 items-center">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           
-          {/* ─── Left Column: Theatrical Narrative (Figma 1:1) ─── */}
+          {/* ─── Left Column: Theatrical Narrative ─── */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-6 flex flex-col justify-center"
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-6 flex flex-col justify-center space-y-5"
           >
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2C261E] leading-[1.08] mb-8"
+              className="text-3xl sm:text-4xl lg:text-[46px] font-semibold tracking-tight text-[#121010] leading-tight"
             >
-              WHEN THE CURTAIN<br />CLOSES.
+              When The Curtain Closes.
             </h2>
 
-            <div className="space-y-4 max-w-lg text-[#5A5043] text-sm sm:text-base leading-relaxed font-light">
+            <div className="space-y-4 max-w-lg text-[#5A5043] text-xs sm:text-sm lg:text-[15px] leading-relaxed font-sans font-light">
               <p className="text-[#2C261E] font-medium">
                 The experience is only beginning.
               </p>
@@ -65,31 +56,28 @@ export default function WhenCurtainClosesSection() {
             </div>
           </motion.div>
 
-          {/* ─── Right Column: 4 Glass Stack Cards (Figma 1:1) ─── */}
-          <div className="lg:col-span-6 flex flex-col gap-4 sm:gap-5">
+          {/* ─── Right Column: 4 Cards ─── */}
+          <div className="lg:col-span-6 flex flex-col gap-3.5 sm:gap-4">
             {stackCards.map((card, idx) => (
               <motion.div
                 key={card.role}
-                initial={{ opacity: 0, x: 30 }}
+                initial={{ opacity: 0, x: 24 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative rounded-[20px] bg-white/80 backdrop-blur-md border border-[#EADCC5] p-6 sm:p-7 shadow-[0_6px_24px_rgba(44,38,30,0.06)] hover:border-[#F97316]/60 hover:bg-white hover:shadow-[0_12px_36px_rgba(249,115,22,0.12)] transition-all duration-300"
+                transition={{ duration: 0.7, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="group relative rounded-[18px] bg-white/90 backdrop-blur-sm border border-[#EADBBD] p-5 sm:p-6 shadow-[0_4px_16px_rgba(44,38,30,0.04)] hover:border-[#F97316]/50 hover:bg-white transition-all duration-300"
               >
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <h3
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-lg sm:text-xl font-bold tracking-wider text-[#2C261E] group-hover:text-[#F97316] transition-colors uppercase"
+                    className="text-base sm:text-lg font-bold tracking-wider text-[#121010] group-hover:text-[#F97316] transition-colors uppercase"
                   >
                     {card.role}
                   </h3>
-                  <p className="text-[#5A5043] text-sm sm:text-[15px] font-light">
+                  <p className="text-[#5A5043] text-xs sm:text-sm font-sans font-light">
                     {card.action}
                   </p>
                 </div>
-
-                {/* Subtle right accent bar on hover */}
-                <div className="absolute top-1/2 right-6 -translate-y-1/2 w-1.5 h-6 rounded-full bg-[#F97316] opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.div>
             ))}
           </div>
@@ -99,4 +87,3 @@ export default function WhenCurtainClosesSection() {
     </section>
   );
 }
-

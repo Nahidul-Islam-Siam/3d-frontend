@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Smile, MessageCircleQuestion, Flame, HandHeart } from 'lucide-react';
+import { Smile, HelpCircle, Flame, Award } from 'lucide-react';
 
 const dimensions = [
   {
@@ -9,10 +9,10 @@ const dimensions = [
     staggerClass: 'lg:translate-y-0',
   },
   {
-    icon: MessageCircleQuestion,
+    icon: HelpCircle,
     title: 'QUESTIONS',
     description: 'The quiet wonderings of the soul when the house is still, seeking meaning, belonging, and an anchor.',
-    staggerClass: 'lg:translate-y-10 xl:translate-y-12',
+    staggerClass: 'lg:translate-y-8',
   },
   {
     icon: Flame,
@@ -21,10 +21,10 @@ const dimensions = [
     staggerClass: 'lg:translate-y-0',
   },
   {
-    icon: HandHeart,
+    icon: Award,
     title: 'VICTORIES',
     description: 'The quiet, monumental resilience that woke up this morning, stood up, and decided to keep going.',
-    staggerClass: 'lg:translate-y-10 xl:translate-y-12',
+    staggerClass: 'lg:translate-y-8',
   },
 ];
 
@@ -32,91 +32,101 @@ export default function CarryingAStorySection() {
   return (
     <section 
       id="carrying-a-story"
-      className="relative w-full min-h-screen bg-[#FAF4E6] text-[#2C261E] py-24 sm:py-32 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
+      className="relative w-full bg-[#FAF4E6] text-[#2C261E] py-16 sm:py-24 px-6 sm:px-12 lg:px-20 xl:px-28 select-none overflow-hidden"
     >
-      {/* Warm Ambient Glow from bottom-left */}
-      <div 
-        className="absolute bottom-0 left-0 w-[800px] h-[600px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at bottom left, rgba(249,115,22,0.08) 0%, rgba(217,119,6,0.03) 45%, transparent 75%)',
-          filter: 'blur(80px)',
-        }}
-      />
-
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto">
         
-        {/* ─── Split Header (Figma 1:1) ─── */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-20 sm:mb-28">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-xl"
+        {/* ─── Top Eyebrow Section Title ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-14 sm:mb-20"
+        >
+          <h2
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-3xl sm:text-4xl lg:text-[42px] font-semibold text-[#121010] tracking-tight mb-2.5"
           >
-            <h2
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#2C261E] leading-[1.18]"
-            >
-              Every person you meet is carrying a story.
-            </h2>
-          </motion.div>
+            Stories That Save Lives
+          </h2>
+          <p className="text-[#8F6629] text-xs sm:text-sm italic font-serif">
+            Sometimes hope begins with one conversation.
+          </p>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-md"
+        {/* ─── Main Headline ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-xl mb-12 sm:mb-16"
+        >
+          <h3
+            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-2xl sm:text-3xl lg:text-[38px] font-semibold tracking-tight text-[#121010] leading-tight"
           >
-            <p className="text-[#5A5043] text-sm sm:text-base leading-relaxed font-light">
-              Beneath every everyday encounter lies an entire unspoken landscape of experience, struggle, and untamed beauty.
-            </p>
-          </motion.div>
-        </div>
+            Every person you meet is
+            <br />
+            carrying a story.
+          </h3>
+        </motion.div>
 
-        {/* ─── 4 Staggered Glass Cards (Figma 1:1) ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 pb-12 lg:pb-24">
+        {/* ─── 4 Staggered Story Cards ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-12 sm:pb-16">
           {dimensions.map((dim, idx) => {
             const Icon = dim.icon;
             return (
               <motion.div
                 key={dim.title}
-                initial={{ opacity: 0, y: 35 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className={`relative group rounded-[24px] bg-white/80 backdrop-blur-md border border-[#EADCC5] p-8 sm:p-9 flex flex-col justify-between min-h-[300px] sm:min-h-[340px] shadow-[0_8px_30px_rgba(44,38,30,0.06)] hover:border-[#F97316]/50 hover:bg-white hover:shadow-[0_16px_45px_rgba(249,115,22,0.12)] transition-all duration-300 ${dim.staggerClass}`}
+                transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className={`relative group rounded-[22px] bg-white/85 backdrop-blur-sm border border-[#EADCC5] p-7 sm:p-8 flex flex-col justify-between min-h-[260px] sm:min-h-[290px] shadow-[0_6px_24px_rgba(44,38,30,0.05)] hover:border-[#F97316]/50 hover:bg-white transition-all duration-300 ${dim.staggerClass}`}
               >
-                {/* Top: Icon */}
                 <div>
-                  <div className="w-12 h-12 rounded-full border border-[#F97316]/30 bg-[#F97316]/10 flex items-center justify-center mb-7 group-hover:scale-110 group-hover:border-[#F97316] transition-transform">
-                    <Icon className="w-6 h-6 text-[#F97316]" strokeWidth={1.75} />
+                  <div className="w-10 h-10 rounded-full border border-[#F97316]/30 bg-[#F97316]/10 flex items-center justify-center mb-6">
+                    <Icon className="w-5 h-5 text-[#F97316]" strokeWidth={1.75} />
                   </div>
 
-                  {/* Title */}
-                  <h3 
+                  <h4 
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                    className="text-xl sm:text-2xl font-bold tracking-wider text-[#F97316] mb-4 uppercase"
+                    className="text-lg sm:text-xl font-bold tracking-wider text-[#F97316] mb-3 uppercase"
                   >
                     {dim.title}
-                  </h3>
+                  </h4>
 
-                  {/* Description */}
-                  <p className="text-[#5A5043] text-sm sm:text-[15px] leading-relaxed font-light">
+                  <p className="text-[#5A5043] text-xs sm:text-[13.5px] leading-relaxed font-sans font-light">
                     {dim.description}
                   </p>
                 </div>
-
-                {/* Subtle Bottom Accent Glow */}
-                <div className="w-10 h-0.5 rounded-full bg-[#F97316]/30 group-hover:w-16 group-hover:bg-[#F97316] transition-all duration-300 mt-6" />
               </motion.div>
             );
           })}
         </div>
 
+        {/* ─── Centered Narrative Block ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-3xl mx-auto text-center space-y-3.5 pt-6 sm:pt-10"
+        >
+          <p className="text-[#5A5043] text-xs sm:text-sm lg:text-[15px] leading-relaxed font-sans">
+            At Live Achieve Believe, we believe stories remind us that we are never as alone as we think we are.
+          </p>
+          <p className="text-[#F97316] text-xs sm:text-sm lg:text-[15px] font-sans font-medium">
+            That is why we created Suicide Awareness Showdown, Where Are You Now? Letters to Etcetera.
+          </p>
+          <p className="text-[#5A5043] text-xs sm:text-sm lg:text-[15px] leading-relaxed font-sans">
+            Not simply to tell a story. But to create an experience that reminds people hope is always worth pursuing, conversations are always worth having, and every life has immeasurable value.
+          </p>
+        </motion.div>
+
       </div>
     </section>
   );
 }
-

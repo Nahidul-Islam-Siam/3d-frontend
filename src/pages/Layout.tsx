@@ -9,10 +9,9 @@ export default function RootLayout() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
-  const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
   const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
-  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isStoriesPage || isWelcomeHomePage || isShowdownPage;
+  const isHeroPage = isHomePage || location.pathname === '/meet-us' || location.pathname === '/who-we-are' || location.pathname === '/donate' || location.pathname === '/how-we-serve' || isYouMatterPage || isWelcomeHomePage || isShowdownPage;
   const [isFooterHidden, setIsFooterHidden] = useState(false);
   const [shouldShowPreloader, setShouldShowPreloader] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -74,7 +73,7 @@ export default function RootLayout() {
     }
   }, [location.pathname, location.hash]);
 
-  const isDarkPage = location.pathname === '/donate' || isStoriesPage;
+  const isDarkPage = location.pathname === '/donate';
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkPage ? 'bg-[#08070B] text-white' : 'bg-[#FAF4E6] text-stone-900'} overflow-x-clip selection:bg-[#F97316] selection:text-white`}>
