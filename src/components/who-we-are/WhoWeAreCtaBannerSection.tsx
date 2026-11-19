@@ -27,28 +27,18 @@ export function WhoWeAreCtaBannerSection({
       className={`relative w-full bg-[#FAF4E6] pt-4 pb-20 sm:pb-28 lg:pb-36 px-6 sm:px-10 lg:px-16 xl:px-20 select-none overflow-hidden ${className}`}
     >
       <div className="w-full max-w-[1240px] xl:max-w-[1300px] mx-auto flex justify-center">
-        {/* ─── Orange Rounded Banner Card (Patterned from AnotherSeatWaitingSection + Figma: border-radius 56px, opacity 0.9, bg #FE6B35) ─── */}
+        {/* ─── Orange Rounded Banner Card ─── */}
         <motion.div
           initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 0.9, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-5xl mx-auto px-6 sm:px-12 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
+          className="relative w-full max-w-5xl mx-auto px-6 sm:px-12 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 overflow-hidden"
           style={{
-            backgroundColor: "#FE6B35",
+            backgroundColor: "#FD7947",
             borderRadius: "56px",
           }}
         >
-          {/* Diffused radiant white & soft cream glow at bottom matching Figma inspect colors (#FFEBBE, #FBFBFB, white) */}
-          <div
-            className="absolute inset-0 pointer-events-none select-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 75% 60% at 50% 90%, rgba(255, 235, 190, 0.5) 0%, rgba(251, 251, 251, 0.3) 35%, rgba(254, 107, 53, 0) 70%)",
-            }}
-            aria-hidden="true"
-          />
-
           <div className="relative z-10 flex flex-col items-center text-center">
             {/* Title */}
             <h2
@@ -63,7 +53,7 @@ export function WhoWeAreCtaBannerSection({
               Act with Purpose.
             </h2>
 
-            {/* 3 Reusable Outline Action Buttons matching AnotherSeatWaitingSection */}
+            {/* 3 Reusable Outline Action Buttons */}
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
               {ctaButtons.map((btn) => (
                 <FigmaButton
@@ -71,7 +61,7 @@ export function WhoWeAreCtaBannerSection({
                   to={btn.to}
                   variant="outline-white"
                   size="md"
-                  className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+                  className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
                 >
                   {btn.label}
                 </FigmaButton>

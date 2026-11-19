@@ -36,21 +36,11 @@ export function NoSingleOrganizationBanner({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full px-6 sm:px-12 lg:px-16 pt-14 sm:pt-20 lg:pt-24 pb-14 sm:pb-20 lg:pb-24 shadow-[0_24px_64px_rgba(249,115,22,0.22)] overflow-hidden rounded-[28px] sm:rounded-[36px] lg:rounded-[44px] box-border text-center flex flex-col items-center justify-center"
+          className="relative w-full px-6 sm:px-12 lg:px-16 pt-14 sm:pt-20 lg:pt-24 pb-14 sm:pb-20 lg:pb-24 overflow-hidden rounded-[28px] sm:rounded-[36px] lg:rounded-[44px] box-border text-center flex flex-col items-center justify-center"
           style={{
-            backgroundColor: '#FE6B35',
+            backgroundColor: '#FD7947',
           }}
         >
-          {/* Diffused radiant white & soft cream glow at bottom matching Figma inspect */}
-          <div
-            className="absolute inset-0 pointer-events-none select-none"
-            style={{
-              background:
-                'radial-gradient(ellipse 75% 60% at 50% 90%, rgba(255, 235, 190, 0.45) 0%, rgba(251, 251, 251, 0.25) 35%, rgba(254, 107, 53, 0) 70%)',
-            }}
-            aria-hidden="true"
-          />
-
           <div className="relative z-10 flex flex-col items-center text-center w-full max-w-4xl mx-auto">
             {/* Title */}
             <h3
@@ -75,7 +65,7 @@ export function NoSingleOrganizationBanner({
             <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 w-full">
               <Link
                 to="/movement"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/80 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-transparent hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 <span>Continue The Journey</span>
                 <ArrowRight className="w-4 h-4 shrink-0" />
@@ -84,7 +74,7 @@ export function NoSingleOrganizationBanner({
               <button
                 type="button"
                 onClick={handleScrollToDoors}
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/80 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-transparent hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 <span>Step Through Another Door</span>
                 <ArrowRight className="w-4 h-4 shrink-0" />
@@ -92,7 +82,7 @@ export function NoSingleOrganizationBanner({
 
               <Link
                 to="/movement"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/75 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-white/10 hover:bg-white/20 backdrop-blur-sm shadow-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full border border-white/80 hover:border-white text-white text-xs sm:text-sm font-medium tracking-wide bg-transparent hover:bg-white/10 transition-all duration-200 active:scale-95 cursor-pointer"
               >
                 <span>Become Part Of The Story</span>
                 <ArrowRight className="w-4 h-4 shrink-0" />

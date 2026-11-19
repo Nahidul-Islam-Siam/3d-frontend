@@ -21,22 +21,11 @@ export default function PlaceForYouCardSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full rounded-[32px] sm:rounded-[40px] px-6 sm:px-12 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
+          className="relative w-full rounded-[32px] sm:rounded-[40px] px-6 sm:px-12 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 overflow-hidden"
           style={{
-            background:
-              "linear-gradient(180deg, #FD7646 0%, #FA7545 40%, #F57242 70%, #EA6635 100%)",
+            backgroundColor: "#FD7947",
           }}
         >
-          {/* Subtle diffused radiant white glow at bottom-center matching Figma & AnotherSeatWaitingSection */}
-          <div
-            className="absolute inset-0 pointer-events-none select-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 70% 55% at 50% 85%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 70%)",
-            }}
-            aria-hidden="true"
-          />
-
           <div className="relative z-10 flex flex-col items-center text-center">
             {/* Title */}
             <h2
@@ -53,7 +42,7 @@ export default function PlaceForYouCardSection({
 
             {/* Subtitle */}
             <div className="mb-8 sm:mb-10 text-center">
-              <p className="font-sans text-xs sm:text-[13.5px] text-white/95 font-medium leading-relaxed">
+              <p className="font-sans text-xs sm:text-[13.5px] text-white font-normal leading-relaxed opacity-95">
                 Live Achieve Believe, Inc.
                 <br />
                 People Matter. Always.
@@ -66,7 +55,7 @@ export default function PlaceForYouCardSection({
                 to="/how-we-serve"
                 variant="outline-white"
                 size="md"
-                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+                className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
               >
                 Discover How We Serve
               </FigmaButton>
@@ -75,7 +64,7 @@ export default function PlaceForYouCardSection({
                 to="/experience-the-story"
                 variant="outline-white"
                 size="md"
-                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+                className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
               >
                 Experience The Production
               </FigmaButton>
@@ -84,7 +73,7 @@ export default function PlaceForYouCardSection({
                 to="/join-the-movement"
                 variant="outline-white"
                 size="md"
-                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+                className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
               >
                 Become Part Of The Story
               </FigmaButton>

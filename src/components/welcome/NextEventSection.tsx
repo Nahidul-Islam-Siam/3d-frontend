@@ -71,7 +71,7 @@ export default function NextEventSection({
               variant="outline-white"
               size="sm"
               showArrow={true}
-              className="!border-white/30 !text-white !bg-white/10 hover:!bg-white/20"
+              className="!border-white/50 !text-white !bg-transparent hover:!bg-white/10"
             >
               Audition
             </FigmaButton>

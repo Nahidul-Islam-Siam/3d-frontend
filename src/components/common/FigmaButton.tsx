@@ -74,7 +74,7 @@ export default function FigmaButton({
       activeArrowIcon = frame7Arrow;
     }
   } else if (variant === 'outline-white' || variant === 'dark-outline') {
-    containerStyles = "border border-white/70 bg-black/20 hover:bg-white/10 hover:border-white shadow-sm backdrop-blur-[2px]";
+    containerStyles = "border border-white/80 bg-transparent hover:bg-white/10 hover:border-white";
     textColor = "text-white";
     if (!activeArrowIcon) {
       activeArrowIcon = btnArrow;

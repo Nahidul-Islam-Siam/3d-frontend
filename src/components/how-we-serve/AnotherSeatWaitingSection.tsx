@@ -274,23 +274,12 @@ export default function AnotherSeatWaitingSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-5xl mx-auto px-4 sm:px-10 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 shadow-[0_24px_64px_rgba(249,115,22,0.18)] overflow-hidden"
+          className="relative w-full max-w-5xl mx-auto px-4 sm:px-10 lg:px-16 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 overflow-hidden"
           style={{
-            backgroundColor: '#FE6B35',
+            backgroundColor: '#FD7947',
             borderRadius: '56px',
-            opacity: 0.9,
           }}
         >
-          {/* Diffused radiant white & soft cream glow at bottom matching Figma inspect colors (#FFEBBE, #FBFBFB, white) */}
-          <div
-            className="absolute inset-0 pointer-events-none select-none"
-            style={{
-              background:
-                'radial-gradient(ellipse 75% 60% at 50% 90%, rgba(255, 235, 190, 0.5) 0%, rgba(251, 251, 251, 0.3) 35%, rgba(254, 107, 53, 0) 70%)',
-            }}
-            aria-hidden="true"
-          />
-
           <div className="relative z-10 flex flex-col items-center text-center">
             {/* Title */}
             <h3
@@ -316,7 +305,7 @@ export default function AnotherSeatWaitingSection({
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-2xl sm:max-w-3xl mx-auto px-2 mb-8 sm:mb-10">
               {partnerPills.map((pill, idx) => (
                 <div key={pill} className="inline-flex items-center gap-2 sm:gap-2.5">
-                  <span className="px-3.5 sm:px-4 py-1.5 rounded-full border border-white/60 text-white text-[11.5px] sm:text-[12.5px] font-medium tracking-wide bg-white/10 backdrop-blur-sm shadow-sm select-none hover:bg-white/20 transition-colors whitespace-nowrap">
+                  <span className="px-3.5 sm:px-4 py-1.5 rounded-full border border-white/60 text-white text-[11.5px] sm:text-[12.5px] font-medium tracking-wide bg-transparent select-none hover:bg-white/10 transition-colors whitespace-nowrap">
                     {pill}
                   </span>
                   {idx < partnerPills.length - 1 && (
@@ -334,7 +323,7 @@ export default function AnotherSeatWaitingSection({
                 to="/#doors"
                 variant="outline-white"
                 size="md"
-                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+                className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
               >
                 Return To Hallway Of Hope
               </FigmaButton>
@@ -343,7 +332,7 @@ export default function AnotherSeatWaitingSection({
                 to="/movement"
                 variant="outline-white"
                 size="md"
-                className="!border-white/80 !text-white !bg-white/10 hover:!bg-white/25 shadow-sm backdrop-blur-sm"
+                className="!border-white/80 !text-white !bg-transparent hover:!bg-white/10 !shadow-none !backdrop-blur-none"
               >
                 Next Door
               </FigmaButton>

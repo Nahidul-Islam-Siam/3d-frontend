@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import theaterImg from "@/assets/experience-story/stories/image 100.png";
-import showdownPosterImg from "@/assets/welcome/showdown-poster.png";
+import auditionBanner from "@/assets/welcome/audition_banner.png";
 
 export interface StoriesStageForHopeSectionProps {
   id?: string;
@@ -50,10 +50,10 @@ export default function StoriesStageForHopeSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[352px_1fr] gap-7 sm:gap-10 lg:gap-12 items-start"
+            className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[340px_1fr] gap-7 sm:gap-10 lg:gap-12 items-start"
           >
             {/* Image (Theater Auditorium) */}
-            <div className="overflow-hidden rounded-[14px] shadow-sm aspect-[352/288] w-full max-w-[352px] mx-auto md:mx-0">
+            <div className="overflow-hidden rounded-[14px] shadow-sm aspect-[352/288] w-full max-w-[340px] mx-auto md:mx-0">
               <img
                 src={theaterImg}
                 alt="Audience watching stage production"
@@ -96,12 +96,12 @@ export default function StoriesStageForHopeSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[352px_1fr] gap-7 sm:gap-10 lg:gap-12 items-start"
+            className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[340px_1fr] gap-7 sm:gap-10 lg:gap-12 items-start"
           >
             {/* Image (Showdown Suicide Awareness Poster) */}
-            <div className="overflow-hidden rounded-[14px] shadow-sm aspect-[352/288] w-full max-w-[352px] mx-auto md:mx-0">
+            <div className="overflow-hidden rounded-[14px] shadow-sm aspect-[1/1] w-full max-w-[340px] mx-auto md:mx-0">
               <img
-                src={showdownPosterImg}
+                src={auditionBanner}
                 alt="Showdown Suicide Awareness - Where Are You Now? Letters to Etcetera"
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -110,7 +110,7 @@ export default function StoriesStageForHopeSection({
 
             {/* Narrative Content */}
             <div className="flex flex-col justify-start">
-              <span className="font-sans text-xs sm:text-[12.5px] text-[#666666] font-medium tracking-normal mb-1.5 block">
+              <span className="font-sans text-xs sm:text-[12px] text-[#666666] font-medium tracking-normal mb-1.5 block">
                 Awareness Showdown
               </span>
               <h3 className="font-serif font-bold text-xl sm:text-2xl lg:text-[26px] text-[#141414] leading-snug mb-2.5">
@@ -118,18 +118,34 @@ export default function StoriesStageForHopeSection({
                 <br />
                 Letters to Etcetera
               </h3>
-              <p className="font-sans text-xs sm:text-[13px] font-semibold text-[#272624] leading-snug mb-3">
-                Beyond the silence, there's a story. Beyond the struggle, there's possibility.
-              </p>
+              <h4 className="font-serif font-bold text-sm sm:text-base text-[#141414] leading-snug mb-3">
+                Beyond the silence, there&apos;s a story. Beyond the struggle,
+                <br className="hidden sm:inline" /> there&apos;s possibility.
+              </h4>
               <div className="space-y-3 font-sans text-xs sm:text-[13px] text-[#444444] leading-relaxed">
                 <p>
-                  Suicide Awareness Showdown: Where Are You Now? Letters to Etcetera is more than a theatrical production. It's an invitation to experience the power of connection, discover hope in unexpected places, and remember that even the smallest gestures can make an extraordinary difference.
+                  Imagine an evening where laughter opens hearts, music stirs emotions, and stories illuminate the beautiful, sometimes unexpected ways our lives touch one another.
                 </p>
                 <p>
-                  Through unforgettable characters, music, humor, dance, and moments that speak straight to the heart, we invite audiences to suspend their expectations, embrace compassion, and be reminded that within each of our own journeys...
+                  Suicide Awareness Showdown: Where Are You Now? Letters to Etcetera is more than a theatrical production. It&apos;s an invitation to experience the power of connection, discover hope in unexpected places, and remember that even the smallest gesture can make an extraordinary difference.
                 </p>
                 <p>
-                  And perhaps that is what matters most. A conversation started. A moment of openness shared with a loved one. The courage to reach out, or the inspiration to notice someone else who needs that extra kindness.
+                  Through unforgettable characters, music, dance, humor, and moments that speak straight to the heart, we invite audiences on a journey that celebrates life, courage, compassion, and the possibilities that unfold when we truly see one another.
+                </p>
+                <p>
+                  And when the curtain falls, we hope something wonderful begins.
+                </p>
+                <p>
+                  Perhaps it&apos;s a long-overdue conversation. A friendship rekindled. A moment of kindness offered without hesitation. The courage to reach out, or the inspiration to remind someone just how much they matter.
+                </p>
+                <p>
+                  Because the most powerful stories don&apos;t simply stay on the stage.
+                </p>
+                <p>
+                  They come alive in us. They inspire us to love more openly, listen more deeply, and recognize the extraordinary value of every life.
+                </p>
+                <p className="font-semibold text-[#141414] pt-1">
+                  Every life deserves to be seen. Every voice deserves to be heard. Every story matters.
                 </p>
               </div>
             </div>

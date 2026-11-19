@@ -93,7 +93,7 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
 
           {/* Col 4: Next Event Broadcast Box */}
           <div className="lg:col-span-4 xl:col-span-4">
-            <div className="rounded-[18px] sm:rounded-[20px] border border-[#F97316] bg-transparent p-5 sm:p-6 space-y-3">
+            <div className="rounded-[18px] sm:rounded-[20px] border border-[#F97316] bg-[#F9731614] p-5 sm:p-6 space-y-3">
               <span className="block text-xs font-bold tracking-[0.14em] text-[#F97316] uppercase font-sans">
                 NEXT EVENT BROADCAST
               </span>
@@ -121,7 +121,7 @@ export default function Footer({ isHidden = false, className = '' }: FooterProps
         {/* Bottom Sub-Bar with thin divider */}
         <div className="w-full mt-12 sm:mt-14 pt-6 border-t border-[#F4D8A5] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#5A4F44] font-sans">
           <p>
-            © 2025 Live Achieve Believe (LAB) Foundation. All rights reserved.
+            © 2026 Live Achieve Believe (LAB) Foundation. All rights reserved.
           </p>
 
           <div className="flex items-center gap-6 text-[#5A4F44] font-sans">
