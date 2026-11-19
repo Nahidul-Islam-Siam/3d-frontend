@@ -59,7 +59,7 @@ const walkWays: WalkWayCard[] = [
     extendedText:
       'Mentoring middle and high school students through the LEADS program, instilling leadership, dignity, and self-worth so the next generation thrives.',
     ctaText: 'Explore Youth Mentorship',
-    ctaLink: '/how-we-serve/you-matter',
+    ctaLink: '/how-we-serve/strong-foundations',
     image: cardYouthImg,
   },
   {

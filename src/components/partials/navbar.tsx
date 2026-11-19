@@ -28,11 +28,10 @@ export default function Navbar() {
 
   const isHomePage = location.pathname === '/';
   const isDonatePage = location.pathname === '/donate';
-  const isYouMatterPage = location.pathname === '/how-we-serve/you-matter' || location.pathname === '/you-matter';
   const isStoriesPage = location.pathname === '/how-we-serve/stories-that-save-lives' || location.pathname === '/stories-that-save-lives';
   const isWelcomeHomePage = location.pathname === '/how-we-serve/welcome-home' || location.pathname === '/welcome-home';
   const isShowdownPage = location.pathname === '/suicide-awareness-showdown' || location.pathname === '/showdown';
-  const isDarkHeroPage = isDonatePage || isYouMatterPage || isWelcomeHomePage || isShowdownPage;
+  const isDarkHeroPage = isDonatePage || isWelcomeHomePage || isShowdownPage;
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const isDarkScrolled = (isDonatePage || isShowdownPage) && hasScrolled;
   const isDarkTheme = isTransparent || isDarkScrolled;
@@ -110,7 +109,7 @@ export default function Navbar() {
           doorNumber: 2, 
           label: "Strong Foundations", 
           subtitle: "Youth development, respect & guidance", 
-          to: "/how-we-serve/you-matter" 
+          to: "/how-we-serve/strong-foundations" 
         },
         { 
           doorNumber: 3, 

@@ -34,7 +34,7 @@ const THREE_DOORS: ThreeDoorData[] = [
     title: "Strong Foundations",
     subtitle: "A hopeful space for youth growth",
     quote: "Sometimes hope begins\nwith guidance.",
-    href: "/how-we-serve/you-matter",
+    href: "/how-we-serve/strong-foundations",
     side: "right",
     zPos: -14,
     color: 0x160f09,

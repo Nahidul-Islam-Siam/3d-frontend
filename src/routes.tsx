@@ -14,6 +14,7 @@ import ProtectedAdminRoute from "./components/auth/ProtectedAdminRoute";
 import Contact from "./pages/contact";
 import Donate from "./pages/donate";
 import YouMatter from "./pages/you-matter";
+import StrongFoundations from "./pages/strong-foundations";
 import StoriesThatSaveLives from "./pages/stories-that-save-lives";
 import APlaceAtTheTable from "./pages/a-place-at-the-table";
 import WelcomeHome from "./pages/welcome-home";
@@ -110,6 +111,14 @@ export const router = createBrowserRouter([
       {
         path: "/a-place-at-the-table",
         element: <APlaceAtTheTable />,
+      },
+      {
+        path: "/how-we-serve/strong-foundations",
+        element: <StrongFoundations />,
+      },
+      {
+        path: "/strong-foundations",
+        element: <StrongFoundations />,
       },
       {
         path: "/how-we-serve/you-matter",

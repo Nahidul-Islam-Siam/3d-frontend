@@ -50,7 +50,7 @@ const navSections: NavSection[] = [
     title: "How We Serve — The 7 Doors",
     items: [
       { to: "/how-we-serve/a-place-at-the-table", label: "A Place at the Table", icon: Utensils },
-      { to: "/how-we-serve/you-matter", label: "Strong Foundations (You Matter)", icon: Heart },
+      { to: "/how-we-serve/strong-foundations", label: "Strong Foundations", icon: Heart },
       { to: "/how-we-serve/stories-that-save-lives", label: "Stories That Save Lives", icon: BookHeart },
       { to: "/how-we-serve/welcome-home", label: "Welcome Home", icon: HomeIcon },
       { to: "/how-we-serve#a-new-beginning", label: "A New Beginning", icon: Sparkles },

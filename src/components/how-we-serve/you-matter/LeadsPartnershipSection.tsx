@@ -198,7 +198,7 @@ export default function LeadsPartnershipSection() {
     <div
       ref={containerRef}
       id="leads-partnership"
-      className="relative w-full bg-[#FAF4E6] text-[#2C261E]"
+      className="relative w-full bg-[#FFF3D9] text-[#2C261E] border-y border-[rgba(227,182,143,0.35)]"
     >
       {/* ─── Pinned Stage Viewport ─── */}
       <section 

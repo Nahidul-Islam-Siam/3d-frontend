@@ -114,11 +114,11 @@ export default function StrongFoundationsSection() {
           <div className="space-y-2.5">
             <h2
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-[78px] xl:text-[84px] font-bold tracking-tight text-[#2C261E] leading-none uppercase"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-semibold tracking-tight text-[#2C261E] leading-tight"
             >
-              YOU MATTER
+              You Matter
             </h2>
-            <p className="text-[#746343] text-sm sm:text-base lg:text-lg font-sans tracking-widest uppercase font-medium">
+            <p className="text-[#8F6629] text-xs sm:text-sm lg:text-[14px] font-sans tracking-widest uppercase font-semibold">
               Strong Foundations
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function StrongFoundationsSection() {
           {/* Italic Quote */}
           <p
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-[#574D3B] text-xl sm:text-2xl lg:text-[27px] font-normal leading-relaxed italic max-w-xl"
+            className="text-[#574D3B] text-xl sm:text-2xl lg:text-[26px] font-normal leading-relaxed italic max-w-xl"
           >
             “Sometimes hope begins when someone discovers their worth.”
           </p>
