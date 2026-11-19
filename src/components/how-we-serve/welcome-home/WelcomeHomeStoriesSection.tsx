@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
-import keyPhoto from '@/assets/how-we-serve/welcome-home/home-sweet-home-ring.png';
-import familyPhoto from '@/assets/how-we-serve/welcome-home/soldier-family-moving.png';
+import keyBackdrop from '@/assets/how-we-serve/stories-that-save-lives/Rectangle 108.png';
+import keyPhoto from '@/assets/how-we-serve/stories-that-save-lives/Rectangle 555.png';
+import soldierBackdrop from '@/assets/how-we-serve/stories-that-save-lives/455.png';
+import familyPhoto from '@/assets/how-we-serve/stories-that-save-lives/Rectangle 108 copy.png';
 
 export interface WelcomeHomeStoriesSectionProps {
   id?: string;
@@ -69,7 +71,7 @@ export default function WelcomeHomeStoriesSection({
             </div>
           </motion.div>
 
-          {/* Right Image: Kitchen Counter Key with Warm Sun Flare */}
+          {/* Right Image: Kitchen Counter Key with Backplate (Figma 1:1) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -77,20 +79,31 @@ export default function WelcomeHomeStoriesSection({
             transition={{ duration: 0.85, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 flex justify-center lg:justify-end"
           >
-            <div className="relative w-full max-w-[480px] sm:max-w-[520px] aspect-[4/3.8] rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-[0_12px_40px_rgba(44,38,30,0.12)] border border-[#EADCC5]">
+            <div className="relative w-full max-w-[480px] sm:max-w-[520px] aspect-[726/788] flex items-center justify-center">
+              {/* Outer Frosted Glass Backplate (Rectangle 108.png) */}
               <img
-                src={keyPhoto}
-                alt="Keys on kitchen counter with Home Sweet Home keychain"
-                className="w-full h-full object-cover object-center"
-                loading="lazy"
+                src={keyBackdrop}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none drop-shadow-[0_12px_40px_rgba(44,38,30,0.08)]"
               />
+
+              {/* Inner Rounded Key Photo (Rectangle 555.png) */}
+              <div className="relative z-10 w-[85.7%] aspect-[622/675] rounded-[24px] sm:rounded-[30px] overflow-hidden shadow-[0_8px_30px_rgba(44,38,30,0.1)]">
+                <img
+                  src={keyPhoto}
+                  alt="Keys on kitchen counter with Home Sweet Home keychain"
+                  className="w-full h-full object-cover object-center"
+                  loading="lazy"
+                />
+              </div>
             </div>
           </motion.div>
         </div>
 
         {/* ─── Block 2: For Many Veterans... (Image Left / Text Right) ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          {/* Left Image: Soldier Moving In With Family */}
+          {/* Left Image: Soldier Moving In With Family with Backplate (Figma 1:1) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -98,13 +111,24 @@ export default function WelcomeHomeStoriesSection({
             transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 flex justify-center lg:justify-start order-2 lg:order-1"
           >
-            <div className="relative w-full max-w-[480px] sm:max-w-[520px] aspect-[4/4.2] rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-[0_12px_40px_rgba(44,38,30,0.12)] border border-[#EADCC5]">
+            <div className="relative w-full max-w-[480px] sm:max-w-[520px] aspect-[744/806] flex items-center justify-center">
+              {/* Outer Frosted Glass Backplate (455.png) */}
               <img
-                src={familyPhoto}
-                alt="Smiling veteran in uniform carrying moving box with his family"
-                className="w-full h-full object-cover object-center"
-                loading="lazy"
+                src={soldierBackdrop}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none drop-shadow-[0_12px_40px_rgba(44,38,30,0.08)]"
               />
+
+              {/* Inner Rounded Soldier Photo (Rectangle 108 copy.png) */}
+              <div className="relative z-10 w-[83.6%] aspect-[622/675] rounded-[24px] sm:rounded-[30px] overflow-hidden shadow-[0_8px_30px_rgba(44,38,30,0.1)]">
+                <img
+                  src={familyPhoto}
+                  alt="Smiling veteran in uniform carrying moving box with his family"
+                  className="w-full h-full object-cover object-center"
+                  loading="lazy"
+                />
+              </div>
             </div>
           </motion.div>
 
