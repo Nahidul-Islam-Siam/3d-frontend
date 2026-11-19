@@ -11,6 +11,7 @@ import {
   ArrowDown
 } from 'lucide-react';
 import welcomeVideo from '@/assets/video/welcome.mp4';
+import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 import SpotlightCanvas from './SpotlightCanvas';
 import ScrollIndicator3D from './ScrollIndicator3D';
 
@@ -18,12 +19,17 @@ interface WelcomeExperienceProps {
   onEnterHallway?: () => void;
 }
 
+let hasRevealedOnceInSpa = false;
+
 export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Starts as unrevealed cinema on every load/refresh
-  const [isRevealed, setIsRevealed] = useState<boolean>(false);
+  // Starts as unrevealed cinema on initial load / refresh, stays revealed during SPA tab transitions
+  const [isRevealed, setIsRevealed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined' && window.location.hash) return true;
+    return hasRevealedOnceInSpa;
+  });
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -31,6 +37,12 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [showControls, setShowControls] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+
+  const liveWelcomeVideo = usePublicVideoSlot({
+    pagePaths: ['/', '/ (Homepage)'],
+    slotMatchers: ['welcome', 'hero'],
+    fallbackUrl: welcomeVideo,
+  });
 
   // Sync video start with preloader wipe: Sound ON by default
   useEffect(() => {

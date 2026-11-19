@@ -37,6 +37,7 @@ import {
 } from '@ant-design/icons';
 
 import theLabsLogo from '@/assets/logo/The Labs Live Achieve Believe Logo (1) 1.png';
+import theLabsIcon from '@/assets/logo/the-labs-icon.png';
 import { useLogoutSessionMutation } from '@/redux/api/authApi';
 import { useAppSelector } from '@/redux/hooks';
 import {
@@ -518,14 +519,14 @@ export default function AdminDashboard() {
         }}
       >
         <img
-          src={theLabsLogo}
+          src={isSiderCompact ? theLabsIcon : theLabsLogo}
           alt="Live Achieve Believe"
           style={{
-            height: isSiderCompact ? 28 : 38,
+            height: isSiderCompact ? 36 : 38,
             width: 'auto',
             objectFit: 'contain',
             display: 'block',
-            transition: 'height 0.2s ease',
+            transition: 'all 0.2s ease',
           }}
         />
       </button>
