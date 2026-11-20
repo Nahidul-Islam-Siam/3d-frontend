@@ -33,7 +33,7 @@ export default function Navbar() {
   const isTransparent = isDarkHeroPage && !hasScrolled;
   const isDarkScrolled = isDarkHeroPage && hasScrolled;
   const isDarkTheme = isDarkHeroPage;
-  const isCreamPage = location.pathname.startsWith('/how-we-serve') || location.pathname === '/welcome-home' || location.pathname === '/you-matter' || location.pathname === '/strong-foundations' || location.pathname === '/serve-beside-us' || location.pathname === '/stories-that-save-lives' || location.pathname === '/your-story';
+  const isCreamPage = location.pathname.startsWith('/how-we-serve') || location.pathname === '/welcome-home' || location.pathname === '/you-matter' || location.pathname === '/strong-foundations' || location.pathname === '/serve-beside-us' || location.pathname === '/stories-that-save-lives' || location.pathname === '/your-story' || location.pathname === '/a-new-beginning';
   const [isRevealed, setIsRevealed] = useState(!isHomePage);
 
   const toggleOpen = () => setIsOpen(!isOpen);
@@ -126,7 +126,7 @@ export default function Navbar() {
           doorNumber: 5, 
           label: "A New Beginning", 
           subtitle: "Household essentials & fresh starts", 
-          to: "/how-we-serve#a-new-beginning" 
+          to: "/how-we-serve/a-new-beginning" 
         },
         { 
           doorNumber: 6, 

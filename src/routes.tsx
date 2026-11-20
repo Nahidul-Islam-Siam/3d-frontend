@@ -18,6 +18,7 @@ import StrongFoundations from "./pages/strong-foundations";
 import StoriesThatSaveLives from "./pages/stories-that-save-lives";
 import APlaceAtTheTable from "./pages/a-place-at-the-table";
 import WelcomeHome from "./pages/welcome-home";
+import ANewBeginning from "./pages/a-new-beginning";
 import ServeBesideUs from "./pages/serve-beside-us";
 import YourStory from "./pages/your-story";
 import SuicideAwarenessShowdown from "./pages/suicide-awareness-showdown";
@@ -152,6 +153,14 @@ export const router = createBrowserRouter([
       {
         path: "/welcome-home",
         element: <WelcomeHome />,
+      },
+      {
+        path: "/how-we-serve/a-new-beginning",
+        element: <ANewBeginning />,
+      },
+      {
+        path: "/a-new-beginning",
+        element: <ANewBeginning />,
       },
       {
         path: "/how-we-serve/serve-beside-us",

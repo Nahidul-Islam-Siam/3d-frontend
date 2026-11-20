@@ -19,6 +19,11 @@ export default function HowWeServePage() {
     if (location.hash === '#your-story') {
       navigate('/how-we-serve/your-story', { replace: true });
     }
+
+    // Deep link #a-new-beginning redirects to dedicated A New Beginning page
+    if (location.hash === '#a-new-beginning') {
+      navigate('/how-we-serve/a-new-beginning', { replace: true });
+    }
   }, [location.hash, navigate]);
 
   return (

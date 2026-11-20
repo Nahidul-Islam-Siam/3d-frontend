@@ -53,7 +53,7 @@ const navSections: NavSection[] = [
       { to: "/how-we-serve/strong-foundations", label: "Strong Foundations", icon: Heart },
       { to: "/how-we-serve/stories-that-save-lives", label: "Stories That Save Lives", icon: BookHeart },
       { to: "/how-we-serve/welcome-home", label: "Welcome Home", icon: HomeIcon },
-      { to: "/how-we-serve#a-new-beginning", label: "A New Beginning", icon: Sparkles },
+      { to: "/how-we-serve/a-new-beginning", label: "A New Beginning", icon: Sparkles },
       { to: "/how-we-serve/serve-beside-us", label: "Serve Beside Us", icon: HandHeart },
       { to: "/how-we-serve/your-story", label: "Your Story", icon: Users },
     ]
