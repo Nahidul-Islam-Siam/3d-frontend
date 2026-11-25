@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { RotateCcw, ArrowDown, ArrowRight } from 'lucide-react';
+import { RotateCcw, ArrowRight } from 'lucide-react';
 
 export interface VideoEndedVerbiageOverlayProps {
   visible: boolean;
@@ -12,7 +12,7 @@ export interface VideoEndedVerbiageOverlayProps {
   ctaLabel?: string;
   ctaHref?: string;
   onReplay: () => void;
-  onScrollDown: () => void;
+  onScrollDown?: () => void;
 }
 
 /**
@@ -29,7 +29,7 @@ export default function VideoEndedVerbiageOverlay({
   ctaLabel,
   ctaHref,
   onReplay,
-  onScrollDown,
+  onScrollDown: _onScrollDown,
 }: VideoEndedVerbiageOverlayProps) {
   return (
     <AnimatePresence>
@@ -86,14 +86,7 @@ export default function VideoEndedVerbiageOverlay({
             )}
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
-              <button
-                type="button"
-                onClick={onScrollDown}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#F97316] hover:bg-[#ea580c] text-white text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-lg"
-              >
-                <span>Scroll Down to Explore</span>
-                <ArrowDown className="w-3.5 h-3.5" />
-              </button>
+
 
               {ctaLabel && ctaHref && (
                 <Link

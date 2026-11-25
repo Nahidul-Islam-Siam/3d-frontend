@@ -175,6 +175,10 @@ export const router = createBrowserRouter([
         element: <YourStory />,
       },
       {
+        path: "/how-we-serve/story",
+        element: <Navigate to="/how-we-serve/your-story" replace />,
+      },
+      {
         path: "/your-story",
         element: <YourStory />,
       },

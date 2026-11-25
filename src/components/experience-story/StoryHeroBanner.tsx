@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
+import { useAutoPauseOnScroll } from "@/lib/hooks/useAutoPauseOnScroll";
 import { motion } from "framer-motion";
 import FigmaButton from "@/components/common/FigmaButton";
 import storyVideo from "@/assets/experience-story/experience-story.mp4";
@@ -16,6 +17,9 @@ export default function StoryHeroBanner({
 }: StoryHeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
+
+  // Auto pause & mute when scrolling past this hero section
+  useAutoPauseOnScroll(videoRef, undefined, setIsMuted, { autoResumeMuted: true });
 
   const liveVideo = usePublicVideoSlot({
     pagePaths: ["/experience-the-story", "/experience-story", "/about"],

@@ -1,4 +1,7 @@
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
+import { useAutoPauseOnScroll } from "@/lib/hooks/useAutoPauseOnScroll";
 import heroVideo from "@/assets/how-we-serve/A_slow_cinematic_video_begins_.mp4.mp4";
 import heroPhoto from "@/assets/how-we-serve/one-mission-hero.jpg";
 
@@ -11,6 +14,22 @@ export function HowWeServeHeroSection({
   id = "how-we-serve-hero",
   className = "",
 }: HowWeServeHeroSectionProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+
+  // Auto pause & mute when scrolling past this hero section
+  useAutoPauseOnScroll(videoRef, undefined, setIsMuted, { autoResumeMuted: true });
+
+  const toggleMute = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!videoRef.current) return;
+    const nextMuted = !videoRef.current.muted;
+    videoRef.current.muted = nextMuted;
+    setIsMuted(nextMuted);
+    if (!nextMuted && videoRef.current.paused) {
+      videoRef.current.play().catch(() => {});
+    }
+  };
   return (
     <section
       id={id}
@@ -66,16 +85,44 @@ export function HowWeServeHeroSection({
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 flex justify-center lg:justify-end items-center"
           >
-            <div className="w-full max-w-[480px] lg:max-w-[520px] xl:max-w-[550px] aspect-[386/357] rounded-[28px] sm:rounded-[36px] lg:rounded-[40px] overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.06)] bg-[#FAF4E6]">
+            <div className="relative w-full max-w-[480px] lg:max-w-[520px] xl:max-w-[550px] aspect-[386/357] rounded-[28px] sm:rounded-[36px] lg:rounded-[40px] overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.06)] bg-[#FAF4E6] group">
               <video
+                ref={videoRef}
                 src={heroVideo}
                 poster={heroPhoto}
                 autoPlay
                 loop
-                muted
+                muted={isMuted}
                 playsInline
-                className="w-full h-full object-cover block select-none pointer-events-none"
+                className="w-full h-full object-cover block select-none cursor-pointer"
+                onClick={toggleMute}
               />
+
+              {/* Floating Sound Toggle Pill (Top Right) */}
+              <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-30 pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  aria-label={isMuted ? "Unmute video sound" : "Mute video sound"}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-sans font-semibold tracking-wide uppercase transition-all backdrop-blur-md shadow-xl cursor-pointer ${
+                    isMuted
+                      ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white shadow-[0_0_20px_rgba(249,115,22,0.5)] hover:scale-105 animate-pulse'
+                      : 'bg-black/70 hover:bg-black/90 text-white border border-white/30'
+                  }`}
+                >
+                  {isMuted ? (
+                    <>
+                      <VolumeX className="w-3.5 h-3.5 text-white" />
+                      <span>Tap for Sound</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5 text-[#F97316]" />
+                      <span>Sound On</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

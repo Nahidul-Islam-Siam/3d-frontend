@@ -13,28 +13,11 @@ export interface PeopleBehindMissionSectionProps {
 
 export default function PeopleBehindMissionSection({
   className = '',
-  onScrollClick,
+  onScrollClick: _onScrollClick,
 }: PeopleBehindMissionSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   
-  const handleScrollDown = () => {
-    if (onScrollClick) {
-      onScrollClick();
-      return;
-    }
-
-    const nextSection =
-      document.getElementById('people-leading-the-way') ||
-      document.getElementById('leadership-spotlight') ||
-      document.getElementById('meet-us-team');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
-    }
-  };
-
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -151,40 +134,8 @@ export default function PeopleBehindMissionSection({
         </div>
       </div>
 
-      {/* ─── Bottom-Right CTA: SCROLL TO ENTER STORY ─── */}
-      <div
-        id="mission-scroll-cta"
-        className="relative z-10 w-full max-w-[1416px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-0 pb-10 sm:pb-12 lg:pb-14 flex justify-end items-end pointer-events-auto"
-      >
-        <button
-          type="button"
-          onClick={handleScrollDown}
-          className="group flex items-center gap-2.5 text-white/85 hover:text-white transition-colors duration-300 cursor-pointer select-none outline-none focus-visible:ring-1 focus-visible:ring-white rounded-full p-1"
-        >
-          {/* Circular Down Arrow Icon Badge matching Figma */}
-          <span className="w-5 h-5 rounded-full border border-white/60 group-hover:border-white flex items-center justify-center transition-all duration-300">
-            <svg
-              className="w-2.5 h-2.5 text-white/85 group-hover:text-white transition-transform duration-300 group-hover:translate-y-0.5"
-              viewBox="0 0 10 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="5" y1="2" x2="5" y2="8" />
-              <polyline points="2.5 5.5 5 8 7.5 5.5" />
-            </svg>
-          </span>
-
-          <span
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-[10px] sm:text-[11px] tracking-[0.22em] font-medium uppercase text-white/85 group-hover:text-white transition-colors duration-300"
-          >
-            SCROLL TO ENTER STORY
-          </span>
-        </button>
-      </div>
+      {/* Hidden anchor for layout */}
+      <div id="mission-scroll-cta" className="hidden" />
 
       {/* ─── Bottom Smooth Fade to Next Section ─── */}
       <div

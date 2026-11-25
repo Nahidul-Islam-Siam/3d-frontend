@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
-  Sparkles,
-  ArrowDown
+  Sparkles
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -334,17 +333,7 @@ export default function ZAxisStage() {
             preload="auto"
             className="w-full h-full object-contain lg:object-cover portrait:object-contain"
           />
-          <div className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-2 pointer-events-none select-none">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-white/40 flex items-center justify-center shrink-0">
-              <ArrowDown className="w-3 h-3 text-white/80" />
-            </div>
-            <span 
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/85 whitespace-nowrap font-medium"
-            >
-              SCROLL TO ENTER THE STORY
-            </span>
-          </div>
+
         </section>
 
         {/* Chapter 1: Welcome */}
@@ -502,21 +491,8 @@ export default function ZAxisStage() {
             {/* Ambient Vignette */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
 
-            {/* Scroll prompt at bottom of video (visible if not scrolled) */}
-            <div 
-              onClick={handleScrollToStory}
-              className="ch0-prompt absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-2 cursor-pointer select-none group pointer-events-auto"
-            >
-              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-white/40 group-hover:border-white/80 flex items-center justify-center shrink-0 transition-colors">
-                <ArrowDown className="w-3 h-3 text-white/80 group-hover:text-white transition-colors animate-bounce" />
-              </div>
-              <span 
-                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-white/85 group-hover:text-white transition-colors whitespace-nowrap font-medium"
-              >
-                SCROLL TO ENTER THE STORY
-              </span>
-            </div>
+            {/* Hidden prompt element for GSAP timeline compatibility */}
+            <div className="ch0-prompt hidden" />
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════

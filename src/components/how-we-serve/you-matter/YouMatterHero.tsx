@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import youthVideo from '@/assets/how-we-serve/you-matter/Bright_hopeful_youth_communit.mp4.mp4';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { officialPillars } from '@/data/officialVerbiage';
@@ -10,11 +11,14 @@ interface YouMatterHeroProps {
   onScrollClick?: () => void;
 }
 
-export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
+export default function YouMatterHero({ onScrollClick: _onScrollClick }: YouMatterHeroProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
+
+  // Auto pause & mute when scrolling past this hero section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
   const content = officialPillars.strongFoundations;
   const liveVideo = usePublicVideoSlot({
     pagePaths: ['/how-we-serve/you-matter', '/you-matter'],
@@ -148,24 +152,7 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
         {/* Empty Center for Clear Video View */}
         <div className="flex-1" />
 
-        {/* Bottom Right: Scroll to Title */}
-        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pb-10 sm:pb-12 flex justify-end items-end">
-          <button
-            type="button"
-            onClick={handleScrollToTitle}
-            className="inline-flex items-center gap-2.5 text-white/80 hover:text-white transition-colors cursor-pointer group"
-          >
-            <span className="w-6 h-6 rounded-full border border-white/70 group-hover:border-white flex items-center justify-center transition-colors">
-              <ArrowDown className="w-3 h-3 text-white group-hover:translate-y-0.5 transition-transform" />
-            </span>
-            <span 
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[12px] uppercase tracking-[0.22em] text-white font-medium"
-            >
-              SCROLL
-            </span>
-          </button>
-        </div>
+
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
@@ -201,24 +188,7 @@ export default function YouMatterHero({ onScrollClick }: YouMatterHeroProps) {
           </motion.h1>
         </div>
 
-        {/* Bottom Right: Scroll to Section 3 */}
-        <div className="relative z-10 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pb-10 sm:pb-12 flex justify-end">
-          <button
-            type="button"
-            onClick={onScrollClick}
-            className="inline-flex items-center gap-2.5 text-[#746343] hover:text-[#F97316] transition-colors cursor-pointer group"
-          >
-            <span className="w-6 h-6 rounded-full border border-[#746343]/50 group-hover:border-[#F97316] flex items-center justify-center transition-colors">
-              <ArrowDown className="w-3 h-3 text-[#746343] group-hover:text-[#F97316] group-hover:translate-y-0.5 transition-transform" />
-            </span>
-            <span 
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[12px] uppercase tracking-[0.22em] text-[#746343] group-hover:text-[#F97316] font-medium"
-            >
-              SCROLL
-            </span>
-          </button>
-        </div>
+
       </section>
     </>
   );

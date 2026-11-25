@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
 
 import g1 from '@/assets/how-we-serve/you-matter/gallery/gallery-1.jpg';
 import g2 from '@/assets/how-we-serve/you-matter/gallery/gallery-2.jpg';
@@ -225,11 +224,7 @@ export default function StrongFoundationsSection() {
         </div>
       </div>
 
-      {/* ─── Bottom-Right Floating Subtle Scroll Badge (Figma 1:1) ─── */}
-      <div className="absolute bottom-6 right-8 lg:bottom-10 lg:right-14 z-30 pointer-events-none hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-[#D4C3A3] text-[#2C261E] text-xs tracking-widest uppercase shadow-md">
-        <ArrowDown className="w-3.5 h-3.5 text-[#F97316] animate-bounce" />
-        <span className="font-sans font-medium text-[11px] text-[#746343]">SCROLL</span>
-      </div>
+
     </section>
   );
 }

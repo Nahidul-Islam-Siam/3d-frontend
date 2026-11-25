@@ -107,20 +107,7 @@ export default function MovementSecondVideo({
         aria-hidden="true"
       />
 
-      {/* ─── Bottom-Right: 4-Point Star Sparkle Watermark (Figma 1:1) ─── */}
-      <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 lg:bottom-10 lg:right-12 z-20 pointer-events-none select-none">
-        <svg
-          viewBox="0 0 80 80"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-9 h-9 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white/55 drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] animate-[spin_28s_linear_infinite]"
-        >
-          <path
-            d="M40 0C40 22.0914 47.9086 40 70 40C47.9086 40 40 57.9086 40 80C40 57.9086 32.0914 40 10 40C32.0914 40 40 22.0914 40 0Z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
+
 
       {/* ─── Floating Controls (Top Left) ─── */}
       <div className="absolute top-5 left-5 sm:top-7 sm:left-7 z-30 flex items-center gap-2.5 pointer-events-auto">

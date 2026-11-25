@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import doorVideo from '@/assets/how-we-serve/welcome-home/gemini_generated_video_382e9620.mp4.mp4';
 
 export interface VeteranNewDoorSectionProps {
@@ -16,6 +17,9 @@ export default function VeteranNewDoorSection({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+
+  // Auto pause & mute when scrolling past this section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
 
   const togglePlay = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -112,20 +116,7 @@ export default function VeteranNewDoorSection({
             </button>
           </div>
 
-          {/* 4-Point Star Sparkle Watermark */}
-          <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 lg:bottom-10 lg:right-12 z-20 pointer-events-none select-none">
-            <svg
-              viewBox="0 0 80 80"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-9 h-9 sm:w-12 sm:h-12 text-white/50 drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] animate-[spin_28s_linear_infinite]"
-            >
-              <path
-                d="M40 0C40 22.0914 47.9086 40 70 40C47.9086 40 40 57.9086 40 80C40 57.9086 32.0914 40 10 40C32.0914 40 40 22.0914 40 0Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
+
 
           {/* Play/Pause Pulse Feedback */}
           <AnimatePresence>

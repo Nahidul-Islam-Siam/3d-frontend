@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
 export interface WhoWeAreVideoSectionProps {
@@ -17,6 +18,9 @@ export default function WhoWeAreVideoSection({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+
+  // Auto pause & mute when scrolling past this section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
   const liveVideo = usePublicVideoSlot({
     pagePaths: ['/who-we-are'],
     slotMatchers: ['who', 'lab'],
@@ -89,20 +93,7 @@ export default function WhoWeAreVideoSection({
             aria-hidden="true"
           />
 
-          {/* ─── Bottom-Right 4-Point Star Sparkle Watermark (Figma 1:1) ─── */}
-          <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 lg:bottom-12 lg:right-14 z-20 pointer-events-none select-none">
-            <svg
-              viewBox="0 0 80 80"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-9 h-9 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white/55 drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] animate-[spin_28s_linear_infinite]"
-            >
-              <path
-                d="M40 0C40 22.0914 47.9086 40 70 40C47.9086 40 40 57.9086 40 80C40 57.9086 32.0914 40 10 40C32.0914 40 40 22.0914 40 0Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
+
 
           {/* ─── Floating Controls (Top Left) ─── */}
           <div className="absolute top-5 left-5 sm:top-7 sm:left-7 z-30 flex items-center gap-2.5 pointer-events-auto">

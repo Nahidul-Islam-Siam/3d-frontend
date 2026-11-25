@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import welcomeHomeVideo from '@/assets/how-we-serve/welcome-home/gemini_generated_video_b330336e.mp4.mp4';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { officialPillars } from '@/data/officialVerbiage';
@@ -14,6 +15,9 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
+
+  // Auto pause & mute when scrolling past this hero section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
   const content = officialPillars.welcomeHome;
   const liveVideo = usePublicVideoSlot({
     pagePaths: ['/how-we-serve/welcome-home', '/welcome-home'],
@@ -123,20 +127,7 @@ export default function WelcomeHomeHero({ onScrollClick }: WelcomeHomeHeroProps)
         </button>
       </div>
 
-      {/* ─── Bottom Center "SCROLL TO CONTINUE" Pill ─── */}
-      <div className="relative z-20 pb-8 flex justify-center w-full">
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-black/45 hover:bg-black/75 backdrop-blur-md border border-white/25 text-white/90 hover:text-white transition-all cursor-pointer text-[11px] font-serif tracking-[0.2em] uppercase shadow-lg"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="7" />
-            <line x1="12" y1="6" x2="12" y2="10" />
-          </svg>
-          <span>Scroll to continue</span>
-        </button>
-      </div>
+
     </section>
   );
 }

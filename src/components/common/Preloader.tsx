@@ -18,12 +18,17 @@ export default function Preloader({ onComplete }: PreloaderProps) {
   const [isDone, setIsDone] = useState(alreadyDone);
 
   useEffect(() => {
+    // Remove static HTML initial preloader if present
+    const initialEl = document.getElementById('initial-preloader');
+    if (initialEl) initialEl.remove();
+
     if (alreadyDone) {
       if (typeof window !== 'undefined') {
         (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
         try {
           sessionStorage.setItem('lab_preloader_seen', 'true');
         } catch {}
+        document.documentElement.style.backgroundColor = '#FAF4E6';
         window.dispatchEvent(new CustomEvent('preloader-complete'));
       }
       if (onComplete) onComplete();
@@ -48,25 +53,8 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       if (current >= 100) {
         clearInterval(interval);
         setTimeout(() => {
-          setIsDone(true);
-          if (typeof window !== 'undefined') {
-            (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
-            try {
-              sessionStorage.setItem('lab_preloader_seen', 'true');
-            } catch {}
-          }
-          if (onComplete) onComplete();
-          // Dispatch right when the wipe starts revealing the screen
-          setTimeout(() => {
-            if (typeof window !== 'undefined') {
-              (window as unknown as { __preloaderDone?: boolean }).__preloaderDone = true;
-              try {
-                sessionStorage.setItem('lab_preloader_seen', 'true');
-              } catch {}
-              window.dispatchEvent(new CustomEvent('preloader-complete'));
-            }
-          }, 600); // Halfway through the 1.2s wipe so screen is clear
-        }, 500); // Elegant hold at 100%
+          setIsDone(true); // Triggers AnimatePresence exit wipe!
+        }, 400); // Elegant hold at 100%
       }
     }, 28);
 
@@ -86,12 +74,15 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           try {
             sessionStorage.setItem('lab_preloader_seen', 'true');
           } catch {}
+          document.documentElement.style.backgroundColor = '#FAF4E6';
           window.dispatchEvent(new CustomEvent('preloader-complete'));
+          window.dispatchEvent(new CustomEvent('reveal-navbar'));
         }
+        if (onComplete) onComplete();
       }}
     >
       {!isDone && (
-        <div className="fixed inset-0 z-[100] pointer-events-none select-none overflow-hidden font-sans">
+        <div className="fixed inset-0 z-[100] bg-[#000000] pointer-events-none select-none overflow-hidden font-sans">
           
           {/* Main Pure Black Shutter (Edolus 1:1) */}
           <motion.div

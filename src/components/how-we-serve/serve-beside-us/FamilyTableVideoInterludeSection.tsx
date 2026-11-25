@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import interludeVideo from '@/assets/how-we-serve/serve-beside-us/Untitled design (2).mp4.mp4';
 import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 
@@ -17,6 +18,9 @@ export default function FamilyTableVideoInterludeSection({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+
+  // Auto pause & mute when scrolling past this section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
 
   const liveVideo = usePublicVideoSlot({
     pagePaths: ['/how-we-serve/serve-beside-us', '/serve-beside-us'],

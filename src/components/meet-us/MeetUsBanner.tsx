@@ -77,36 +77,8 @@ export default function MeetUsBanner({
           </motion.p>
         </div>
 
-        {/* Center Teaser Prompt (Matching image copy.png & image copy 2.png) */}
-        <div
-          id="meet-us-teaser"
-          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 select-none z-20"
-        >
-          <div className="flex items-center gap-3 text-white/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
-            <span className="w-6 h-6 rounded-full border border-white/70 flex items-center justify-center">
-              <svg
-                className="w-3 h-3 text-white"
-                viewBox="0 0 10 10"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.25"
-              >
-                <line x1="5" y1="2" x2="5" y2="8" strokeLinecap="round" />
-                <polyline
-                  points="2.5,5.5 5,8 7.5,5.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            <span
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-xs sm:text-sm tracking-[0.22em] uppercase font-medium text-white"
-            >
-              SCROLL TO ENTER STORY
-            </span>
-          </div>
-        </div>
+        {/* Hidden anchor for GSAP compatibility */}
+        <div id="meet-us-teaser" className="hidden" />
 
         {/* Bottom Right CTA Action Trigger: STEP INSIDE */}
         <motion.div

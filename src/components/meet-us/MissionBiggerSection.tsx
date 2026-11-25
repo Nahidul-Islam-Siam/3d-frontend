@@ -11,7 +11,7 @@ export interface MissionBiggerSectionProps {
 export default function MissionBiggerSection({
   id = 'mission-bigger-than-one',
   className = '',
-  onScrollClick,
+  onScrollClick: _onScrollClick,
 }: MissionBiggerSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -57,20 +57,6 @@ export default function MissionBiggerSection({
     setIsHovered(false);
     mouseX.set(0);
     mouseY.set(0);
-  };
-
-  const handleScrollDown = () => {
-    if (onScrollClick) {
-      onScrollClick();
-      return;
-    }
-
-    const nextSection = document.getElementById('one-movement') || document.getElementById('what-coming-up-next');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollBy({ top: window.innerHeight * 0.95, behavior: 'smooth' });
-    }
   };
 
   return (
@@ -169,38 +155,7 @@ export default function MissionBiggerSection({
         </motion.p>
       </motion.div>
 
-      {/* ─── Bottom-Right Interactive CTA: SCROLL TO ENTER STORY ─── */}
-      <div className="relative z-10 w-full max-w-[1520px] mx-auto px-6 sm:px-10 lg:px-16 pb-4 sm:pb-6 flex justify-end items-end">
-        <motion.button
-          type="button"
-          onClick={handleScrollDown}
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="group flex items-center gap-2.5 text-white/85 hover:text-white transition-colors duration-300 cursor-pointer select-none outline-none focus-visible:ring-1 focus-visible:ring-white rounded-full p-1.5"
-        >
-          <span className="w-5 h-5 rounded-full border border-white/60 group-hover:border-[#F97316] flex items-center justify-center transition-all duration-300 bg-white/5 backdrop-blur-sm group-hover:scale-110">
-            <svg
-              className="w-2.5 h-2.5 text-white/80 group-hover:text-[#F97316] transition-transform duration-300 group-hover:translate-y-0.5"
-              viewBox="0 0 10 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="5" y1="2" x2="5" y2="8" />
-              <polyline points="2.5 5.5 5 8 7.5 5.5" />
-            </svg>
-          </span>
-          <span className="text-[11px] font-sans font-medium uppercase tracking-[0.18em] group-hover:text-white transition-colors">
-            SCROLL TO ENTER STORY
-          </span>
-        </motion.button>
-      </div>
+
     </section>
   );
 }

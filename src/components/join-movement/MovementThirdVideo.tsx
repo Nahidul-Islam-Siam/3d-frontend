@@ -93,20 +93,7 @@ export default function MovementThirdVideo({
         {/* Ambient Subtle Vignette */}
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_55%,rgba(0,0,0,0.35)_100%)]" />
 
-        {/* ─── Bottom-Right 4-Point Star Sparkle Watermark ─── */}
-        <div className="absolute bottom-6 right-8 sm:bottom-10 sm:right-14 lg:bottom-14 lg:right-20 z-10 pointer-events-none select-none">
-          <svg
-            viewBox="0 0 80 80"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white/40 hover:text-white/60 transition-colors"
-          >
-            <path
-              d="M40 0C40 22.0914 47.9086 40 70 40C47.9086 40 40 57.9086 40 80C40 57.9086 32.0914 40 10 40C32.0914 40 40 22.0914 40 0Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
+
       </div>
     </section>
   );

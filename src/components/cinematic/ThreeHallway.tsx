@@ -736,12 +736,7 @@ export default function ThreeHallway({ onClose, onScrollToOverview }: ThreeHallw
       {/* ─── Dark Vignette Overlay ─── */}
       <div className="pointer-events-none absolute inset-0 z-15 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(8,5,3,0.85)_95%)]" />
 
-      {/* ─── Bottom-Right Sparkle Diamond Icon (Exact Screenshot Match) ─── */}
-      <div className="absolute bottom-8 right-8 z-20 pointer-events-none opacity-70">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="#dfb978" className="animate-pulse drop-shadow-[0_0_12px_rgba(223,185,120,0.6)]">
-          <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
-        </svg>
-      </div>
+
 
       {/* ─── Seamless Door-Entering Flare ─── */}
       {isTransitioning && (

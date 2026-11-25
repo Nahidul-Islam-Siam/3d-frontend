@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import charityJarBg from '@/assets/donate/Rectangle 57.png';
 
 /*
@@ -11,12 +11,12 @@ import charityJarBg from '@/assets/donate/Rectangle 57.png';
 
 interface DonateHeroSectionProps {
   onDonateClick: () => void;
-  onScrollClick: () => void;
+  onScrollClick?: () => void;
 }
 
 export default function DonateHeroSection({
   onDonateClick,
-  onScrollClick,
+  onScrollClick: _onScrollClick,
 }: DonateHeroSectionProps) {
   return (
     <section 
@@ -93,24 +93,7 @@ export default function DonateHeroSection({
         </div>
       </div>
 
-      {/* ─── Bottom Right: SCROLL Indicator Button (Serif Font Matching Figma) ─── */}
-      <div className="relative z-10 w-full px-6 sm:px-10 lg:px-16 xl:px-24 pb-10 sm:pb-14 flex justify-end">
-        <button
-          type="button"
-          onClick={onScrollClick}
-          className="inline-flex items-center gap-2.5 text-white/80 hover:text-white transition-colors cursor-pointer group"
-        >
-          <span className="w-6 h-6 rounded-full border border-white/70 group-hover:border-white flex items-center justify-center transition-colors">
-            <ArrowDown className="w-3 h-3 text-white group-hover:translate-y-0.5 transition-transform" />
-          </span>
-          <span 
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            className="text-[12px] uppercase tracking-[0.22em] text-white font-medium"
-          >
-            SCROLL
-          </span>
-        </button>
-      </div>
+
 
       {/*
       // ─── PREVIOUS CODE WITH 3D COIN CANVAS (COMMENTED OUT) ───

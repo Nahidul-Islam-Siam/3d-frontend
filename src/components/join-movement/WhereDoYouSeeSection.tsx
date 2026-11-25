@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import card1Img from '@/assets/join-movement/cards/1.png';
@@ -139,18 +139,6 @@ export default function WhereDoYouSeeSection({
     };
   }, []);
 
-  const handleScrollDown = () => {
-    const next = document.getElementById('living-movement');
-    if (next) {
-      const lenis = (window as unknown as { __lenis?: { scrollTo: (target: HTMLElement, opts?: object) => void } }).__lenis;
-      if (lenis) {
-        lenis.scrollTo(next, { offset: -74, duration: 1.2 });
-      } else {
-        next.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
   return (
     <section 
       id={id}
@@ -233,24 +221,7 @@ export default function WhereDoYouSeeSection({
           </div>
         </div>
 
-        {/* ─── Bottom Bar: Floating Scroll Prompt ─── */}
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-12 flex justify-end pb-6 sm:pb-8 relative z-10 shrink-0">
-          {/* (↓) SCROLL CTA button matching Figma reference */}
-          <div 
-            onClick={handleScrollDown}
-            className="flex items-center gap-2.5 cursor-pointer select-none group text-white/80 hover:text-white transition-all ml-auto"
-          >
-            <div className="w-6 h-6 rounded-full border border-white/40 group-hover:border-white flex items-center justify-center shrink-0 transition-colors">
-              <ArrowDown className="w-3.5 h-3.5 text-white animate-bounce" />
-            </div>
-            <span
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[11px] sm:text-xs uppercase tracking-[0.22em] text-white/85 group-hover:text-white transition-colors whitespace-nowrap font-medium"
-            >
-              SCROLL
-            </span>
-          </div>
-        </div>
+
       </div>
     </section>
   );

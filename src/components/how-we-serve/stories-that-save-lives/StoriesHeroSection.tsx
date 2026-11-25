@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import heroVideo from '@/assets/how-we-serve/stories-that-save-lives/Untitled design (3).mp4.mp4';
 import heroPoster from '@/assets/how-we-serve/stories-that-save-lives/image copy.png';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
@@ -24,6 +25,9 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
     fallbackUrl: heroVideo,
     fallbackPoster: heroPoster,
   });
+
+  // Auto pause & mute when scrolling past this hero section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
 
   useEffect(() => {
     if (videoRef.current) {
@@ -154,38 +158,7 @@ export default function StoriesHeroSection({ onScrollClick }: StoriesHeroSection
         {/* Center Space for Clean Visual Focus */}
         <div className="flex-1" />
 
-        {/* Bottom Bar: Scroll to Continue + 4-Point Star Sparkle */}
-        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 xl:px-28 pb-10 sm:pb-12 flex justify-between items-end">
-          <div className="flex-1" />
 
-          {/* Centered Scroll Prompt */}
-          <button
-            type="button"
-            onClick={handleScrollToTitle}
-            className="inline-flex items-center gap-2.5 text-white/90 hover:text-white transition-colors cursor-pointer group"
-          >
-            <span className="w-7 h-7 rounded-full border border-white/70 group-hover:border-white flex items-center justify-center transition-colors">
-              <ArrowDown className="w-3.5 h-3.5 text-white group-hover:translate-y-0.5 transition-transform" />
-            </span>
-            <span 
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[13px] uppercase tracking-[0.22em] text-white font-medium"
-            >
-              SCROLL TO CONTINUE
-            </span>
-          </button>
-
-          {/* Right: 4-Point Star Sparkle (Figma 1:1) */}
-          <div className="flex-1 flex justify-end">
-            <svg
-              className="w-6 h-6 text-white/70"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z" />
-            </svg>
-          </div>
-        </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════

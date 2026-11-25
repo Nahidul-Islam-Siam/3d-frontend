@@ -7,29 +7,23 @@ import {
   Volume2, 
   VolumeX, 
   Maximize, 
-  Minimize, 
-  ArrowDown
+  Minimize
 } from 'lucide-react';
 import welcomeVideo from '@/assets/video/welcome.mp4';
 import { usePublicVideoSlot } from '@/lib/hooks/usePublicCms';
 import SpotlightCanvas from './SpotlightCanvas';
-import ScrollIndicator3D from './ScrollIndicator3D';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 
 interface WelcomeExperienceProps {
   onEnterHallway?: () => void;
 }
 
-let hasRevealedOnceInSpa = false;
-
-export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceProps) {
+export default function WelcomeExperience({ onEnterHallway: _onEnterHallway }: WelcomeExperienceProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Starts as unrevealed cinema on initial load / refresh, stays revealed during SPA tab transitions
-  const [isRevealed, setIsRevealed] = useState<boolean>(() => {
-    if (typeof window !== 'undefined' && window.location.hash) return true;
-    return hasRevealedOnceInSpa;
-  });
+  // Docked cinema card matches Figma design 1:1 with navbar visible immediately
+  const [isRevealed, setIsRevealed] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -38,14 +32,22 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
   const [showControls, setShowControls] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
 
+  // Auto pause & mute when scrolling past this welcome video
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted);
+
   const liveWelcomeVideo = usePublicVideoSlot({
     pagePaths: ['/', '/ (Homepage)'],
     slotMatchers: ['welcome', 'hero'],
     fallbackUrl: welcomeVideo,
   });
 
-  // Sync video start with preloader wipe: Sound ON by default
+  // Start video immediately on load without waiting for countdown or preloader
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('reveal-navbar'));
+      document.body.style.overflow = '';
+    }
+
     // Gesture listener to unmute if browser policy initially required user interaction
     const handleFirstGesture = () => {
       if (videoRef.current && videoRef.current.muted) {
@@ -78,33 +80,9 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
         });
     };
 
-    const isDone = typeof window !== 'undefined' && (
-      (window as unknown as { __preloaderDone?: boolean }).__preloaderDone ||
-      sessionStorage.getItem('lab_preloader_seen') === 'true'
-    );
-    if (isDone) {
-      startPlaybackWithSound();
-      return () => {
-        window.removeEventListener('pointerdown', handleFirstGesture);
-        window.removeEventListener('keydown', handleFirstGesture);
-      };
-    }
+    startPlaybackWithSound();
 
-    // Freeze video at 0.00 while preloader is on screen
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-      videoRef.current.muted = false;
-      setIsPlaying(false);
-    }
-
-    const handlePreloaderComplete = () => {
-      startPlaybackWithSound();
-    };
-
-    window.addEventListener('preloader-complete', handlePreloaderComplete);
     return () => {
-      window.removeEventListener('preloader-complete', handlePreloaderComplete);
       window.removeEventListener('pointerdown', handleFirstGesture);
       window.removeEventListener('keydown', handleFirstGesture);
     };
@@ -112,7 +90,6 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
 
   // Trigger the grand reveal sequence (navbar glides in, video docks into card, footer unlocks)
   const triggerReveal = useCallback(() => {
-    hasRevealedOnceInSpa = true;
     setIsRevealed(true);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('reveal-navbar'));
@@ -284,20 +261,6 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
     }
   };
 
-  // Smooth scroll past the video into story
-  const scrollToStory = () => {
-    if (onEnterHallway) {
-      onEnterHallway();
-      return;
-    }
-    const target = document.getElementById('welcome-hero') || document.getElementById('story-start');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
-    }
-  };
-
   const formatTime = (timeInSeconds: number) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
@@ -341,38 +304,40 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
           />
 
           {/* ──────────────────────────────────────────────────────────
+              PERMANENT FLOATING SOUND TOGGLE (ALWAYS VISIBLE, Z-50)
+              ────────────────────────────────────────────────────────── */}
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 z-50 pointer-events-auto">
+            <button
+              onClick={(e) => toggleMute(e)}
+              type="button"
+              aria-label={isMuted ? "Unmute Welcome Video" : "Mute Welcome Video"}
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-[13px] font-sans font-semibold tracking-wide uppercase transition-all backdrop-blur-md shadow-2xl cursor-pointer ${
+                isMuted
+                  ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white shadow-[0_0_25px_rgba(249,115,22,0.6)] hover:scale-105 animate-pulse'
+                  : 'bg-black/70 hover:bg-black/90 text-white border border-white/30 hover:border-white/60'
+              }`}
+            >
+              {isMuted ? (
+                <>
+                  <VolumeX className="w-4 h-4 text-white" />
+                  <span>Tap for Sound</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 text-[#F97316]" />
+                  <span>Sound On</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* ──────────────────────────────────────────────────────────
               CINEMA HUD (ONLY VISIBLE DURING !isRevealed CINEMA MODE)
-              Clean theater: Only Sound Toggle + 3D Scroll Indicator
               ────────────────────────────────────────────────────────── */}
           {!isRevealed && (
             <>
               {/* Subtle Screen Ambient Vignette */}
               <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.65)_100%)]" />
-
-              {/* Sound Toggle Pill (Top Right) */}
-              <div className="absolute top-6 right-6 md:right-12 z-50 pointer-events-auto">
-                <button
-                  onClick={(e) => toggleMute(e)}
-                  aria-label={isMuted ? "Unmute sound" : "Mute sound"}
-                  className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-serif font-bold tracking-wider uppercase transition-all backdrop-blur-md shadow-2xl ${
-                    isMuted 
-                      ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white shadow-[0_0_30px_rgba(249,115,22,0.6)] animate-pulse hover:scale-105' 
-                      : 'bg-black/60 hover:bg-black/80 text-stone-200 border border-white/20'
-                  }`}
-                >
-                  {isMuted ? (
-                    <>
-                      <VolumeX className="w-4 h-4 text-white" />
-                      <span>Tap for Sound</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      <span>Sound On</span>
-                    </>
-                  )}
-                </button>
-              </div>
 
               {/* Central Play/Pause Pulse indicator */}
               <AnimatePresence>
@@ -389,10 +354,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
                 )}
               </AnimatePresence>
 
-              {/* Bottom Minimal 3D Scroll Indicator (Centered) */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-                <ScrollIndicator3D onClick={triggerReveal} />
-              </div>
+
             </>
           )}
 
@@ -401,31 +363,6 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
               ────────────────────────────────────────────────────────── */}
           {isRevealed && (
             <>
-              {/* Floating Sound Toggle Pill (Top Right) */}
-              <div className="absolute top-5 right-5 md:top-8 md:right-8 z-30">
-                <button
-                  onClick={(e) => toggleMute(e)}
-                  aria-label={isMuted ? "Unmute Welcome Video" : "Mute Welcome Video"}
-                  className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-serif font-bold tracking-wider uppercase transition-all backdrop-blur-md shadow-xl ${
-                    isMuted
-                      ? 'bg-gradient-to-r from-[#F97316] to-[#ea580c] text-white hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)]'
-                      : 'bg-black/60 hover:bg-black/80 text-stone-200 border border-white/20'
-                  }`}
-                >
-                  {isMuted ? (
-                    <>
-                      <VolumeX className="w-4 h-4 text-white" />
-                      <span>Tap for Sound</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      <span>Sound On</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
               {/* Central Play/Replay Button when Paused or Ended */}
               <AnimatePresence>
                 {!isPlaying && (
@@ -442,22 +379,7 @@ export default function WelcomeExperience({ onEnterHallway }: WelcomeExperienceP
                 )}
               </AnimatePresence>
 
-              {/* Centered Figma 844:103 "SCROLL TO ENTER THE STORY" Indicator */}
-              <motion.button
-                onClick={scrollToStory}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                aria-label="Scroll to enter the story"
-                className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-black/45 hover:bg-black/70 border border-[#F5F1E8]/60 backdrop-blur-md text-[#F5F1E8] transition-all hover:scale-105 shadow-[0_4px_20px_rgba(0,0,0,0.5)] cursor-pointer group/btn"
-              >
-                <div className="w-6 h-6 rounded-full border border-[#F5F1E8] flex items-center justify-center">
-                  <ArrowDown className="w-3.5 h-3.5 group-hover/btn:translate-y-0.5 transition-transform" />
-                </div>
-                <span className="font-serif font-bold text-xs md:text-sm tracking-wider uppercase whitespace-nowrap">
-                  SCROLL TO ENTER THE STORY
-                </span>
-              </motion.button>
+
 
               {/* On-Hover Video Controls Bar */}
               <div

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, Play, Pause, ArrowDown } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useAutoPauseOnScroll } from '@/lib/hooks/useAutoPauseOnScroll';
 import heroVideo from '@/assets/join-movement/join-movement.mp4';
 import VideoEndedVerbiageOverlay from '@/components/common/VideoEndedVerbiageOverlay';
 import { serveBesideUs } from '@/data/officialVerbiage';
@@ -21,6 +22,9 @@ export default function MovementHeroBanner({
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isEnded, setIsEnded] = useState<boolean>(false);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
+
+  // Auto pause & mute when scrolling past this hero section
+  useAutoPauseOnScroll(videoRef, setIsPlaying, setIsMuted, { autoResumeMuted: true });
   const liveVideo = usePublicVideoSlot({
     pagePaths: ['/join-the-movement', '/movement'],
     slotMatchers: ['movement 1', 'hero', 'banner'],
@@ -163,39 +167,9 @@ export default function MovementHeroBanner({
             aria-hidden="true"
           />
 
-          {/* ─── Center Bottom: SCROLL TO ENTER THE STORY (Figma 1:1) ─── */}
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              handleScrollDown();
-            }}
-            className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all cursor-pointer shadow-lg select-none group/scroll"
-          >
-            <span className="w-5 h-5 rounded-full border border-white/40 flex items-center justify-center">
-              <ArrowDown className="w-3 h-3 text-[#F97316] group-hover/scroll:translate-y-0.5 transition-transform" />
-            </span>
-            <span 
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              className="text-[10px] sm:text-[11.5px] tracking-[0.2em] uppercase font-medium"
-            >
-              SCROLL TO ENTER THE STORY
-            </span>
-          </div>
 
-          {/* ─── Bottom-Right: 4-Point Star Sparkle Watermark (Figma 1:1) ─── */}
-          <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 lg:bottom-10 lg:right-12 z-20 pointer-events-none select-none">
-            <svg
-              viewBox="0 0 80 80"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-9 h-9 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white/55 drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] animate-[spin_28s_linear_infinite]"
-            >
-              <path
-                d="M40 0C40 22.0914 47.9086 40 70 40C47.9086 40 40 57.9086 40 80C40 57.9086 32.0914 40 10 40C32.0914 40 40 22.0914 40 0Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
+
+
 
           {/* ─── Floating Controls (Top Left) ─── */}
           <div className="absolute top-5 left-5 sm:top-7 sm:left-7 z-30 flex items-center gap-2.5 pointer-events-auto">

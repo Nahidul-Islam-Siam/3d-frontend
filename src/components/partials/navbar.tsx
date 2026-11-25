@@ -34,7 +34,7 @@ export default function Navbar() {
   const isDarkScrolled = isDarkHeroPage && hasScrolled;
   const isDarkTheme = isDarkHeroPage;
   const isCreamPage = location.pathname.startsWith('/how-we-serve') || location.pathname === '/welcome-home' || location.pathname === '/you-matter' || location.pathname === '/strong-foundations' || location.pathname === '/serve-beside-us' || location.pathname === '/stories-that-save-lives' || location.pathname === '/your-story' || location.pathname === '/a-new-beginning';
-  const [isRevealed, setIsRevealed] = useState(!isHomePage);
+  const [isRevealed, setIsRevealed] = useState(true);
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -54,8 +54,8 @@ export default function Navbar() {
   }, [location.pathname, location.hash]);
 
   useEffect(() => {
-    // Initial reveal state
-    setIsRevealed(!isHomePage);
+    // Navbar stays revealed by default across all pages
+    setIsRevealed(true);
  
     const handleReveal = () => setIsRevealed(true);
     const handleHide = () => setIsRevealed(false);
@@ -151,7 +151,7 @@ export default function Navbar() {
       <SideNav handleClose={toggleOpen} isOpen={isOpen} />
       
       <motion.nav 
-        initial={{ y: isHomePage ? -80 : 0, opacity: isHomePage ? 0 : 1 }}
+        initial={{ y: 0, opacity: 1 }}
         animate={{ 
           y: isRevealed ? 0 : -80, 
           opacity: isRevealed ? 1 : 0 

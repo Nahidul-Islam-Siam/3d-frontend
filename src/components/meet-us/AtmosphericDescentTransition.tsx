@@ -506,28 +506,7 @@ export default function AtmosphericDescentTransition({
           <span className="text-white/90">LIVE ACHIEVE BELIEVE</span>
         </div>
 
-        {/* Minimal Scroll Down Pulse Indicator */}
-        <div
-          className="flex items-center gap-2 text-white/70 transition-opacity duration-300"
-          style={{ opacity: Math.max(0, 1 - scrollProgress * 2.5) }}
-        >
-          <span className="w-5 h-5 rounded-full border border-white/50 flex items-center justify-center animate-bounce">
-            <svg
-              className="w-2.5 h-2.5 text-white"
-              viewBox="0 0 10 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.25"
-            >
-              <line x1="5" y1="2" x2="5" y2="8" strokeLinecap="round" />
-              <polyline
-                points="2.5,5.5 5,8 7.5,5.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-        </div>
+
       </div>
     </section>
   );
